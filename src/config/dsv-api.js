@@ -5,8 +5,9 @@ const dsvClient = axios.create({
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
-        'Ocp-Apim-Subscription-Key': config.dsv.subscriptionKey,
-        'Authorization': `Bearer ${config.dsv.serviceAuth}`, // Note: Auth scheme might need checking based on docs
+        'DSV-Subscription-Key': config.dsv.subscriptionKey,
+        'DSV-Service-Auth': config.dsv.serviceAuth,
+        'x-pat': config.dsv.pat
     }
 });
 

@@ -1,6 +1,7 @@
 const dsvClient = require('../config/dsv-api');
-const FormData = require('form-data'); // You might need to install this: npm install form-data
+const FormData = require('form-data');
 const fs = require('fs');
+const config = require('../config/env');
 
 exports.uploadDocument = async (req, res) => {
     try {
@@ -14,16 +15,19 @@ exports.uploadDocument = async (req, res) => {
         const { type } = req.body; // e.g., 'commercial_invoice'
 
         // POST /bookings/{draftId}/documents
+        const docUrl = `${config.dsv.endpoints.booking}/bookings/${draftId}/documents`;
+
         // Using 'form-data' library for backend-to-backend multipart upload
         const form = new FormData();
         form.append('file', fs.createReadStream(file.path), file.originalname);
         form.append('type', type || 'other');
 
-        const response = await dsvClient.post(`/bookings/${draftId}/documents`, form, {
+        const response = await dsvClient.post(docUrl, form, {
             headers: {
                 ...form.getHeaders()
             }
         });
+
 
         // Clean up temp file
         // fs.unlinkSync(file.path); 

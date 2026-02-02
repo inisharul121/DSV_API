@@ -1,11 +1,13 @@
 const dsvClient = require('../config/dsv-api');
+const config = require('../config/env');
 
 exports.trackShipment = async (req, res) => {
     try {
         const { shipmentId } = req.params;
 
         // GET /shipments/{shipmentId}/tracking
-        const response = await dsvClient.get(`/shipments/${shipmentId}/tracking`);
+        const trackUrl = `${config.dsv.endpoints.tracking}/shipments/${shipmentId}/tracking`; // Adjust if needed
+        const response = await dsvClient.get(trackUrl);
 
         res.json({
             success: true,
