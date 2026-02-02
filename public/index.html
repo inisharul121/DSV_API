@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSV XPress Booking Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="logo">DSV XPress Portal</a>
+        <nav class="nav">
+            <a href="/" class="active">Dashboard</a>
+            <a href="/booking.html">New Booking</a>
+            <a href="/tracking.html">Track Shipment</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Global Shipping Simplified</h1>
+            <p>Create bookings, generate labels, and track shipments worldwide with our DSV XPress integration.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="/booking.html" class="btn" style="background: white; color: var(--primary);">Create Shipment</a>
+                <a href="/tracking.html" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);">Track Package</a>
+            </div>
+        </section>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>📦 Quick Quote</h3>
+                <p>Get instant rate estimates for domestic and international shipments.</p>
+                <a href="/booking.html" class="btn btn-outline btn-block">Get Rates</a>
+            </div>
+            <div class="card">
+                <h3>✈️ International Booking</h3>
+                <p>Streamlined process for cross-border shipments including document upload.</p>
+                <a href="/booking.html?type=complex" class="btn btn-outline btn-block">Book International</a>
+            </div>
+            <div class="card">
+                <h3>🔍 Live Tracking</h3>
+                <p>Real-time visibility into your shipment status and history.</p>
+                <a href="/tracking.html" class="btn btn-outline btn-block">Track Now</a>
+            </div>
+        </div>
+
+        <div style="margin-top: 4rem;">
+            <h2>Recent Updates</h2>
+            <div class="card" style="margin-top: 1rem;">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div style="font-weight: 600;">System Update v1.0</div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">Successfully deployed DSV Booking API Integration</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div style="font-weight: 600;">Service Status</div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">All API systems operational</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
