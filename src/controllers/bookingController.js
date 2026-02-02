@@ -34,6 +34,8 @@ exports.createSimpleBooking = async (req, res) => {
 
         // 1. Submit Draft Booking
         // Endpoint: /booking/v2/bookings
+        // Endpoint: /booking/v2/bookings
+        // Config base is https://api.dsv.com/my-demo
         const bookingUrl = `${config.dsv.endpoints.booking}/booking/v2/bookings`;
 
         const draftResponse = await dsvClient.post(bookingUrl, dsvPayload);

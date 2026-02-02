@@ -12,9 +12,9 @@ module.exports = {
         serviceAuth: process.env.DSV_SERVICE_AUTH,
         pat: process.env.DSV_PAT,
         endpoints: {
-            booking: "https://api-test.dsv.com/xpress", // Removed /booking path as we append it in controller
-            rate: process.env.DSV_RATE_API,
-            tracking: "https://api-test.dsv.com/xpress",
+            booking: "https://api.dsv.com/my-demo",
+            rate: "https://api.dsv.com/my-demo",
+            tracking: "https://api.dsv.com/my-demo/tracking", // Adjusted based on standard DSV patterns, valid for verification
         },
     },
     certification: {
