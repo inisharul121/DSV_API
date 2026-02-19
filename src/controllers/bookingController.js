@@ -40,14 +40,15 @@ exports.createSimpleBooking = async (req, res) => {
 
         const draftResponse = await dsvClient.post(bookingUrl, dsvPayload);
 
-        // Response format: { bookingId: "..." }
-        const { bookingId } = draftResponse.data;
+        // Response format usually contains shipmentIdentificationNumber
+        const bookingId = draftResponse.data.shipmentIdentificationNumber || draftResponse.data.bookingId;
 
         if (!bookingId) {
-            throw new Error('Failed to create booking: No Booking ID returned');
+            console.error('DSV Response missing ID:', draftResponse.data);
+            throw new Error('Failed to create booking: No Booking ID or Shipment ID returned');
         }
 
-        console.log(`Draft Created: ${bookingId}`);
+        console.log(`Shipment Created: ${bookingId}`);
 
         // 2. Confirm Booking (If needed, or just return draft ID for now)
         // Note: For simple bookings in the docs, "Submit Draft" is step 1.

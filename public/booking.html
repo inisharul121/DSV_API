@@ -32,26 +32,30 @@
                     <div class="form-group">
                         <label class="form-label">Origin Country</label>
                         <select name="originCountry" class="form-control" required>
-                            <option value="US">United States</option>
-                            <option value="DE">Germany</option>
-                            <option value="CN">China</option>
-                            <option value="GB">United Kingdom</option>
+                            <option value="CH" selected>Switzerland (CH)</option>
+                            <option value="DK">Denmark (DK)</option>
+                            <option value="DE">Germany (DE)</option>
+                            <option value="US">United States (US)</option>
+                            <option value="CN">China (CN)</option>
+                            <option value="GB">United Kingdom (GB)</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Destination Country</label>
                         <select name="destCountry" class="form-control" required id="destCountry">
-                            <option value="US">United States</option>
-                            <option value="DE">Germany</option>
-                            <option value="CN">China</option>
-                            <option value="GB">United Kingdom</option>
+                            <option value="DE" selected>Germany (DE)</option>
+                            <option value="DK">Denmark (DK)</option>
+                            <option value="US">United States (US)</option>
+                            <option value="CN">China (CN)</option>
+                            <option value="GB">United Kingdom (GB)</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Commodity Description</label>
-                    <input type="text" name="commodity" class="form-control" placeholder="e.g. Electronics, Documents"
+                    <input type="text" name="commodity" class="form-control"
+                        placeholder="e.g. Industrial Circuit Boards, Laptop Computers" value="Industrial Circuit Boards"
                         required>
                 </div>
 

@@ -139,7 +139,7 @@ if (bookingForm) {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('type') === 'complex') {
         const destSelect = document.getElementById('destCountry');
-        if (destSelect) destSelect.value = 'CN'; // Default to international
+        if (destSelect) destSelect.value = 'DE'; // Default to reliable international lane for demo
     }
 }
 

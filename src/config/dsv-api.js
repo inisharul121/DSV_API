@@ -5,8 +5,8 @@ const dsvClient = axios.create({
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
-        'DSV-Subscription-Key': config.dsv.subscriptionKey,
-        'DSV-Service-Auth': config.dsv.serviceAuth,
+        'dsv-subscription-key': config.dsv.subscriptionKey,
+        'dsv-service-auth': config.dsv.serviceAuth,
         'x-pat': config.dsv.pat
     }
 });

@@ -11,10 +11,11 @@ module.exports = {
         subscriptionKey: process.env.DSV_SUBSCRIPTION_KEY,
         serviceAuth: process.env.DSV_SERVICE_AUTH,
         pat: process.env.DSV_PAT,
+        account: parseInt(process.env.DSV_ACCOUNT || "8004990000", 10),
         endpoints: {
-            booking: "https://api.dsv.com/my-demo",
-            rate: "https://api.dsv.com/my-demo",
-            tracking: "https://api.dsv.com/my-demo/tracking", // Adjusted based on standard DSV patterns, valid for verification
+            booking: process.env.DSV_BOOKING_API || "https://api-test.dsv.com/xpress/booking",
+            rate: process.env.DSV_RATE_API || "https://api-test.dsv.com/xpress/rate",
+            tracking: process.env.DSV_TRACKING_API || "https://api-test.dsv.com/xpress/tracking",
         },
     },
     certification: {
