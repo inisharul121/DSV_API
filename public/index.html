@@ -42,6 +42,10 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
+            <a href="#" class="nav-item" data-view="users">
+                <i class="fas fa-user-shield"></i>
+                <span>Users</span>
+            </a>
         </nav>
         <div class="sidebar-footer" style="padding: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
             v1.3.0 • API Operational
@@ -405,6 +409,70 @@
                 <p>On-time Delivery Rate: <strong>98.2%</strong></p>
                 <p>Average Transit Time: <strong>2.4 Days</strong></p>
                 <p>Customer Satisfaction: <strong>4.9/5.0</strong></p>
+            </div>
+        </section>
+        <!-- USERS VIEW -->
+        <section id="view-users" class="view-section">
+            <div class="stat-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Local Staff Management</h2>
+                    <button class="btn-primary">+ Add New User</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                        <thead>
+                            <tr
+                                style="text-align: left; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem;">
+                                <th style="padding: 1rem;">NAME</th>
+                                <th style="padding: 1rem;">ROLE</th>
+                                <th style="padding: 1rem;">EMAIL</th>
+                                <th style="padding: 1rem;">LAST ACTIVE</th>
+                                <th style="padding: 1rem;">STATUS</th>
+                                <th style="padding: 1rem;">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <div
+                                            style="width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: grid; place-items: center; font-weight: 700; font-size: 0.75rem;">
+                                            AD</div>
+                                        <span style="font-weight: 600;">Admin User</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem;">Super Admin</td>
+                                <td style="padding: 1rem;">admin@dsv-xpress.com</td>
+                                <td style="padding: 1rem;">Currently Active</td>
+                                <td style="padding: 1rem;"><span
+                                        style="padding: 0.25rem 0.75rem; border-radius: 20px; background: rgba(16, 185, 129, 0.1); color: var(--success); font-size: 0.75rem;">Online</span>
+                                </td>
+                                <td style="padding: 1rem;"><i class="fas fa-edit"
+                                        style="cursor:pointer; margin-right: 0.5rem;"></i> <i class="fas fa-trash-alt"
+                                        style="cursor:pointer; color: var(--error);"></i></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <div
+                                            style="width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: grid; place-items: center; font-weight: 700; font-size: 0.75rem;">
+                                            MO</div>
+                                        <span style="font-weight: 600;">Manager One</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem;">Operations Manager</td>
+                                <td style="padding: 1rem;">manager1@dsv-xpress.com</td>
+                                <td style="padding: 1rem;">2 hours ago</td>
+                                <td style="padding: 1rem;"><span
+                                        style="padding: 0.25rem 0.75rem; border-radius: 20px; background: rgba(100, 116, 139, 0.1); color: var(--text-muted); font-size: 0.75rem;">Offline</span>
+                                </td>
+                                <td style="padding: 1rem;"><i class="fas fa-edit"
+                                        style="cursor:pointer; margin-right: 0.5rem;"></i> <i class="fas fa-trash-alt"
+                                        style="cursor:pointer; color: var(--error);"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
     </main>

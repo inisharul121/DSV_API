@@ -70,6 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewTitle.innerText = 'Analytics & Reports';
                 viewSubtitle.innerText = 'Deep dive into your logistical performance.';
                 break;
+            case 'users':
+                viewTitle.innerText = 'User Management';
+                viewSubtitle.innerText = 'Control access for local dashboard administrators.';
+                break;
         }
     }
 
