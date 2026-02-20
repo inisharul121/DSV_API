@@ -17,25 +17,32 @@
             <div class="logo-icon"><i class="fas fa-box"></i></div>
             <span class="logo-text">DSV XPress</span>
         </div>
+        <div style="padding: 0 1.5rem 1rem;">
+            <select id="language-select" class="input-field" style="padding: 0.4rem; font-size: 0.8rem;">
+                <option value="en">English</option>
+                <option value="bn">বাংলা (Bangla)</option>
+            </select>
+        </div>
         <nav class="sidebar-nav">
             <a href="#" class="nav-item active" data-view="dashboard">
                 <i class="fas fa-chart-line"></i>
-                <span>Dashboard</span>
+                <span data-i18n="nav_dashboard">Dashboard</span>
             </a>
             <a href="#" class="nav-item" data-view="bookings">
                 <i class="fas fa-plus-circle"></i>
-                <span>New Booking</span>
+                <span data-i18n="nav_new_booking">New Booking</span>
             </a>
             <a href="#" class="nav-item" data-view="tracking">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>Shipment Tracking</span>
+                <span data-i18n="nav_tracking">Shipment Tracking</span>
             </a>
             <a href="#" class="nav-item" data-view="documents">
                 <i class="fas fa-file-invoice"></i>
-                <span>Documents</span>
+                <span data-i18n="nav_documents">Documents</span>
             </a>
         </nav>
-        <div class="sidebar-footer" style="padding: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
+        <div class="sidebar-footer" style="padding: 1.5rem; font-size: 0.8rem; color: var(--text-muted);"
+            data-i18n="sidebar_footer">
             v1.2.0 • API Operational
         </div>
     </aside>
@@ -47,7 +54,8 @@
                 <p id="view-subtitle">Welcome back! Here's what's happening today.</p>
             </div>
             <div class="top-actions">
-                <button class="btn-primary" id="btn-quick-booking">+ Quick Booking</button>
+                <button class="btn-primary" id="btn-quick-booking" data-i18n="btn_quick_booking">+ Quick
+                    Booking</button>
             </div>
         </header>
 
@@ -59,41 +67,43 @@
                         <i class="fas fa-ship"></i>
                     </div>
                     <div class="stat-val">24</div>
-                    <div class="stat-label">Active Shipments</div>
+                    <div class="stat-label" data-i18n="stat_active">Active Shipments</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div class="stat-val">128</div>
-                    <div class="stat-label">Delivered This Month</div>
+                    <div class="stat-label" data-i18n="stat_delivered">Delivered This Month</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="stat-val">3</div>
-                    <div class="stat-label">Pending Clearances</div>
+                    <div class="stat-label" data-i18n="stat_pending">Pending Clearances</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
                     <div class="stat-val">0</div>
-                    <div class="stat-label">Exceptions</div>
+                    <div class="stat-label" data-i18n="stat_exceptions">Exceptions</div>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
                 <div class="stat-card">
-                    <h3>Volume Analytics</h3>
+                    <h3 data-i18n="dashboard_analytics">Volume Analytics</h3>
                     <canvas id="volumeChart" height="150"></canvas>
                 </div>
                 <div class="stat-card">
-                    <h3>Quick Status Check</h3>
+                    <h3 data-i18n="dashboard_status_check">Quick Status Check</h3>
                     <div class="form-group" style="margin-top: 1rem;">
-                        <input type="text" class="input-field" placeholder="Enter Tracking #...">
-                        <button class="btn-primary" style="width:100%; margin-top:0.5rem;">Track</button>
+                        <input type="text" class="input-field" placeholder="Enter Tracking #..."
+                            data-i18n-placeholder="placeholder_track">
+                        <button class="btn-primary" style="width:100%; margin-top:0.5rem;"
+                            data-i18n="btn_track">Track</button>
                     </div>
                 </div>
             </div>
@@ -102,18 +112,19 @@
         <!-- BOOKINGS VIEW -->
         <section id="view-bookings" class="view-section">
             <div class="form-card">
-                <h2>Create New Draft Booking</h2>
-                <div style="margin-bottom: 2rem; color: var(--text-muted);">Fill in the shipment details below to
+                <h2 data-i18n="booking_title">Create New Draft Booking</h2>
+                <div style="margin-bottom: 2rem; color: var(--text-muted);" data-i18n="booking_desc">Fill in the
+                    shipment details below to
                     generate a DSV booking label.</div>
 
                 <form id="booking-form">
                     <div class="form-row">
                         <div class="input-group">
-                            <label class="input-label">DSV Account Number</label>
+                            <label class="input-label" data-i18n="label_dsv_account">DSV Account Number</label>
                             <input type="text" name="dsvAccount" class="input-field" value="8004990000">
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Service Code</label>
+                            <label class="input-label" data-i18n="label_service_code">Service Code</label>
                             <select name="serviceCode" class="input-field">
                                 <option value="DSVAirExpress">DSV Air Express</option>
                                 <option value="DSVParcels">DSV Parcels</option>
@@ -124,26 +135,26 @@
 
                     <div class="form-row">
                         <div class="input-group">
-                            <label class="input-label">Origin Country (ISO)</label>
+                            <label class="input-label" data-i18n="label_origin_country">Origin Country (ISO)</label>
                             <input type="text" name="origin_country" class="input-field" value="CH"
                                 placeholder="e.g. CH">
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Commodity</label>
+                            <label class="input-label" data-i18n="label_commodity">Commodity</label>
                             <input type="text" name="commodity" class="input-field" value="Industrial Parts"
                                 placeholder="e.g. Industrial Parts">
                         </div>
                     </div>
 
-                    <h3>Receiver Information</h3>
+                    <h3 data-i18n="header_receiver">Receiver Information</h3>
                     <div class="form-row">
                         <div class="input-group">
-                            <label class="input-label">Company Name</label>
+                            <label class="input-label" data-i18n="label_company_name">Company Name</label>
                             <input type="text" name="dest_company" class="input-field" placeholder="Test Receiver GmbH"
                                 required>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Address</label>
+                            <label class="input-label" data-i18n="label_address">Address</label>
                             <input type="text" name="dest_address" class="input-field" placeholder="Main Street 1"
                                 required>
                         </div>
@@ -151,12 +162,12 @@
 
                     <div class="form-row">
                         <div class="input-group">
-                            <label class="input-label">City</label>
+                            <label class="input-label" data-i18n="label_city">City</label>
                             <input type="text" name="dest_city" class="input-field" value="Krefeld"
                                 placeholder="e.g. Krefeld" required>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Zip Code (5 digits for DE)</label>
+                            <label class="input-label" data-i18n="label_zip_code">Zip Code (5 digits for DE)</label>
                             <input type="text" name="dest_zip" class="input-field" value="47807"
                                 placeholder="e.g. 47807" required>
                         </div>
@@ -164,17 +175,18 @@
 
                     <div class="form-row">
                         <div class="input-group">
-                            <label class="input-label">Country (ISO)</label>
+                            <label class="input-label" data-i18n="label_dest_country">Country (ISO)</label>
                             <input type="text" name="dest_country" class="input-field" value="DE" placeholder="e.g. DE"
                                 required>
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Weight (KG)</label>
+                            <label class="input-label" data-i18n="label_weight">Weight (KG)</label>
                             <input type="number" step="0.1" name="weight" class="input-field" value="2.5" required>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-primary">Create Real Booking</button>
+                    <button type="submit" class="btn-primary" data-i18n="btn_create_booking">Create Real
+                        Booking</button>
                 </form>
             </div>
         </section>
@@ -182,10 +194,11 @@
         <!-- TRACKING VIEW -->
         <section id="view-tracking" class="view-section">
             <div class="stat-card" style="max-width: 600px; margin: 0 auto;">
-                <h2>Track Your Shipment</h2>
+                <h2 data-i18n="tracking_title">Track Your Shipment</h2>
                 <div class="form-group" style="margin: 1.5rem 0; display: flex; gap: 1rem;">
-                    <input type="text" id="tracking-input" class="input-field" placeholder="Search by ID or Tracking #">
-                    <button id="btn-track" class="btn-primary">Track</button>
+                    <input type="text" id="tracking-input" class="input-field" placeholder="Search by ID or Tracking #"
+                        data-i18n-placeholder="placeholder_track_main">
+                    <button id="btn-track" class="btn-primary" data-i18n="btn_track_main">Track</button>
                 </div>
 
                 <div id="tracking-result" class="hidden">
@@ -200,13 +213,13 @@
         <!-- DOCUMENTS VIEW -->
         <section id="view-documents" class="view-section">
             <div class="stat-card">
-                <h2>Document Repository</h2>
+                <h2 data-i18n="docs_title">Document Repository</h2>
                 <div
                     style="margin: 2rem 0; padding: 3rem; border: 2px dashed #e2e8f0; border-radius: 16px; text-align: center; color: var(--text-muted);">
                     <i class="fas fa-cloud-upload-alt"
                         style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-                    <p>Drag and drop customs documents here to attach them to your drafts.</p>
-                    <button class="btn-primary" style="margin-top: 1.5rem;">Browse Files</button>
+                    <p data-i18n="docs_desc">Drag and drop customs documents here to attach them to your drafts.</p>
+                    <button class="btn-primary" style="margin-top: 1.5rem;" data-i18n="btn_browse">Browse Files</button>
                 </div>
             </div>
         </section>
