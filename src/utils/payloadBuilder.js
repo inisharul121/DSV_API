@@ -9,7 +9,7 @@ exports.buildBookingPayload = (data) => {
     const formatDSVDate = (date) => date.toISOString().split('.')[0] + 'Z';
 
     return {
-        dsvAccount: config.dsv.account, // Mandatory: integer
+        dsvAccount: parseInt(data.dsvAccount || config.dsv.account), // Mandatory: integer
         pickup: {
             requestPickup: true,
             collectDateFrom: formatDSVDate(collectFrom),
@@ -19,18 +19,18 @@ exports.buildBookingPayload = (data) => {
                 companyName: "BCIC Swiss GmbH",
                 addressLine1: "Lättichstrasse 6",
                 city: "Baar",
-                countryCode: data.origin?.country || "CH",
+                countryCode: data.origin_country || "CH",
                 zipCode: "6340",
                 contactName: "Eric Aubry",
                 contactPhoneNumber: "+41 786195928"
             }
         },
         delivery: {
-            companyName: data.destination?.company || "Test Receiver GmbH",
-            addressLine1: data.destination?.address || "Main Street 1",
-            city: data.destination?.city || "Krefeld",
-            countryCode: data.destination?.country || "DE",
-            zipCode: data.destination?.zip || "47807",
+            companyName: data.dest_company || "Test Receiver GmbH",
+            addressLine1: data.dest_address || "Main Street 1",
+            city: data.dest_city || "Krefeld",
+            countryCode: data.dest_country || "DE",
+            zipCode: data.dest_zip || "47807",
             contactName: "Receiver",
             contactPhoneNumber: "+44 12345678",
             residential: false
@@ -45,7 +45,7 @@ exports.buildBookingPayload = (data) => {
         },
         serviceOptions: {
             packageType: "PARCELS",
-            serviceCode: "DSVAirExpress"
+            serviceCode: data.serviceCode || "DSVAirExpress"
         },
         dimensionUnit: "CM",
         weightUnit: "KG",
@@ -54,13 +54,13 @@ exports.buildBookingPayload = (data) => {
                 length: 10,
                 width: 10,
                 height: 10,
-                grossWeight: parseFloat(data.parcels?.[0]?.weight || 2.5)
+                grossWeight: parseFloat(data.weight || 2.5)
             }
         ],
         commodities: [
             {
-                originCountryCode: data.origin?.country || "CH",
-                goodsDescription: (data.commodity && data.commodity.length > 5 && data.commodity !== 'Electonic') ? data.commodity : "Industrial Circuit Boards",
+                originCountryCode: data.origin_country || "CH",
+                goodsDescription: data.commodity || "Industrial Circuit Boards",
                 goodsValue: {
                     currencyCode: "CHF",
                     monetaryValue: 100

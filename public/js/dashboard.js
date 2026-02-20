@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('--- DSV Dashboard Loaded v1.2 ---');
     // UI Elements
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.view-section');
@@ -54,44 +55,88 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Chart.js Mock Data
+    // Chart.js Analytics
     const ctx = document.getElementById('volumeChart');
     if (ctx) {
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Packages Shipped',
-                    data: [12, 19, 3, 5, 2, 3, 7],
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { opacity: 0.05 } },
-                    x: { grid: { display: false } }
-                }
+        try {
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js not loaded, skipping analytics');
+                ctx.parentElement.innerHTML = '<div style="padding: 2rem; color: var(--text-muted); text-align: center;">Analytics unavailable (offline)</div>';
+            } else {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Packages Shipped',
+                            data: [12, 19, 3, 5, 2, 3, 7],
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { opacity: 0.05 } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
             }
-        });
+        } catch (chartErr) {
+            console.error('Chart initialization failed:', chartErr);
+        }
     }
 
     // Booking Logic
     if (bookingForm) {
+        console.log('Booking form found and listener attached');
         bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            showToast('Processing booking...', 'info');
+            e.stopPropagation();
 
-            // Mocking a delay to show premium feel
-            setTimeout(() => {
-                showToast('Draft booking created successfully #102934', 'success');
-            }, 1500);
+            const submitBtn = bookingForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            const formData = new FormData(bookingForm);
+            const data = Object.fromEntries(formData.entries());
+
+            showToast('Submitting shipment to DSV...', 'info');
+
+            try {
+                const response = await fetch('/api/bookings/simple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ shipmentData: data })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(`Success! Booking ID: ${result.bookingId}`, 'success');
+                    bookingForm.reset();
+                } else {
+                    const errorMsg = result.error?.message || result.error || 'Failed to create booking';
+                    showToast(`Error: ${errorMsg}`, 'error');
+                }
+            } catch (err) {
+                console.error('Fetch error:', err);
+                showToast('Network error while creating booking', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
         });
+    } else {
+        console.error('Booking form NOT found in DOM');
     }
 
     // Tracking Logic
@@ -104,29 +149,39 @@ document.addEventListener('DOMContentLoaded', () => {
             trackingTimeline.innerHTML = '<div class="loader"></div> Loading tracking data...';
 
             try {
-                // In a real scenario, we would fetch from /api/shipments/${id}/tracking
-                setTimeout(() => {
-                    renderTrackingMock();
-                }, 1000);
+                const response = await fetch(`/api/shipments/${id}/tracking`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    renderTrackingData(result.data);
+                } else {
+                    trackingTimeline.innerHTML = '<div style="color: var(--error);">No tracking information found for this ID.</div>';
+                    showToast('Shipment not found', 'error');
+                }
             } catch (err) {
-                showToast('Could not find shipment', 'error');
+                console.error('Tracking fetch error:', err);
+                trackingTimeline.innerHTML = '<div style="color: var(--error);">Error fetching tracking data.</div>';
+                showToast('Error fetching tracking data', 'error');
             }
         });
     }
 
-    function renderTrackingMock() {
-        const events = [
-            { time: 'Today, 10:45 AM', status: 'In Transit', desc: 'Arrived at Sorting Facility - Krefeld, DE' },
-            { time: 'Yesterday, 02:20 PM', status: 'Picked Up', desc: 'Package collected from sender - Hedehusene, DK' },
-            { time: '3 Days Ago', status: 'Label Created', desc: 'Shipment data confirmed by DSV XPress' }
-        ];
+    function renderTrackingData(data) {
+        // DSV tracking data usually has an events array or similar
+        // Adjusting based on standard DSV Tracking API response structure
+        const events = data.events || [];
+
+        if (events.length === 0) {
+            trackingTimeline.innerHTML = '<div style="color: var(--text-muted);">No events recorded yet for this shipment.</div>';
+            return;
+        }
 
         trackingTimeline.innerHTML = events.map(ev => `
             <div class="timeline-event">
                 <div class="timeline-dot"></div>
-                <div style="font-weight: 700; font-size: 1rem;">${ev.status}</div>
-                <div style="color: var(--text-muted); font-size: 0.875rem;">${ev.time}</div>
-                <div style="margin-top: 0.25rem;">${ev.desc}</div>
+                <div style="font-weight: 700; font-size: 1rem;">${ev.status || 'Status Updated'}</div>
+                <div style="color: var(--text-muted); font-size: 0.875rem;">${new Date(ev.date).toLocaleString()}</div>
+                <div style="margin-top: 0.25rem;">${ev.description || ev.location || ''}</div>
             </div>
         `).join('');
     }
