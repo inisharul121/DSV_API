@@ -1,67 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSV XPress Booking Portal</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>DSV XPress | Premium Logistics Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <header class="header">
-        <a href="/" class="logo">DSV XPress Portal</a>
-        <nav class="nav">
-            <a href="/" class="active">Dashboard</a>
-            <a href="/booking.html">New Booking</a>
-            <a href="/tracking.html">Track Shipment</a>
-        </nav>
-    </header>
-
-    <main class="container">
-        <section class="hero">
-            <h1>Global Shipping Simplified</h1>
-            <p>Create bookings, generate labels, and track shipments worldwide with our DSV XPress integration.</p>
-            <div style="display: flex; gap: 1rem; justify-content: center;">
-                <a href="/booking.html" class="btn" style="background: white; color: var(--primary);">Create Shipment</a>
-                <a href="/tracking.html" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);">Track Package</a>
-            </div>
-        </section>
-
-        <div class="card-grid">
-            <div class="card">
-                <h3>📦 Quick Quote</h3>
-                <p>Get instant rate estimates for domestic and international shipments.</p>
-                <a href="/booking.html" class="btn btn-outline btn-block">Get Rates</a>
-            </div>
-            <div class="card">
-                <h3>✈️ International Booking</h3>
-                <p>Streamlined process for cross-border shipments including document upload.</p>
-                <a href="/booking.html?type=complex" class="btn btn-outline btn-block">Book International</a>
-            </div>
-            <div class="card">
-                <h3>🔍 Live Tracking</h3>
-                <p>Real-time visibility into your shipment status and history.</p>
-                <a href="/tracking.html" class="btn btn-outline btn-block">Track Now</a>
-            </div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon"><i class="fas fa-box"></i></div>
+            <span class="logo-text">DSV XPress</span>
         </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-view="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-view="bookings">
+                <i class="fas fa-plus-circle"></i>
+                <span>New Booking</span>
+            </a>
+            <a href="#" class="nav-item" data-view="tracking">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Shipment Tracking</span>
+            </a>
+            <a href="#" class="nav-item" data-view="documents">
+                <i class="fas fa-file-invoice"></i>
+                <span>Documents</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer" style="padding: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
+            v1.2.0 • API Operational
+        </div>
+    </aside>
 
-        <div style="margin-top: 4rem;">
-            <h2>Recent Updates</h2>
-            <div class="card" style="margin-top: 1rem;">
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div style="font-weight: 600;">System Update v1.0</div>
-                        <div style="color: var(--text-secondary); font-size: 0.9rem;">Successfully deployed DSV Booking API Integration</div>
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="page-title">
+                <h1 id="view-title">Dashboard Overview</h1>
+                <p id="view-subtitle">Welcome back! Here's what's happening today.</p>
+            </div>
+            <div class="top-actions">
+                <button class="btn-primary" id="btn-quick-booking">+ Quick Booking</button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-section active">
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--accent);">
+                        <i class="fas fa-ship"></i>
                     </div>
-                    <div class="timeline-item">
-                        <div style="font-weight: 600;">Service Status</div>
-                        <div style="color: var(--text-secondary); font-size: 0.9rem;">All API systems operational</div>
+                    <div class="stat-val">24</div>
+                    <div class="stat-label">Active Shipments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-val">128</div>
+                    <div class="stat-label">Delivered This Month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-val">3</div>
+                    <div class="stat-label">Pending Clearances</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-val">0</div>
+                    <div class="stat-label">Exceptions</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                <div class="stat-card">
+                    <h3>Volume Analytics</h3>
+                    <canvas id="volumeChart" height="150"></canvas>
+                </div>
+                <div class="stat-card">
+                    <h3>Quick Status Check</h3>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <input type="text" class="input-field" placeholder="Enter Tracking #...">
+                        <button class="btn-primary" style="width:100%; margin-top:0.5rem;">Track</button>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- BOOKINGS VIEW -->
+        <section id="view-bookings" class="view-section">
+            <div class="form-card">
+                <h2>Create New Draft Booking</h2>
+                <div style="margin-bottom: 2rem; color: var(--text-muted);">Fill in the shipment details below to
+                    generate a DSV booking label.</div>
+
+                <form id="booking-form">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label class="input-label">DSV Account Number</label>
+                            <input type="text" name="dsvAccount" class="input-field" placeholder="6400000000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Service Code</label>
+                            <select name="serviceCode" class="input-field">
+                                <option value="DSVAirExpress">DSV Air Express</option>
+                                <option value="DSVParcels">DSV Parcels</option>
+                                <option value="DSVEconomy">DSV Economy</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3>Pickup Information</h3>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label class="input-label">Company Name</label>
+                            <input type="text" name="pickup_company" class="input-field" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Contact Name</label>
+                            <input type="text" name="pickup_contact" class="input-field" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label class="input-label">Email</label>
+                            <input type="email" name="pickup_email" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Phone</label>
+                            <input type="text" name="pickup_phone" class="input-field">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Generate Shipment Draft</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TRACKING VIEW -->
+        <section id="view-tracking" class="view-section">
+            <div class="stat-card" style="max-width: 600px; margin: 0 auto;">
+                <h2>Track Your Shipment</h2>
+                <div class="form-group" style="margin: 1.5rem 0; display: flex; gap: 1rem;">
+                    <input type="text" id="tracking-input" class="input-field" placeholder="Search by ID or Tracking #">
+                    <button id="btn-track" class="btn-primary">Track</button>
+                </div>
+
+                <div id="tracking-result" class="hidden">
+                    <hr style="margin-bottom: 2rem; opacity: 0.1;">
+                    <div class="timeline" id="tracking-timeline">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <script src="js/main.js"></script>
+    <!-- TOAST -->
+    <div id="toast" class="toast hidden">
+        <i id="toast-icon"></i>
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="js/dashboard.js"></script>
 </body>
+
 </html>
