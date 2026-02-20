@@ -7,8 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewTitle = document.getElementById('view-title');
     const viewSubtitle = document.getElementById('view-subtitle');
     const bookingForm = document.getElementById('booking-form');
+    const bookingFormContainer = document.getElementById('booking-form-container');
+    const btnOpenBooking = document.getElementById('btn-open-booking-modal');
+    const btnCloseBooking = document.getElementById('btn-close-booking');
+    const btnQuickCreateOrder = document.getElementById('btn-create-new-order');
+
+    // Tracking Elements
     const trackingInput = document.getElementById('tracking-input');
     const btnTrack = document.getElementById('btn-track');
+    const quickTrackInput = document.getElementById('quick-track-input');
+    const btnQuickTrack = document.getElementById('btn-quick-track');
+
     const trackingResult = document.getElementById('tracking-result');
     const trackingTimeline = document.getElementById('tracking-timeline');
 
@@ -41,19 +50,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewTitle.innerText = 'Dashboard Overview';
                 viewSubtitle.innerText = "Welcome back! Here's what's happening today.";
                 break;
-            case 'bookings':
-                viewTitle.innerText = 'Shipment Booking';
-                viewSubtitle.innerText = 'Create and manage your DSV shipments efficiently.';
+            case 'orders':
+                viewTitle.innerText = 'Order Management';
+                viewSubtitle.innerText = 'View and manage your active courier orders.';
                 break;
-            case 'tracking':
-                viewTitle.innerText = 'Real-time Tracking';
-                viewSubtitle.innerText = 'Get visibility into your shipment movement.';
+            case 'shipments':
+                viewTitle.innerText = 'Shipment Tracking';
+                viewSubtitle.innerText = 'Monitor real-time status of your packages.';
                 break;
-            case 'documents':
-                viewTitle.innerText = 'Document Management';
-                viewSubtitle.innerText = 'Securely upload and manage customs documentation.';
+            case 'customers':
+                viewTitle.innerText = 'Customer Directory';
+                viewSubtitle.innerText = 'Manage your address book and customer profiles.';
+                break;
+            case 'payments':
+                viewTitle.innerText = 'Financial Overview';
+                viewSubtitle.innerText = 'Track invoices, payments, and billing history.';
+                break;
+            case 'reports':
+                viewTitle.innerText = 'Analytics & Reports';
+                viewSubtitle.innerText = 'Deep dive into your logistical performance.';
                 break;
         }
+    }
+
+    // Modal/Form Toggles
+    if (btnOpenBooking) {
+        btnOpenBooking.addEventListener('click', () => {
+            bookingFormContainer.classList.remove('hidden');
+            bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    if (btnCloseBooking) {
+        btnCloseBooking.addEventListener('click', () => {
+            bookingFormContainer.classList.add('hidden');
+        });
+    }
+
+    if (btnQuickCreateOrder) {
+        btnQuickCreateOrder.addEventListener('click', () => {
+            // Switch to orders view
+            const ordersNavItem = document.querySelector('[data-view="orders"]');
+            if (ordersNavItem) ordersNavItem.click();
+            // Show form
+            setTimeout(() => {
+                bookingFormContainer.classList.remove('hidden');
+                bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        });
     }
 
     // Chart.js Analytics
@@ -140,31 +184,42 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Booking form NOT found in DOM');
     }
 
-    // Tracking Logic
-    if (btnTrack) {
-        btnTrack.addEventListener('click', async () => {
-            const id = trackingInput.value;
-            if (!id) return showToast('Please enter a tracking ID', 'error');
+    // Unified Tracking Logic
+    async function handleTracking(shipmentId) {
+        if (!shipmentId) return showToast('Please enter a tracking ID', 'error');
 
-            trackingResult.classList.remove('hidden');
-            trackingTimeline.innerHTML = '<div class="loader"></div> Loading tracking data...';
+        // Switch to shipments view if not already there
+        const shipmentsNavItem = document.querySelector('[data-view="shipments"]');
+        if (shipmentsNavItem && !shipmentsNavItem.classList.contains('active')) {
+            shipmentsNavItem.click();
+        }
 
-            try {
-                const response = await fetch(`/api/shipments/${id}/tracking`);
-                const result = await response.json();
+        trackingResult.classList.remove('hidden');
+        trackingTimeline.innerHTML = '<div class="loader"></div> Loading tracking data...';
 
-                if (result.success && result.data) {
-                    renderTrackingData(result.data);
-                } else {
-                    trackingTimeline.innerHTML = '<div style="color: var(--error);">No tracking information found for this ID.</div>';
-                    showToast('Shipment not found', 'error');
-                }
-            } catch (err) {
-                console.error('Tracking fetch error:', err);
-                trackingTimeline.innerHTML = '<div style="color: var(--error);">Error fetching tracking data.</div>';
-                showToast('Error fetching tracking data', 'error');
+        try {
+            const response = await fetch(`/api/shipments/${shipmentId}/tracking`);
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                renderTrackingData(result.data);
+            } else {
+                trackingTimeline.innerHTML = '<div style="color: var(--error);">No tracking information found for this ID.</div>';
+                showToast('Shipment not found', 'error');
             }
-        });
+        } catch (err) {
+            console.error('Tracking fetch error:', err);
+            trackingTimeline.innerHTML = '<div style="color: var(--error);">Error fetching tracking data.</div>';
+            showToast('Error fetching tracking data', 'error');
+        }
+    }
+
+    if (btnTrack) {
+        btnTrack.addEventListener('click', () => handleTracking(trackingInput.value));
+    }
+
+    if (btnQuickTrack) {
+        btnQuickTrack.addEventListener('click', () => handleTracking(quickTrackInput.value));
     }
 
     function renderTrackingData(data) {
