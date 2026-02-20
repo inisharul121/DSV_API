@@ -82,12 +82,7 @@ The project uses a strict environment variable system (`src/config/env.js`) to e
 
 ---
 
-## 🇧🇩 5. Multi-language Support
-The platform supports real-time language switching (Bangla/English) without page reloads. This is handled by a frontend translation dictionary in `dashboard.js`, updating the DOM elements dynamically based on the selected locale.
-
----
-
-## 🚀 6. Future Expansion
+## 🚀 5. Future Expansion
 1.  **Automated Label Printing**: Hooking into local thermal printers for warehouse automation.
 2.  **Webhooks**: Receiving real-time status updates from DSV without polling.
 3.  **Rate API Integration**: Calculating shipping costs before confirming bookings.
