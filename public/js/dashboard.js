@@ -191,6 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Unified Tracking Logic
     async function handleTracking(shipmentId) {
         if (!shipmentId) return showToast('Please enter a tracking ID', 'error');
+        shipmentId = shipmentId.trim();
+
+        console.log(`[Dashboard] Tracking shipment: ${shipmentId} (v1.3)`);
 
         // Switch to shipments view if not already there
         const shipmentsNavItem = document.querySelector('[data-view="shipments"]');
@@ -198,22 +201,45 @@ document.addEventListener('DOMContentLoaded', () => {
             shipmentsNavItem.click();
         }
 
-        trackingResult.classList.remove('hidden');
-        trackingTimeline.innerHTML = '<div class="loader"></div> Loading tracking data...';
+        const container = document.getElementById('tracking-result');
+        const timeline = document.getElementById('tracking-timeline');
+
+        container.classList.remove('hidden');
+        timeline.innerHTML = '<div class="loader"></div> Loading tracking data from DSV...';
 
         try {
-            const response = await fetch(`/api/shipments/${shipmentId}/tracking`);
-            const result = await response.json();
+            // 1. Determine which endpoint to use based on the ID format
+            let detailsUrl = `/api/tracking/shipments/${shipmentId}`;
+            let eventsUrl = `/api/tracking/shipments/${shipmentId}/events`;
 
-            if (result.success && result.data) {
-                renderTrackingData(result.data);
+            // Simple heuristic for AWB or Carrier IDs
+            if (shipmentId.length > 15 && /^\d+$/.test(shipmentId)) {
+                // Likely AWB
+                eventsUrl = `/api/tracking/awb/${shipmentId}/events`;
+            } else if (shipmentId.startsWith('DSV-')) {
+                // Internal reference
+                eventsUrl = `/api/tracking/shipments/${shipmentId}/events`;
+            } else if (shipmentId.length === 12 && /^\d+$/.test(shipmentId)) {
+                // Likely Carrier Tracking Number (e.g., 921541696551)
+                eventsUrl = `/api/tracking/carrier/${shipmentId}/events`;
+            }
+
+            // 2. Fetch both Details and Events
+            const [detailsRes, eventsRes] = await Promise.all([
+                fetch(detailsUrl).then(r => r.json()).catch(() => ({ success: false })),
+                fetch(eventsUrl).then(r => r.json()).catch(() => ({ success: false }))
+            ]);
+
+            if (eventsRes.success && eventsRes.data.events && eventsRes.data.events.length > 0) {
+                renderTrackingData({ events: eventsRes.data.events });
             } else {
-                trackingTimeline.innerHTML = '<div style="color: var(--error);">No tracking information found for this ID.</div>';
-                showToast('Shipment not found', 'error');
+                const errorMsg = eventsRes.error?.errors?.[0]?.message || 'No events recorded yet for this shipment.';
+                timeline.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 1rem;">${errorMsg}</div>`;
+                if (!eventsRes.success) showToast('Tracking information unavailable', 'warning');
             }
         } catch (err) {
             console.error('Tracking fetch error:', err);
-            trackingTimeline.innerHTML = '<div style="color: var(--error);">Error fetching tracking data.</div>';
+            timeline.innerHTML = '<div style="color: var(--error);">Error fetching tracking data.</div>';
             showToast('Error fetching tracking data', 'error');
         }
     }
@@ -227,20 +253,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderTrackingData(data) {
-        // DSV tracking data usually has an events array or similar
         const events = data.events || [];
+        const timeline = document.getElementById('tracking-timeline');
 
-        if (events.length === 0) {
-            trackingTimeline.innerHTML = '<div style="color: var(--text-muted);">No events recorded yet for this shipment.</div>';
-            return;
-        }
-
-        trackingTimeline.innerHTML = events.map(ev => `
-            <div class="timeline-event">
-                <div class="timeline-dot"></div>
-                <div style="font-weight: 700; font-size: 1rem;">${ev.status || 'Status Updated'}</div>
-                <div style="color: var(--text-muted); font-size: 0.875rem;">${new Date(ev.date).toLocaleString()}</div>
-                <div style="margin-top: 0.25rem;">${ev.description || ev.location || ''}</div>
+        timeline.innerHTML = events.map((ev, index) => `
+            <div class="timeline-event" style="opacity: ${1 - (index * 0.1)};">
+                <div class="timeline-dot" style="background: ${index === 0 ? 'var(--accent)' : 'var(--border-color)'};"></div>
+                <div style="font-weight: 700; font-size: 1rem;">${ev.eventDescription || ev.eventCode}</div>
+                <div style="color: var(--text-muted); font-size: 0.875rem;">${new Date(ev.eventDate).toLocaleString()}</div>
+                <div style="margin-top: 0.25rem;">${ev.location || 'DSV Tracking Node'}</div>
             </div>
         `).join('');
     }

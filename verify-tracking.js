@@ -2,7 +2,7 @@ const dsvClient = require('./src/config/dsv-api');
 const config = require('./src/config/env');
 
 async function testTracking() {
-    const shipmentId = '14620017';
+    const shipmentId = '14620023';
     const awbNumber = '40170726203663178132';
     const carrierId = '921541696551';
     const base = 'https://api.dsv.com/xp/tracking/v2';

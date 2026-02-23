@@ -8,7 +8,9 @@ const config = require('../config/env');
 exports.getShipmentDetails = async (req, res) => {
     try {
         const { shipmentId } = req.params;
+        console.log(`[Tracking Controller] Fetching details for: ${shipmentId}`);
         const url = `${config.dsv.endpoints.tracking}/shipmentDetails/${shipmentId}`;
+        console.log(`[Tracking Controller] Details URL: ${url}`);
         const response = await dsvClient.get(url);
 
         res.json({
@@ -31,7 +33,9 @@ exports.getShipmentDetails = async (req, res) => {
 exports.getShipmentEvents = async (req, res) => {
     try {
         const { shipmentId } = req.params;
+        console.log(`[Tracking Controller] Fetching events for ID: ${shipmentId}`);
         const url = `${config.dsv.endpoints.tracking}/shipments/shipmentId/${shipmentId}`;
+        console.log(`[Tracking Controller] Events URL: ${url}`);
         const response = await dsvClient.get(url);
 
         res.json({

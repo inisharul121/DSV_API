@@ -145,6 +145,7 @@ if (bookingForm) {
 
 // Tracking Logic
 async function trackShipment() {
+    console.log('[Tracking] trackShipment called v1.3');
     const input = document.getElementById('trackingInput');
     const id = input.value.trim();
     if (!id) return;
