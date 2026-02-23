@@ -29,9 +29,13 @@ console.log('----------------------');
 // Request interceptor for dynamic auth or logging if needed
 dsvClient.interceptors.request.use(request => {
     // Switch subscription key if it's a tracking request
-    const isTracking = request.url.includes('/tracking') || request.url.includes('/shipments') || request.url.includes('/awbs') || request.url.includes('/carriers');
+    const isTracking = request.url.includes('/tracking') || request.url.includes('/shipments') || request.url.includes('/awbs') || request.url.includes('/carriers') || request.url.includes('Events') || request.url.includes('Details');
+
     if (isTracking) {
-        request.headers['dsv-subscription-key'] = config.dsv.trackingSubscriptionKey;
+        // Use Title-Case for Tracking API
+        delete request.headers['dsv-subscription-key'];
+        request.headers['DSV-Subscription-Key'] = config.dsv.trackingSubscriptionKey;
+        request.headers['Cache-Control'] = 'no-cache';
         console.log(`[DSV API] Using Tracking Key for: ${request.url}`);
     } else {
         console.log(`[DSV API] Using Booking Key for: ${request.url}`);
