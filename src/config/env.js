@@ -9,6 +9,7 @@ module.exports = {
     port: process.env.PORT || 3001,
     dsv: {
         subscriptionKey: process.env.DSV_SUBSCRIPTION_KEY,
+        trackingSubscriptionKey: process.env.DSV_TRACKING_PRIMARY_KEY,
         serviceAuth: process.env.DSV_SERVICE_AUTH,
         pat: process.env.DSV_PAT,
         account: parseInt(process.env.DSV_ACCOUNT || "8004990000", 10),

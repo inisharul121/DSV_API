@@ -28,7 +28,10 @@ console.log('----------------------');
 
 // Request interceptor for dynamic auth or logging if needed
 dsvClient.interceptors.request.use(request => {
-    // If we need to refresh tokens or add dynamic headers, do it here
+    // Switch subscription key if it's a tracking request
+    if (request.url.includes('/tracking') || request.url.includes('/shipments')) {
+        request.headers['dsv-subscription-key'] = config.dsv.trackingSubscriptionKey;
+    }
     return request;
 });
 

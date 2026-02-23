@@ -2,24 +2,23 @@ const dsvClient = require('./src/config/dsv-api');
 const config = require('./src/config/env');
 
 async function testTracking() {
-    const shipmentId = '14617935';
+    const shipmentId = '10123456';
+    const awbNumber = '40170726203663178132';
+    const carrierId = '921541696551';
 
-    const patterns = [
-        `https://api.dsv.com/xp/v1/shipments/${shipmentId}/tracking`,
-        `https://api.dsv.com/xp/v1/tracking/shipments/${shipmentId}`,
-        `https://api.dsv.com/xp/v1/tracking/shipments/${shipmentId}/events`,
-        `https://api.dsv.com/xp/v2/tracking/shipments/${shipmentId}/events`,
-        `https://api.dsv.com/xp/v3/tracking/shipments/${shipmentId}/events`,
-        `https://api.dsv.com/xp/v3.1/tracking/shipments/${shipmentId}`,
+    const endpoints = [
+        `${config.dsv.endpoints.tracking}/shipments/${shipmentId}`,
+        `${config.dsv.endpoints.tracking}/shipments/${shipmentId}/events`,
+        `${config.dsv.endpoints.tracking}/awbs/${awbNumber}/events`,
+        `${config.dsv.endpoints.tracking}/carriers/${carrierId}/events`,
     ];
 
-    for (const url of patterns) {
-        console.log(`\n--- Testing URL: ${url} ---`);
+    for (const url of endpoints) {
+        console.log(`\n--- Testing Endpoint: ${url} ---`);
         try {
             const response = await dsvClient.get(url);
-            console.log(`SUCCESS!`);
+            console.log(`SUCCESS! Status: ${response.status}`);
             console.log('Response:', JSON.stringify(response.data).substring(0, 500));
-            return;
         } catch (error) {
             console.log(`FAILED: ${error.response?.status || 'ERROR'}`);
             if (error.response?.data) {
