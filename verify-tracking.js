@@ -3,25 +3,23 @@ const config = require('./src/config/env');
 
 async function testTracking() {
     const shipmentId = '14620017';
-    const account = '6400000000'; // From dashboard screenshot
+    const awbNumber = '40170726203663178132';
+    const carrierId = '921541696551';
     const base = 'https://api.dsv.com/xp/tracking/v2';
 
-    const secondaryKey = 'bd08b8c325f843f6919e0f56375970dc';
-
-    const tests = [
-        { name: 'Primary Key + shipmentDetails', key: config.dsv.trackingSubscriptionKey, url: `${base}/shipmentDetails/${shipmentId}` },
-        { name: 'Secondary Key + shipmentDetails', key: secondaryKey, url: `${base}/shipmentDetails/${shipmentId}` },
-        { name: 'Primary Key + shipmentDetails + dsvAccount', key: config.dsv.trackingSubscriptionKey, url: `${base}/shipmentDetails/${shipmentId}?dsvAccount=${account}` },
+    const finalTests = [
+        { name: 'Shipment Details', url: `${base}/shipmentDetails/${shipmentId}` },
+        { name: 'Shipment Events (by ID)', url: `${base}/shipments/shipmentId/${shipmentId}` },
+        { name: 'Shipment Events (by AWB)', url: `${base}/shipments/awb/${awbNumber}` },
+        { name: 'Shipment Events (by Carrier)', url: `${base}/shipments/carrierTrackingNumber/${carrierId}` },
     ];
 
-    for (const test of tests) {
+    for (const test of finalTests) {
         console.log(`\n--- Testing: ${test.name} ---`);
         try {
-            const response = await dsvClient.get(test.url, {
-                headers: { 'DSV-Subscription-Key': test.key }
-            });
+            const response = await dsvClient.get(test.url);
             console.log(`SUCCESS! Status: ${response.status}`);
-            console.log('Response:', JSON.stringify(response.data));
+            console.log('Response:', JSON.stringify(response.data).substring(0, 500));
         } catch (error) {
             console.log(`FAILED: ${error.response?.status || 'ERROR'}`);
             if (error.response?.data) {

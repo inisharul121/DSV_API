@@ -34,11 +34,13 @@ dsvClient.interceptors.request.use(request => {
     if (isTracking) {
         // Use Title-Case for Tracking API
         delete request.headers['dsv-subscription-key'];
+        delete request.headers['dsv-service-auth'];
         request.headers['DSV-Subscription-Key'] = config.dsv.trackingSubscriptionKey;
+        request.headers['dsv-service-auth'] = config.dsv.trackingServiceAuth; // Testing case sensitivity
         request.headers['Cache-Control'] = 'no-cache';
-        console.log(`[DSV API] Using Tracking Key for: ${request.url}`);
+        console.log(`[DSV API] Using Tracking Auth for: ${request.url}`);
     } else {
-        console.log(`[DSV API] Using Booking Key for: ${request.url}`);
+        console.log(`[DSV API] Using Booking Auth for: ${request.url}`);
     }
     return request;
 });

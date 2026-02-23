@@ -3,7 +3,7 @@ const config = require('../config/env');
 
 /**
  * Shipment details (by DSV XPress Shipment ID)
- * GET /shipments/:shipmentId
+ * GET /tracking/shipments/:shipmentId
  */
 exports.getShipmentDetails = async (req, res) => {
     try {
@@ -26,12 +26,12 @@ exports.getShipmentDetails = async (req, res) => {
 
 /**
  * Shipment events (by DSV XPress Shipment ID)
- * GET /shipments/:shipmentId/events
+ * GET /tracking/shipments/:shipmentId/events
  */
 exports.getShipmentEvents = async (req, res) => {
     try {
         const { shipmentId } = req.params;
-        const url = `${config.dsv.endpoints.tracking}/shipmentEvents/${shipmentId}`;
+        const url = `${config.dsv.endpoints.tracking}/shipments/shipmentId/${shipmentId}`;
         const response = await dsvClient.get(url);
 
         res.json({
@@ -49,12 +49,12 @@ exports.getShipmentEvents = async (req, res) => {
 
 /**
  * Shipment events (by AWB number)
- * GET /awb/:awbNumber/events
+ * GET /tracking/awb/:awbNumber/events
  */
 exports.getShipmentEventsByAWB = async (req, res) => {
     try {
         const { awbNumber } = req.params;
-        const url = `${config.dsv.endpoints.tracking}/awbEvents/${awbNumber}`;
+        const url = `${config.dsv.endpoints.tracking}/shipments/awb/${awbNumber}`;
         const response = await dsvClient.get(url);
 
         res.json({
@@ -72,12 +72,12 @@ exports.getShipmentEventsByAWB = async (req, res) => {
 
 /**
  * Shipment events (by Carrier tracking ID)
- * GET /carrier/:carrierId/events
+ * GET /tracking/carrier/:carrierId/events
  */
 exports.getShipmentEventsByCarrierID = async (req, res) => {
     try {
         const { carrierId } = req.params;
-        const url = `${config.dsv.endpoints.tracking}/carrierTrackingEvents/${carrierId}`;
+        const url = `${config.dsv.endpoints.tracking}/shipments/carrierTrackingNumber/${carrierId}`;
         const response = await dsvClient.get(url);
 
         res.json({
@@ -95,5 +95,4 @@ exports.getShipmentEventsByCarrierID = async (req, res) => {
 
 // Legacy support or generic tracking
 exports.trackShipment = exports.getShipmentDetails;
-
 
