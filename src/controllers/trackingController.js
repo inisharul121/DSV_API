@@ -8,7 +8,7 @@ const config = require('../config/env');
 exports.getShipmentDetails = async (req, res) => {
     try {
         const { shipmentId } = req.params;
-        const url = `${config.dsv.endpoints.tracking}/shipments/${shipmentId}`;
+        const url = `${config.dsv.endpoints.tracking}/shipmentDetails/${shipmentId}`;
         const response = await dsvClient.get(url);
 
         res.json({
@@ -31,7 +31,7 @@ exports.getShipmentDetails = async (req, res) => {
 exports.getShipmentEvents = async (req, res) => {
     try {
         const { shipmentId } = req.params;
-        const url = `${config.dsv.endpoints.tracking}/shipments/${shipmentId}/events`;
+        const url = `${config.dsv.endpoints.tracking}/shipmentEvents/${shipmentId}`;
         const response = await dsvClient.get(url);
 
         res.json({
@@ -54,7 +54,7 @@ exports.getShipmentEvents = async (req, res) => {
 exports.getShipmentEventsByAWB = async (req, res) => {
     try {
         const { awbNumber } = req.params;
-        const url = `${config.dsv.endpoints.tracking}/awbs/${awbNumber}/events`;
+        const url = `${config.dsv.endpoints.tracking}/awbEvents/${awbNumber}`;
         const response = await dsvClient.get(url);
 
         res.json({
@@ -77,7 +77,7 @@ exports.getShipmentEventsByAWB = async (req, res) => {
 exports.getShipmentEventsByCarrierID = async (req, res) => {
     try {
         const { carrierId } = req.params;
-        const url = `${config.dsv.endpoints.tracking}/carriers/${carrierId}/events`;
+        const url = `${config.dsv.endpoints.tracking}/carrierTrackingEvents/${carrierId}`;
         const response = await dsvClient.get(url);
 
         res.json({
@@ -95,4 +95,5 @@ exports.getShipmentEventsByCarrierID = async (req, res) => {
 
 // Legacy support or generic tracking
 exports.trackShipment = exports.getShipmentDetails;
+
 

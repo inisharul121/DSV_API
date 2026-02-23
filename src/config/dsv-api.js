@@ -29,8 +29,12 @@ console.log('----------------------');
 // Request interceptor for dynamic auth or logging if needed
 dsvClient.interceptors.request.use(request => {
     // Switch subscription key if it's a tracking request
-    if (request.url.includes('/tracking') || request.url.includes('/shipments')) {
+    const isTracking = request.url.includes('/tracking') || request.url.includes('/shipments') || request.url.includes('/awbs') || request.url.includes('/carriers');
+    if (isTracking) {
         request.headers['dsv-subscription-key'] = config.dsv.trackingSubscriptionKey;
+        console.log(`[DSV API] Using Tracking Key for: ${request.url}`);
+    } else {
+        console.log(`[DSV API] Using Booking Key for: ${request.url}`);
     }
     return request;
 });
