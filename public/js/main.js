@@ -149,48 +149,83 @@ async function trackShipment() {
     const id = input.value.trim();
     if (!id) return;
 
-    // Simulate looking up
     const container = document.getElementById('trackingResult');
     const timeline = document.getElementById('trackingTimeline');
+    const badge = document.getElementById('statusBadge');
 
-    // Clear previous
-    timeline.innerHTML = '<div style="text-align:center">Loading...</div>';
+    // Clear previous and show loading
+    timeline.innerHTML = '<div style="text-align:center; padding: 2rem;">Loading details and events...</div>';
     container.style.display = 'block';
 
     try {
-        const response = await fetch(`/api/shipments/${id}/tracking`);
-        const result = await response.json();
+        // 1. Determine which endpoint to use based on the ID format
+        let detailsUrl = `/api/tracking/shipments/${id}`;
+        let eventsUrl = `/api/tracking/shipments/${id}/events`;
 
-        // Mock data if 404/server not fully wired to real DSV API yet
-        const events = result.data || [
-            { status: 'Delivered', location: 'Berlin, DE', time: '2026-02-02 14:00' },
-            { status: 'Out for Delivery', location: 'Berlin, DE', time: '2026-02-02 08:30' },
-            { status: 'In Transit', location: 'Hamburg, DE', time: '2026-02-01 18:45' },
-            { status: 'Picked Up', location: 'New York, US', time: '2026-01-31 10:00' }
-        ];
-
-        timeline.innerHTML = '';
-        const badge = document.getElementById('statusBadge');
-        if (badge) {
-            const latest = events[0].status;
-            badge.textContent = latest;
-            badge.className = `badge ${latest === 'Delivered' ? 'badge-success' : 'badge-warning'}`;
+        // Simple heuristic for AWB or Carrier IDs
+        if (id.length > 15 && /^\d+$/.test(id)) {
+            // Likely AWB
+            eventsUrl = `/api/tracking/awb/${id}/events`;
+        } else if (id.startsWith('DSV-')) {
+            // Format seen in screenshots
+            eventsUrl = `/api/tracking/shipments/${id}/events`;
+        } else if (id.length === 12 && /^\d+$/.test(id)) {
+            // Likely Carrier Tracking Number (e.g., 921541696551)
+            eventsUrl = `/api/tracking/carrier/${id}/events`;
         }
 
-        events.forEach(event => {
-            const item = document.createElement('div');
-            item.className = 'timeline-item';
-            item.innerHTML = `
-                <div style="font-weight: 600;">${event.status}</div>
-                <div style="color: var(--text-secondary); font-size: 0.9rem;">
-                    ${event.location} • ${event.time}
-                </div>
-            `;
-            timeline.appendChild(item);
-        });
+        // 2. Fetch both Details and Events
+        const [detailsRes, eventsRes] = await Promise.all([
+            fetch(detailsUrl).then(r => r.json()).catch(() => ({ success: false })),
+            fetch(eventsUrl).then(r => r.json()).catch(() => ({ success: false }))
+        ]);
+
+        // 3. Update UI
+        timeline.innerHTML = '';
+
+        // Handle Details (mostly for the status badge)
+        if (detailsRes.success && detailsRes.data.shipment) {
+            // Status mapping or logic if available in details
+        }
+
+        // Handle Events
+        if (eventsRes.success && eventsRes.data.events && eventsRes.data.events.length > 0) {
+            const events = eventsRes.data.events;
+
+            // Update status badge with most recent event
+            const latest = events[0];
+            if (badge) {
+                badge.textContent = latest.eventDescription || latest.eventCode;
+                badge.className = `badge ${latest.eventCode === 'DEL' ? 'badge-success' : 'badge-warning'}`;
+            }
+
+            events.forEach(event => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+
+                // Format date nicely
+                const date = new Date(event.eventDate).toLocaleString();
+
+                item.innerHTML = `
+                    <div style="font-weight: 600;">${event.eventDescription || event.eventCode}</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        ${event.location || 'DSV XPress Center'} • ${date}
+                    </div>
+                `;
+                timeline.appendChild(item);
+            });
+        } else {
+            const errorMsg = eventsRes.error?.errors?.[0]?.message || 'No events recorded yet for this shipment.';
+            timeline.innerHTML = `<div style="text-align:center; padding: 2rem; color: var(--text-secondary);">${errorMsg}</div>`;
+            if (badge) {
+                badge.textContent = 'Unknown';
+                badge.className = 'badge';
+            }
+        }
 
     } catch (e) {
-        timeline.innerHTML = '<div style="color:red">Tracking information unavailable.</div>';
+        console.error('Tracking Error:', e);
+        timeline.innerHTML = '<div style="color:red; text-align:center; padding: 2rem;">Tracking information unavailable. Please check your connection.</div>';
     }
 }
 
