@@ -306,7 +306,26 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-primary">Generate DSV Booking</button>
+                        <div class="form-row"
+                            style="align-items: flex-end; margin-top: 1rem; padding: 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 8px;">
+                            <div class="input-group" style="flex: 2;">
+                                <label class="input-label">Price Estimate</label>
+                                <div id="booking-price-display"
+                                    style="font-size: 1.25rem; font-weight: 800; color: var(--accent);">
+                                    --.00 EUR
+                                </div>
+                                <small style="color: var(--text-muted);">Estimated rate based on details above.</small>
+                            </div>
+                            <div class="input-group" style="flex: 1;">
+                                <button type="button" id="btn-get-booking-quote" class="btn-primary"
+                                    style="width: 100%; background: var(--success);">
+                                    <i class="fas fa-calculator"></i> Get Quote
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="margin-top: 1.5rem;">Generate DSV
+                            Booking</button>
                     </form>
                 </div>
             </div>

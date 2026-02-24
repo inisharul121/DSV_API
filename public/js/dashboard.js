@@ -192,6 +192,67 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Booking form NOT found in DOM');
     }
 
+    // Price Estimation on Booking Form
+    const btnGetBookingQuote = document.getElementById('btn-get-booking-quote');
+    const bookingPriceDisplay = document.getElementById('booking-price-display');
+
+    if (btnGetBookingQuote) {
+        btnGetBookingQuote.addEventListener('click', async () => {
+            const formData = new FormData(bookingForm);
+            const bookingData = Object.fromEntries(formData.entries());
+
+            // Map Booking Form fields to Quote API fields
+            const quoteRequestData = {
+                dsvAccount: bookingData.dsvAccount,
+                pickupCountryCode: bookingData.origin_country,
+                deliveryCountryCode: bookingData.dest_country,
+                deliveryCity: bookingData.dest_city,
+                deliveryZipCode: bookingData.dest_zip,
+                packageType: "PARCELS", // Default for the simple form
+                defaultWeight: bookingData.weight
+            };
+
+            const originalContent = btnGetBookingQuote.innerHTML;
+            btnGetBookingQuote.disabled = true;
+            btnGetBookingQuote.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            bookingPriceDisplay.innerText = 'Calculating...';
+
+            try {
+                const response = await fetch('/api/quotes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(quoteRequestData)
+                });
+
+                const result = await response.json();
+                if (result.success && result.data.services && result.data.services.length > 0) {
+                    // Find the best match for the selected service code, or use the first one
+                    const selectedService = bookingData.serviceCode;
+                    const matchedService = result.data.services.find(s =>
+                        s.serviceName.toLowerCase().includes(selectedService.toLowerCase()) ||
+                        selectedService.toLowerCase().includes(s.serviceType.toLowerCase())
+                    ) || result.data.services[0];
+
+                    bookingPriceDisplay.innerHTML = `${matchedService.totalPrice} ${matchedService.currencyCode}`;
+                    showToast('Price estimated successfully', 'success');
+                } else if (result.success && result.data.warnings) {
+                    bookingPriceDisplay.innerText = 'No Rate';
+                    showToast(`Warning: ${result.data.warnings[0].message}`, 'warning');
+                } else {
+                    bookingPriceDisplay.innerText = 'Err';
+                    showToast('Could not calculate price', 'error');
+                }
+            } catch (err) {
+                console.error('Quote calculation error:', err);
+                bookingPriceDisplay.innerText = 'Error';
+                showToast('Network error calculating price', 'error');
+            } finally {
+                btnGetBookingQuote.disabled = false;
+                btnGetBookingQuote.innerHTML = originalContent;
+            }
+        });
+    }
+
     // Quote Logic
     const quoteForm = document.getElementById('quote-form');
     const quoteResults = document.getElementById('quote-results');
