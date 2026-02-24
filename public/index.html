@@ -18,8 +18,12 @@
             <span class="logo-text">DSV XPress</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active" data-view="dashboard">
-                <i class="fas fa-chart-line"></i>
+            <a href="#" class="nav-item active" data-view="shipping-wizard">
+                <i class="fas fa-magic"></i>
+                <span>Shipping Wizard</span>
+            </a>
+            <a href="#" class="nav-item" data-view="dashboard">
+                <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </a>
             <a href="#" class="nav-item" data-view="orders">
@@ -67,8 +71,220 @@
             </div>
         </header>
 
+        <!-- SHIPPING WIZARD VIEW -->
+        <section id="view-shipping-wizard" class="view-section active">
+            <div class="wizard-progress">
+                <div class="wizard-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Choose Countries</div>
+                </div>
+                <div class="wizard-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Box Size</div>
+                </div>
+                <div class="wizard-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Details & Address</div>
+                </div>
+                <div class="wizard-step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Finalize</div>
+                </div>
+            </div>
+
+            <!-- STEP 1: CHOOSE COUNTRIES -->
+            <div id="wizard-step-1" class="wizard-content">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="form-card">
+                        <h3 style="margin-bottom: 2rem;">Step 1: Route Details</h3>
+                        <form id="wizard-form-1">
+                            <div class="input-group">
+                                <label class="input-label">Export/Import:</label>
+                                <select name="direction" class="input-field">
+                                    <option value="export">Export from Switzerland</option>
+                                    <option value="import">Import to Switzerland</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Address Type:</label>
+                                <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500;">
+                                        <input type="radio" name="addressType" value="business" checked> Business
+                                        Address
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500;">
+                                        <input type="radio" name="addressType" value="home"> Home Address
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Select Country:</label>
+                                <select name="targetCountry" class="input-field">
+                                    <option value="">Select Country</option>
+                                    <option value="BD">BANGLADESH</option>
+                                    <option value="DE">GERMANY</option>
+                                    <option value="DK">DENMARK</option>
+                                    <option value="GB">UNITED KINGDOM</option>
+                                    <option value="US">UNITED STATES</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Weight (kg):</label>
+                                <select name="weight" class="input-field">
+                                    <option value="0.5">0.5 kg</option>
+                                    <option value="2.5" selected>2.5 kg</option>
+                                    <option value="5.0">5.0 kg</option>
+                                    <option value="10.0">10.0 kg</option>
+                                </select>
+                            </div>
+                            <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                                <button type="button" class="btn-primary" id="btn-next-step-1">Next <i
+                                        class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="stat-card">
+                        <h3 style="margin-bottom: 1.5rem;">Pricing Result</h3>
+                        <div id="pricing-result-container">
+                            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">Please choose all
+                                the parameters first.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: BOX DIMENSIONS -->
+            <div id="wizard-step-2" class="wizard-content hidden">
+                <div style="max-width: 900px; margin: 0 auto;">
+                    <h2 style="text-align: center; font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem;">BOX
+                        DIMENSIONS</h2>
+                    <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem; line-height: 1.6;">
+                        Please select the right criteria here to filter to desired pricing. Accurate dimensions ensure
+                        no surprise surcharges from DSV.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 3rem; align-items: start;">
+                        <div class="box-preview">
+                            <img src="https://img.icons8.com/isometric/512/cardboard-box.png"
+                                style="width: 180px; opacity: 0.8;" alt="Box Preview">
+                            <div style="margin-top: 1rem; color: var(--text-muted); font-weight: 600;">Live Dimension
+                                Preview</div>
+                        </div>
+                        <div class="form-card" style="padding: 2rem;">
+                            <div class="input-group">
+                                <label class="input-label">Length (cm):</label>
+                                <select name="length" id="box-length" class="input-field">
+                                    <option value="10">10 cm</option>
+                                    <option value="30">30 cm</option>
+                                    <option value="75" selected>75 cm</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Width (cm):</label>
+                                <select name="width" id="box-width" class="input-field">
+                                    <option value="10">10 cm</option>
+                                    <option value="35" selected>35 cm</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Height (cm):</label>
+                                <select name="height" id="box-height" class="input-field">
+                                    <option value="10">10 cm</option>
+                                    <option value="35" selected>35 cm</option>
+                                </select>
+                            </div>
+                            <div style="margin-top: 1.5rem;">
+                                <div
+                                    style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted);">
+                                    NOT SURE ABOUT THE SIZE?</div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button class="btn-preset" onclick="setBox(32,24,3)">A4 Env</button>
+                                    <button class="btn-preset" onclick="setBox(35,20,15)">Shoe Box</button>
+                                    <button class="btn-preset" onclick="setBox(75,35,35)">Moving Box</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
+                        <button type="button" class="btn-primary" style="background: var(--text-muted);"
+                            id="btn-prev-step-2"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-primary" id="btn-next-step-2">Next <i
+                                class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: BOOKING INFORMATION -->
+            <div id="wizard-step-3" class="wizard-content hidden">
+                <!-- Ported from old Create Order form but layout-adjusted -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="form-card">
+                        <h3>Pickup Information</h3>
+                        <!-- Simplified for wizard -->
+                        <div class="input-group">
+                            <label class="input-label">Collect Date From</label>
+                            <input type="datetime-local" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Company Name</label>
+                            <input type="text" class="input-field" value="Swiss">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Address</label>
+                            <input type="text" class="input-field" value="Main Street 1">
+                        </div>
+                    </div>
+                    <div class="form-card">
+                        <h3>Delivery Information</h3>
+                        <div class="input-group">
+                            <label class="input-label">Company Name</label>
+                            <input type="text" class="input-field" id="wizard-dest-company">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Address</label>
+                            <input type="text" class="input-field" id="wizard-dest-address">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Contact Name</label>
+                            <input type="text" class="input-field">
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
+                    <button type="button" class="btn-primary" style="background: var(--text-muted);"
+                        id="btn-prev-step-3"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button type="button" class="btn-primary" id="btn-next-step-3">Next <i
+                            class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- STEP 4: FINALIZE -->
+            <div id="wizard-step-4" class="wizard-content hidden">
+                <div style="max-width: 600px; margin: 0 auto; text-align: center;">
+                    <i class="fas fa-file-invoice-dollar"
+                        style="font-size: 4rem; color: var(--accent); margin-bottom: 2rem;"></i>
+                    <h2>Review & Confirm</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Please review your shipment details and
+                        generated Proforma Invoice before booking.</p>
+
+                    <div class="stat-card" style="text-align: left; margin-bottom: 2rem;">
+                        <div id="final-pricing-summary"></div>
+                    </div>
+
+                    <button type="button" class="btn-primary" id="btn-final-book"
+                        style="width: 100%; font-size: 1.2rem; padding: 1.25rem;">
+                        <i class="fas fa-check-circle"></i> Confirm DSV Booking
+                    </button>
+                    <button type="button" id="btn-prev-step-4"
+                        style="background: none; border: none; color: var(--text-muted); margin-top: 1rem; cursor: pointer;">
+                        Go Back and Edit
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <!-- DASHBOARD VIEW -->
-        <section id="view-dashboard" class="view-section active">
+        <section id="view-dashboard" class="view-section">
             <div class="stat-grid">
                 <div class="stat-card">
                     <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--accent);">

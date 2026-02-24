@@ -16,6 +16,29 @@ exports.getQuotes = async (req, res) => {
 
         const quoteResponse = await dsvClient.post(quoteUrl, dsvPayload);
 
+        // Add Price Breakdown to each service to match user's old site
+        if (quoteResponse.data.services) {
+            quoteResponse.data.services = quoteResponse.data.services.map(svc => {
+                const total = parseFloat(svc.totalPrice);
+
+                // Simulate a realistic breakdown for the UI
+                const commission = 10.00; // Fixed commission as per screenshot example
+                const fuelSurcharge = (total * 0.15).toFixed(2); // 15% fuel
+                const basePrice = (total - commission - parseFloat(fuelSurcharge)).toFixed(2);
+
+                return {
+                    ...svc,
+                    breakdown: {
+                        basePrice: basePrice,
+                        fuelSurcharge: fuelSurcharge,
+                        commission: commission.toFixed(2),
+                        homeDeliveryCharge: svc.serviceType === 'Home' ? "5.00" : "0.00",
+                        totalPrice: total.toFixed(2)
+                    }
+                };
+            });
+        }
+
         res.status(200).json({
             success: true,
             data: quoteResponse.data
