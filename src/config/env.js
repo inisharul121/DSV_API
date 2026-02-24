@@ -15,6 +15,8 @@ module.exports = {
         pat: process.env.DSV_PAT,
         quotePrimaryKey: process.env.DSV_QUOTE_PRIMARY_KEY,
         quoteSecondaryKey: process.env.DSV_QUOTE_SECONDARY_KEY,
+        quoteServiceAuth: process.env.DSV_QUOTE_SERVICE_AUTH,
+        quotePat: process.env.DSV_QUOTE_PAT,
         account: parseInt(process.env.DSV_ACCOUNT || "8004990000", 10),
         endpoints: {
             booking: process.env.DSV_BOOKING_API || "https://api-test.dsv.com/xpress/booking",

@@ -35,8 +35,10 @@ dsvClient.interceptors.request.use(request => {
     if (isQuote) {
         delete request.headers['dsv-subscription-key'];
         delete request.headers['dsv-service-auth'];
+        delete request.headers['x-pat'];
         request.headers['DSV-Subscription-Key'] = config.dsv.quotePrimaryKey;
-        request.headers['dsv-service-auth'] = config.dsv.quoteSecondaryKey;
+        request.headers['dsv-service-auth'] = config.dsv.quoteServiceAuth;
+        request.headers['x-pat'] = config.dsv.pat; // Verified: Quote API works with global PAT
         console.log(`[DSV API] Using Quote Auth for: ${request.url}`);
     } else if (isTracking) {
         // Use Title-Case for Tracking API
