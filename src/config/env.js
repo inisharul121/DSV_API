@@ -13,11 +13,14 @@ module.exports = {
         serviceAuth: process.env.DSV_SERVICE_AUTH,
         trackingServiceAuth: process.env.DSV_TRACKING_SERVICE_AUTH,
         pat: process.env.DSV_PAT,
+        quotePrimaryKey: process.env.DSV_QUOTE_PRIMARY_KEY,
+        quoteSecondaryKey: process.env.DSV_QUOTE_SECONDARY_KEY,
         account: parseInt(process.env.DSV_ACCOUNT || "8004990000", 10),
         endpoints: {
             booking: process.env.DSV_BOOKING_API || "https://api-test.dsv.com/xpress/booking",
             rate: process.env.DSV_RATE_API || "https://api-test.dsv.com/xpress/rate",
             tracking: process.env.DSV_TRACKING_API || "https://api-test.dsv.com/xpress/tracking",
+            quote: process.env.DSV_QUOTE_API || "https://api.dsv.com/xp/comparator/v2/compare",
         },
     },
     certification: {

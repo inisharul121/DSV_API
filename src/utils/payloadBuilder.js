@@ -69,3 +69,45 @@ exports.buildBookingPayload = (data) => {
         ]
     };
 };
+
+exports.buildQuotePayload = (data) => {
+    // Collect Date defaults to today if not provided, format yyyy-MM-dd
+    const now = new Date();
+    const collectDateStr = data.collectDate || now.toISOString().split('T')[0];
+
+    return {
+        dsvAccount: parseInt(data.dsvAccount || config.dsv.account),
+        pickupCountryCode: data.pickupCountryCode || "DK",
+        pickupCity: data.pickupCity || undefined,
+        pickupZipCode: data.pickupZipCode || undefined,
+        deliveryCountryCode: data.deliveryCountryCode || "DE",
+        deliveryCity: data.deliveryCity || undefined,
+        deliveryZipCode: data.deliveryZipCode || undefined,
+        residentialDelivery: data.residentialDelivery === true || data.residentialDelivery === 'true',
+        serviceOptions: {
+            packageType: data.packageType || "PARCELS", // PARCELS / DOCUMENT / ENVELOPE
+            saturdayDelivery: data.saturdayDelivery === true || data.saturdayDelivery === 'true',
+            timeOption: data.timeOption || undefined,
+            insurance: data.insuranceCurrency ? {
+                currencyCode: data.insuranceCurrency,
+                monetaryValue: parseFloat(data.insuranceValue)
+            } : undefined
+        },
+        ddp: data.ddp === true || data.ddp === 'true',
+        specialContent: data.specialContent || null,
+        dimensionUnit: data.dimensionUnit || "CM",
+        weightUnit: data.weightUnit || "KG",
+        packages: data.packages && data.packages.length > 0 ? data.packages.map(p => ({
+            length: p.length ? parseFloat(p.length) : undefined,
+            width: p.width ? parseFloat(p.width) : undefined,
+            height: p.height ? parseFloat(p.height) : undefined,
+            grossWeight: parseFloat(p.grossWeight || p.weight || 1.0)
+        })) : [{
+            length: parseFloat(data.defaultLength || 10),
+            width: parseFloat(data.defaultWidth || 10),
+            height: parseFloat(data.defaultHeight || 10),
+            grossWeight: parseFloat(data.defaultWeight || 1.0)
+        }],
+        collectDate: collectDateStr
+    };
+};
