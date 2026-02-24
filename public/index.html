@@ -26,6 +26,10 @@
                 <i class="fas fa-box"></i>
                 <span>Orders</span>
             </a>
+            <a href="#" class="nav-item" data-view="quotes">
+                <i class="fas fa-search-dollar"></i>
+                <span>Quotes</span>
+            </a>
             <a href="#" class="nav-item" data-view="shipments">
                 <i class="fas fa-truck"></i>
                 <span>Shipments</span>
@@ -107,6 +111,71 @@
                         <input type="text" id="quick-track-input" class="input-field" placeholder="Enter Tracking #...">
                         <button class="btn-primary" id="btn-quick-track"
                             style="width:100%; margin-top:0.5rem;">Track</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUOTES VIEW -->
+        <section id="view-quotes" class="view-section">
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem;">
+                <div class="form-card">
+                    <h3>Search Shipping Rates</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Get real-time quotes
+                        based on your account tariff.</p>
+                    <form id="quote-form">
+                        <div class="input-group">
+                            <label class="input-label">DSV Account</label>
+                            <input type="text" name="dsvAccount" class="input-field" value="8004990000">
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">Origin Country</label>
+                                <input type="text" name="pickupCountryCode" class="input-field" value="DK"
+                                    placeholder="e.g. DK">
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Origin City</label>
+                                <input type="text" name="pickupCity" class="input-field" value="Copenhagen">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">Dest. Country</label>
+                                <input type="text" name="deliveryCountryCode" class="input-field" value="DE"
+                                    placeholder="e.g. DE">
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Dest. City</label>
+                                <input type="text" name="deliveryCity" class="input-field" value="Munchen">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Package Type</label>
+                            <select name="packageType" class="input-field">
+                                <option value="PARCELS">Parcels</option>
+                                <option value="DOCUMENT">Document</option>
+                                <option value="ENVELOPE">Envelope</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">Weight (KG)</label>
+                                <input type="number" step="0.1" name="defaultWeight" class="input-field" value="6.5">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Get
+                            Quotes</button>
+                    </form>
+                </div>
+                <div class="stat-card">
+                    <h3>Available Services & Rates</h3>
+                    <div id="quote-results" class="quote-results-container">
+                        <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                            <i class="fas fa-calculator"
+                                style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.3;"></i>
+                            Enter shipment details to see available service options.
+                        </div>
                     </div>
                 </div>
             </div>

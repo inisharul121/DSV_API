@@ -58,6 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewTitle.innerText = 'Shipment Tracking';
                 viewSubtitle.innerText = 'Monitor real-time status of your packages.';
                 break;
+            case 'quotes':
+                viewTitle.innerText = 'Shipping Quotes';
+                viewSubtitle.innerText = 'Compare rates across different service levels.';
+                break;
             case 'customers':
                 viewTitle.innerText = 'Customer Directory';
                 viewSubtitle.innerText = 'Manage your address book and customer profiles.';
@@ -186,6 +190,82 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else {
         console.error('Booking form NOT found in DOM');
+    }
+
+    // Quote Logic
+    const quoteForm = document.getElementById('quote-form');
+    const quoteResults = document.getElementById('quote-results');
+
+    if (quoteForm) {
+        quoteForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = quoteForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+            quoteResults.innerHTML = '<div class="loader"></div> Requesting rates from DSV...';
+
+            const formData = new FormData(quoteForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/quotes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    renderQuoteResults(result.data);
+                } else {
+                    quoteResults.innerHTML = `<div style="color: var(--error); padding: 1rem;">${result.error?.message || 'Failed to fetch quotes'}</div>`;
+                }
+            } catch (err) {
+                console.error('Quote fetch error:', err);
+                quoteResults.innerHTML = '<div style="color: var(--error); padding: 1rem;">Network error fetching quotes</div>';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    }
+
+    function renderQuoteResults(data) {
+        if (!data || (!data.services && !data.warnings)) {
+            quoteResults.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">No services available for this route.</div>';
+            return;
+        }
+
+        let html = '';
+
+        if (data.warnings && data.warnings.length > 0) {
+            html += `<div style="background: rgba(245, 158, 11, 0.1); color: var(--warning); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;">
+                <i class="fas fa-exclamation-triangle"></i> ${data.warnings.map(w => w.message).join('<br>')}
+            </div>`;
+        }
+
+        if (data.services && data.services.length > 0) {
+            html += data.services.map(svc => `
+                <div class="stat-card" style="margin-bottom: 1rem; border: 1px solid var(--border-color); box-shadow: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin: 0;">${svc.serviceName}</h4>
+                            <small style="color: var(--text-muted);">${svc.serviceType} • ETA: ${svc.estimatedArrival || 'N/A'}</small>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 800; color: var(--accent); font-size: 1.1rem;">${svc.totalPrice} ${svc.currencyCode}</div>
+                            ${svc.vat ? `<small style="font-size: 0.7rem;">incl. VAT</small>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else if (!data.warnings) {
+            html = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">No services found for the requested route.</div>';
+        }
+
+        quoteResults.innerHTML = html;
     }
 
     // Unified Tracking Logic
