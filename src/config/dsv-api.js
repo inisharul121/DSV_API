@@ -34,7 +34,9 @@ dsvClient.interceptors.request.use(request => {
 
     if (isQuote) {
         delete request.headers['dsv-subscription-key'];
-        request.headers['dsv-subscription-key'] = config.dsv.quotePrimaryKey;
+        delete request.headers['dsv-service-auth'];
+        request.headers['DSV-Subscription-Key'] = config.dsv.quotePrimaryKey;
+        request.headers['dsv-service-auth'] = config.dsv.quoteSecondaryKey;
         console.log(`[DSV API] Using Quote Auth for: ${request.url}`);
     } else if (isTracking) {
         // Use Title-Case for Tracking API

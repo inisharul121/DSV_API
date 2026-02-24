@@ -4,6 +4,10 @@ const bookingController = require('../controllers/bookingController');
 const upload = require('../middleware/upload');
 const trackingController = require('../controllers/trackingController');
 const documentController = require('../controllers/documentController');
+const quoteController = require('../controllers/quoteController');
+
+// Quotes
+router.post('/quotes', quoteController.getQuotes);
 
 // Simple booking (JSON only)
 router.post('/bookings/simple', bookingController.createSimpleBooking);
