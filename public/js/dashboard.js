@@ -362,74 +362,78 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Step 1: Delivery Options Logic
+    // Step 1: Delivery Options & Route Logic (Merged)
     const nextStep1 = document.getElementById('btn-next-step-1');
     const primaryDirection = document.getElementById('wizard-primary-direction');
+    const targetCountry = document.getElementById('wizard-target-country');
+    const weightInput = document.getElementById('wizard-weight-2');
+    const pricingResultContainer = document.getElementById('pricing-result-container');
 
     if (nextStep1) {
         nextStep1.addEventListener('click', () => {
-            const dir = primaryDirection.value;
-            // Sync with Step 2's hidden/disabled direction
-            const secondaryDir = document.getElementById('wizard-direction');
-            if (secondaryDir) {
-                secondaryDir.value = dir;
-            }
-            goToStep(2);
+            const country = targetCountry.value;
+            if (!country) return showToast('Please select a country', 'error');
+            const weight = weightInput.value;
+            if (!weight || weight <= 0) return showToast('Please enter a valid weight', 'error');
+
+            goToStep(2); // In the new flow, Step 2 is dimensions
         });
     }
 
-    // Step 2: Routes & Auto-Pricing Logic
-    const wizardForm2 = document.getElementById('wizard-form-2');
-    const pricingResultContainer = document.getElementById('pricing-result-container');
+    // Auto-pricing logic for Step 1
+    const handleMergedPricing = async () => {
+        const country = targetCountry.value;
+        if (!country) return;
 
-    if (wizardForm2) {
-        wizardForm2.addEventListener('change', async () => {
-            const country = document.getElementById('wizard-target-country').value;
-            if (!country) return;
+        pricingResultContainer.innerHTML = '<div class="loader"></div> Calculating...';
 
-            pricingResultContainer.innerHTML = '<div class="loader"></div> Calculating...';
+        try {
+            const direction = primaryDirection.value;
+            const response = await fetch('/api/quotes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dsvAccount: 8004990000,
+                    pickupCountryCode: direction === 'export' ? 'CH' : country,
+                    deliveryCountryCode: direction === 'export' ? country : 'CH',
+                    packageType: "PARCELS",
+                    defaultWeight: weightInput.value || 2.5
+                })
+            });
 
-            try {
-                const direction = document.getElementById('wizard-primary-direction').value;
-                const response = await fetch('/api/quotes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        dsvAccount: 8004990000,
-                        pickupCountryCode: direction === 'export' ? 'CH' : country,
-                        deliveryCountryCode: direction === 'export' ? country : 'CH',
-                        packageType: "PARCELS",
-                        defaultWeight: document.getElementById('wizard-weight-2').value || 2.5
-                    })
-                });
+            const result = await response.json();
+            if (result.success && result.data.services?.length > 0) {
+                const svc = result.data.services[0];
+                const b = svc.breakdown;
 
-                const result = await response.json();
-                if (result.success && result.data.services?.length > 0) {
-                    const svc = result.data.services[0];
-                    const b = svc.breakdown;
-
-                    pricingResultContainer.innerHTML = `
-                        <table class="pricing-table">
-                            <tr><td class="label">Base Price</td><td class="value">CHF ${b.basePrice}</td></tr>
-                            <tr><td class="label">Fuel+Pickup Surcharge</td><td class="value">CHF ${b.fuelSurcharge}</td></tr>
-                            <tr><td class="label">Commission</td><td class="value">CHF ${b.commission}</td></tr>
-                            <tr><td class="label">Home Delivery Charge</td><td class="value">CHF ${b.homeDeliveryCharge}</td></tr>
-                            <tr style="border-top: 2px solid var(--accent);"><td class="label" style="font-weight: 800;">Total Price</td><td class="value" style="font-weight: 800; color: var(--accent);">CHF ${b.totalPrice}</td></tr>
-                        </table>
-                    `;
-                } else {
-                    pricingResultContainer.innerHTML = '<p style="color: var(--error); text-align: center; padding: 2rem;">No rate found for this route.</p>';
-                }
-            } catch (err) {
-                pricingResultContainer.innerHTML = '<p style="color: var(--error); text-align: center; padding: 2rem;">Error calculating price.</p>';
+                pricingResultContainer.innerHTML = `
+                    <table class="pricing-table">
+                        <tr><td class="label">Base Price</td><td class="value">CHF ${b.basePrice}</td></tr>
+                        <tr><td class="label">Fuel+Pickup Surcharge</td><td class="value">CHF ${b.fuelSurcharge}</td></tr>
+                        <tr><td class="label">Commission</td><td class="value">CHF ${b.commission}</td></tr>
+                        <tr><td class="label">Home Delivery Charge</td><td class="value">CHF ${b.homeDeliveryCharge}</td></tr>
+                        <tr style="border-top: 2px solid var(--accent);"><td class="label" style="font-weight: 800;">Total Price</td><td class="value" style="font-weight: 800; color: var(--accent);">CHF ${b.totalPrice}</td></tr>
+                    </table>
+                `;
+            } else {
+                pricingResultContainer.innerHTML = '<p style="color: var(--error); text-align: center; padding: 2rem;">No rate found for this route.</p>';
             }
-        });
-    }
+        } catch (err) {
+            pricingResultContainer.innerHTML = '<p style="color: var(--error); text-align: center; padding: 2rem;">Error calculating price.</p>';
+        }
+    };
+
+    if (primaryDirection) primaryDirection.addEventListener('change', handleMergedPricing);
+    if (targetCountry) targetCountry.addEventListener('change', handleMergedPricing);
+    if (weightInput) weightInput.addEventListener('input', handleMergedPricing); // Use input for live weight updates
+
+    document.querySelectorAll('[name="wizard-addr-type"]').forEach(radio => {
+        radio.addEventListener('change', handleMergedPricing);
+    });
 
     document.getElementById('btn-prev-step-2')?.addEventListener('click', () => goToStep(1));
     document.getElementById('btn-next-step-2')?.addEventListener('click', () => {
-        const country = document.getElementById('wizard-target-country').value;
-        if (!country) return showToast('Please select a country', 'error');
+        // In the new flow, step 2 is dimensions, so next is step 3 (final)
         goToStep(3);
     });
 
@@ -457,11 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         document.getElementById('final-pricing-summary').innerHTML = summaryHtml;
-        goToStep(4);
+        goToStep(3); // Going to final step
     });
 
-    // Step 4: Finalize
-    document.getElementById('btn-prev-step-4')?.addEventListener('click', () => goToStep(3));
+    // Step 3 (Final) finalize
+    document.getElementById('btn-prev-step-3')?.addEventListener('click', () => goToStep(2));
 
     // Step 2 Presets (Used in Step 3 now)
     window.setBox = (l, w, h) => {
@@ -518,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
         }
     });
-    document.getElementById('btn-prev-step-4')?.addEventListener('click', () => goToStep(3));
+    document.getElementById('btn-prev-step-3')?.addEventListener('click', () => goToStep(2));
 
 
     // Unified Tracking Logic

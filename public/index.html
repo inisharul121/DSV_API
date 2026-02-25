@@ -81,97 +81,76 @@
                 </div>
                 <div class="wizard-step" data-step="2">
                     <div class="step-number">2</div>
-                    <div class="step-label">Choose Countries</div>
+                    <div class="step-label">Select Box Size</div>
                 </div>
                 <div class="wizard-step" data-step="3">
                     <div class="step-number">3</div>
-                    <div class="step-label">Select Box Size</div>
-                </div>
-                <div class="wizard-step" data-step="4">
-                    <div class="step-number">4</div>
                     <div class="step-label">Proforma Invoice</div>
                 </div>
             </div>
 
-            <!-- STEP 1: DELIVERY OPTIONS -->
+            <!-- STEP 1: DELIVERY OPTIONS (Merged with Previous Step 2) -->
             <div id="wizard-step-1" class="wizard-content">
-                <div class="form-card" style="max-width: 600px; margin: 0 auto;">
-                    <h3 style="margin-bottom: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">
-                        Step 1: Delivery Options</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Please select your primary delivery
-                        preference to customize your shipping journey.</p>
-                    <div class="input-group">
-                        <label class="input-label">I want to:</label>
-                        <select id="wizard-primary-direction" class="input-field"
-                            style="font-size: 1.1rem; padding: 1rem;">
-                            <option value="export">Ship items from Switzerland (Export)</option>
-                            <option value="import">Receive items in Switzerland (Import)</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Destination Type:</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                            <label class="radio-card">
-                                <input type="radio" name="wizard-addr-type" value="business" checked>
-                                <div class="radio-content">
-                                    <i class="fas fa-building"></i>
-                                    <span>Business Address</span>
-                                </div>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="wizard-addr-type" value="home">
-                                <div class="radio-content">
-                                    <i class="fas fa-home"></i>
-                                    <span>Home Address</span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
-                        <button type="button" class="btn-primary" id="btn-next-step-1">Continue to Routes <i
-                                class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 2: CHOOSE COUNTRIES -->
-            <div id="wizard-step-2" class="wizard-content hidden">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                     <div class="form-card">
-                        <h3 style="margin-bottom: 2rem;">Step 2: Choose Countries</h3>
-                        <form id="wizard-form-2">
-                            <div class="input-group">
-                                <label class="input-label">Export/Import:</label>
-                                <select name="direction" id="wizard-direction" class="input-field" disabled>
-                                    <option value="export">Export to Country</option>
-                                    <option value="import">Import from Country</option>
-                                </select>
+                        <h3
+                            style="margin-bottom: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">
+                            Step 1: Delivery Options</h3>
+
+                        <div class="input-group">
+                            <label class="input-label">Export/Import:</label>
+                            <select id="wizard-primary-direction" class="input-field"
+                                style="font-size: 1rem; padding: 0.75rem;">
+                                <option value="export">Export from Switzerland</option>
+                                <option value="import">Import to Switzerland</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Address Type:</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                                <label class="radio-card">
+                                    <input type="radio" name="wizard-addr-type" value="business" checked>
+                                    <div class="radio-content">
+                                        <i class="fas fa-building"></i>
+                                        <span>Business Address</span>
+                                    </div>
+                                </label>
+                                <label class="radio-card">
+                                    <input type="radio" name="wizard-addr-type" value="home">
+                                    <div class="radio-content">
+                                        <i class="fas fa-home"></i>
+                                        <span>Home Address</span>
+                                    </div>
+                                </label>
                             </div>
-                            <div class="input-group">
-                                <label class="input-label">Select Country:</label>
-                                <select name="targetCountry" id="wizard-target-country" class="input-field" required>
-                                    <option value="">Select Country</option>
-                                    <option value="BD">BANGLADESH</option>
-                                    <option value="DE">GERMANY</option>
-                                    <option value="DK">DENMARK</option>
-                                    <option value="GB">UNITED KINGDOM</option>
-                                    <option value="US">UNITED STATES</option>
-                                    <option value="CH">SWITZERLAND</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Weight (kg):</label>
-                                <input type="number" step="0.1" name="weight" id="wizard-weight-2" class="input-field"
-                                    placeholder="e.g. 2.5">
-                            </div>
-                            <div style="margin-top: 2rem; display: flex; justify-content: space-between;">
-                                <button type="button" class="btn-primary" style="background: var(--text-muted);"
-                                    id="btn-prev-step-2"><i class="fas fa-arrow-left"></i> Back</button>
-                                <button type="button" class="btn-primary" id="btn-next-step-2">Next <i
-                                        class="fas fa-arrow-right"></i></button>
-                            </div>
-                        </form>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Select Country:</label>
+                            <select name="targetCountry" id="wizard-target-country" class="input-field" required>
+                                <option value="">Select Country</option>
+                                <option value="BD">BANGLADESH</option>
+                                <option value="DE">GERMANY</option>
+                                <option value="DK">DENMARK</option>
+                                <option value="GB">UNITED KINGDOM</option>
+                                <option value="US">UNITED STATES</option>
+                                <option value="CH">SWITZERLAND</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="input-label">Weight (kg):</label>
+                            <input type="number" step="0.1" name="weight" id="wizard-weight-2" class="input-field"
+                                placeholder="Select Weight">
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                            <button type="button" class="btn-primary" id="btn-next-step-1">Next <i
+                                    class="fas fa-arrow-right"></i></button>
+                        </div>
                     </div>
+
                     <div class="stat-card">
                         <h3 style="margin-bottom: 1.5rem;">Pricing Result</h3>
                         <div id="pricing-result-container">
@@ -181,6 +160,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Removed wizard-step-2 since it is merged into step-1 -->
 
             <!-- STEP 3: SELECT BOX SIZE -->
             <div id="wizard-step-3" class="wizard-content hidden">
