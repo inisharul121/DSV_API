@@ -26,7 +26,8 @@
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="nav-item" data-view="orders">
+            <!-- Hidden for now as requested -->
+            <a href="#" class="nav-item hidden" data-view="orders">
                 <i class="fas fa-box"></i>
                 <span>Orders</span>
             </a>
@@ -373,48 +374,15 @@
 
         <!-- ORDERS VIEW -->
         <section id="view-orders" class="view-section">
-            <div class="stat-card">
+            <!-- Active Orders table hidden as requested: merrge order and shiping widzerd together -->
+            <div class="stat-card hidden">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h2>Active Orders</h2>
                     <button class="btn-primary" id="btn-open-booking-modal">Create Order</button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
-                        <thead>
-                            <tr
-                                style="text-align: left; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem;">
-                                <th style="padding: 1rem;">ORDER ID</th>
-                                <th style="padding: 1rem;">CUSTOMER</th>
-                                <th style="padding: 1rem;">DATE</th>
-                                <th style="padding: 1rem;">STATUS</th>
-                                <th style="padding: 1rem;">TOTAL</th>
-                                <th style="padding: 1rem;">ACTION</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 1rem; font-weight: 600;">#ORD-7721</td>
-                                <td style="padding: 1rem;">Tech Solutions Inc</td>
-                                <td style="padding: 1rem;">Oct 24, 2023</td>
-                                <td style="padding: 1rem;"><span
-                                        style="padding: 0.25rem 0.75rem; border-radius: 20px; background: rgba(16, 185, 129, 0.1); color: var(--success); font-size: 0.75rem;">Processing</span>
-                                </td>
-                                <td style="padding: 1rem;">$1,240.00</td>
-                                <td style="padding: 1rem;"><i class="fas fa-ellipsis-h"
-                                        style="cursor:pointer; color: var(--text-muted);"></i></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 1rem; font-weight: 600;">#ORD-7719</td>
-                                <td style="padding: 1rem;">Global Logistics Co</td>
-                                <td style="padding: 1rem;">Oct 23, 2023</td>
-                                <td style="padding: 1rem;"><span
-                                        style="padding: 0.25rem 0.75rem; border-radius: 20px; background: rgba(37, 99, 235, 0.1); color: var(--accent); font-size: 0.75rem;">Shipped</span>
-                                </td>
-                                <td style="padding: 1rem;">$850.50</td>
-                                <td style="padding: 1rem;"><i class="fas fa-ellipsis-h"
-                                        style="cursor:pointer; color: var(--text-muted);"></i></td>
-                            </tr>
-                        </tbody>
+                        <!-- ... content ... -->
                     </table>
                 </div>
             </div>
@@ -458,42 +426,41 @@
                                     <div class="input-group">
                                         <label class="input-label">Company Name</label>
                                         <input type="text" name="origin_company" class="input-field"
-                                            placeholder="e.g. BCIC Swiss GmbH">
+                                            value="BCIC Swiss GmbH">
                                     </div>
                                     <div class="input-group">
                                         <label class="input-label">Address *</label>
                                         <input type="text" name="origin_address" class="input-field"
-                                            placeholder="Enter pickup address" required>
+                                            value="Lättichstrasse 6" required>
                                     </div>
                                     <div class="form-row">
                                         <div class="input-group">
                                             <label class="input-label">Zip Code</label>
-                                            <input type="text" name="origin_zip" class="input-field"
-                                                placeholder="e.g. 6340">
+                                            <input type="text" name="origin_zip" class="input-field" value="6340">
                                         </div>
                                         <div class="input-group">
                                             <label class="input-label">City *</label>
-                                            <input type="text" name="origin_city" class="input-field"
-                                                placeholder="e.g. Baar" required>
+                                            <input type="text" name="origin_city" class="input-field" value="Baar"
+                                                required>
                                         </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="input-group">
                                             <label class="input-label">Country Code *</label>
-                                            <input type="text" name="origin_country" class="input-field"
-                                                placeholder="e.g. CH" required>
+                                            <input type="text" name="origin_country" class="input-field" value="CH"
+                                                required>
                                         </div>
                                         <div class="input-group">
                                             <label class="input-label">Contact Name *</label>
                                             <input type="text" name="origin_contact" class="input-field"
-                                                placeholder="e.g. John Doe" required>
+                                                value="Eric Aubry" required>
                                         </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="input-group">
                                             <label class="input-label">Contact Phone *</label>
                                             <input type="text" name="origin_phone" class="input-field"
-                                                placeholder="+41 78 619 59 28" required>
+                                                value="+41 786195928" required>
                                             <small style="color: var(--text-muted); font-size: 0.7rem;">Format: +CC
                                                 Number</small>
                                         </div>

@@ -103,13 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnQuickCreateOrder) {
         btnQuickCreateOrder.addEventListener('click', () => {
-            // Switch to orders view
-            const ordersNavItem = document.querySelector('[data-view="orders"]');
-            if (ordersNavItem) ordersNavItem.click();
-            // Show form
+            // Switch to shipping-wizard view instead of orders
+            const wizardNavItem = document.querySelector('[data-view="shipping-wizard"]');
+            if (wizardNavItem) wizardNavItem.click();
+            // Show booking form immediately (bypassing wizard for "New Order" intent)
             setTimeout(() => {
                 bookingFormContainer.classList.remove('hidden');
                 bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
+                // Reset wizard to step 1 just in case
+                goToStep(1);
             }, 100);
         });
     }
@@ -506,17 +508,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 3. Switch to Orders view and show form
-        const ordersNavItem = document.querySelector('[data-view="orders"]');
-        if (ordersNavItem) ordersNavItem.click();
+        // 3. Show booking form within the same view
+        showToast('Processing your data...', 'success');
 
-        setTimeout(() => {
-            const bookingFormContainer = document.getElementById('booking-form-container');
-            if (bookingFormContainer) {
-                bookingFormContainer.classList.remove('hidden');
-                bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
-            }
-        }, 300);
+        // Hide wizard steps and show form
+        document.querySelectorAll('.wizard-content').forEach(el => el.classList.add('hidden'));
+        if (bookingFormContainer) {
+            bookingFormContainer.classList.remove('hidden');
+            bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
+        }
     });
     document.getElementById('btn-prev-step-4')?.addEventListener('click', () => goToStep(3));
 

@@ -9,24 +9,27 @@ const formatPhoneNumber = (num) => {
     num = num.trim();
 
     // If it already matches or has a space, return as is
-    if (num.includes(' ') || /^[+]?[0-9]{1,4} [0-9]/.test(num)) {
+    if (/^[+]?[0-9]{1,4} [0-9]/.test(num)) {
         return num;
     }
+
+    // Remove all non-numeric characters except + for processing
+    const clean = num.replace(/[^\d+]/g, '');
 
     // Heuristic: If starts with + followed by digits, insert space after first 3 chars (+XX) 
     // or first 4 chars (+XXX) if we want to be safe. 
     // Most common: +4178... -> +41 78...
-    if (num.startsWith('+')) {
-        if (num.length > 5) {
+    if (clean.startsWith('+')) {
+        if (clean.length > 5) {
             // Check if it's +41... (Swiss)
-            if (num.startsWith('+41')) return '+41 ' + num.substring(3);
-            if (num.startsWith('+49')) return '+49 ' + num.substring(3);
-            if (num.startsWith('+45')) return '+45 ' + num.substring(3);
-            if (num.startsWith('+44')) return '+44 ' + num.substring(3);
-            if (num.startsWith('+1')) return '+1 ' + num.substring(2);
+            if (clean.startsWith('+41')) return '+41 ' + clean.substring(3);
+            if (clean.startsWith('+49')) return '+49 ' + clean.substring(3);
+            if (clean.startsWith('+45')) return '+45 ' + clean.substring(3);
+            if (clean.startsWith('+44')) return '+44 ' + clean.substring(3);
+            if (clean.startsWith('+1')) return '+1 ' + clean.substring(2);
 
             // Generic fallback: space after the + and first two digits
-            return num.substring(0, 3) + ' ' + num.substring(3);
+            return clean.substring(0, 3) + ' ' + clean.substring(3);
         }
     }
 
@@ -54,7 +57,7 @@ exports.buildBookingPayload = (data) => {
                 companyName: data.origin_company || data.pickup?.address?.companyName || "Sender",
                 addressLine1: data.origin_address || data.pickup?.address?.addressLine1 || "",
                 city: data.origin_city || data.pickup?.address?.city || "",
-                countryCode: data.origin_country || data.pickup?.address?.countryCode || "CH",
+                countryCode: (data.origin_country || data.pickup?.address?.countryCode || "CH").trim().substring(0, 2).toUpperCase(),
                 zipCode: data.origin_zip || data.pickup?.address?.zipCode || "",
                 contactName: data.origin_contact || data.pickup?.address?.contactName || "",
                 contactPhoneNumber: formatPhoneNumber(data.origin_phone || data.pickup?.address?.contactPhoneNumber || "")
@@ -64,7 +67,7 @@ exports.buildBookingPayload = (data) => {
             companyName: data.dest_company || data.delivery?.companyName || "Receiver",
             addressLine1: data.dest_address || data.delivery?.addressLine1 || "",
             city: data.dest_city || data.delivery?.city || "",
-            countryCode: data.dest_country || data.delivery?.countryCode || "DE",
+            countryCode: (data.dest_country || data.delivery?.countryCode || "DE").trim().substring(0, 2).toUpperCase(),
             zipCode: data.dest_zip || data.delivery?.zipCode || "",
             contactName: data.dest_contact || data.delivery?.contactName || "",
             contactPhoneNumber: formatPhoneNumber(data.dest_phone || data.delivery?.contactPhoneNumber || ""),
