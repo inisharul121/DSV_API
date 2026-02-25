@@ -26,6 +26,7 @@ const payloadBuilder = require('../utils/payloadBuilder');
 exports.createSimpleBooking = async (req, res) => {
     try {
         const { shipmentData } = req.body;
+        console.log('[BOOKING] Received Request Body:', JSON.stringify(req.body, null, 2));
 
         // Transform frontend data to DSV API format
         const dsvPayload = payloadBuilder.buildBookingPayload(shipmentData);

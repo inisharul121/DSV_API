@@ -51,6 +51,13 @@ dsvClient.interceptors.request.use(request => {
     } else {
         console.log(`[DSV API] Using Booking Auth for: ${request.url}`);
     }
+
+    // Add Certification Header if enabled
+    if (config.certification.enabled && config.certification.testId) {
+        request.headers['x-cert-id'] = config.certification.testId;
+        console.log(`[CERTIFICATION] Attached x-cert-id: ${config.certification.testId}`);
+    }
+
     return request;
 });
 

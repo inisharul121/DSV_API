@@ -5,9 +5,13 @@ const upload = require('../middleware/upload');
 const trackingController = require('../controllers/trackingController');
 const documentController = require('../controllers/documentController');
 const quoteController = require('../controllers/quoteController');
+const certMiddleware = require('../middleware/certification');
 
 // Quotes
 router.post('/quotes', quoteController.getQuotes);
+
+// Apply certification middleware to all booking-related routes
+router.use('/bookings', certMiddleware);
 
 // Simple booking (JSON only)
 router.post('/bookings/simple', bookingController.createSimpleBooking);

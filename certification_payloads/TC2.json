@@ -1,0 +1,60 @@
+{
+    "dsvAccount": 8004990000,
+    "pickup": {
+        "requestPickup": true,
+        "collectDateFrom": "2026-02-26T09:00:00Z",
+        "collectDateTo": "2026-02-26T13:00:00Z",
+        "pickupInstructions": "Ready at front desk",
+        "address": {
+            "companyName": "BCIC Swiss GmbH",
+            "addressLine1": "Lättichstrasse 6",
+            "city": "Baar",
+            "countryCode": "CH",
+            "zipCode": "6340",
+            "contactName": "Mazharul Sheikh",
+            "contactPhoneNumber": "+41 786195928"
+        }
+    },
+    "delivery": {
+        "companyName": "Test Receiver GmbH",
+        "addressLine1": "Main Street 1",
+        "city": "Krefeld",
+        "countryCode": "DE",
+        "zipCode": "47807",
+        "contactName": "Receiver",
+        "contactPhoneNumber": "+49 12345678",
+        "residential": false
+    },
+    "paymentInformation": {
+        "shippingChargesPayment": {
+            "paymentType": "SENDER"
+        },
+        "dutiesAndTaxesPayment": {
+            "paymentType": "RECEIVER"
+        }
+    },
+    "serviceOptions": {
+        "packageType": "PARCELS",
+        "serviceCode": "DSVAirExpress"
+    },
+    "dimensionUnit": "CM",
+    "weightUnit": "KG",
+    "packages": [
+        {
+            "length": 10,
+            "width": 10,
+            "height": 10,
+            "grossWeight": 2.5
+        }
+    ],
+    "commodities": [
+        {
+            "originCountryCode": "CH",
+            "goodsDescription": "Industrial Circuit Boards",
+            "goodsValue": {
+                "currencyCode": "CHF",
+                "monetaryValue": 100
+            }
+        }
+    ]
+}

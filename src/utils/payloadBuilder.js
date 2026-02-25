@@ -8,48 +8,49 @@ exports.buildBookingPayload = (data) => {
 
     const formatDSVDate = (date) => date.toISOString().split('.')[0] + 'Z';
 
-    return {
-        dsvAccount: parseInt(data.dsvAccount || config.dsv.account), // Mandatory: integer
+    // Base structure with defaults
+    const payload = {
+        dsvAccount: parseInt(data.dsvAccount || config.dsv.account),
         pickup: {
-            requestPickup: true,
-            collectDateFrom: formatDSVDate(collectFrom),
-            collectDateTo: formatDSVDate(collectTo),
-            pickupInstructions: "Ready at front desk",
+            requestPickup: data.pickup?.requestPickup !== undefined ? data.pickup.requestPickup : true,
+            collectDateFrom: data.pickup?.collectDateFrom || formatDSVDate(collectFrom),
+            collectDateTo: data.pickup?.collectDateTo || formatDSVDate(collectTo),
+            pickupInstructions: data.pickup?.pickupInstructions || "Ready at front desk",
             address: {
-                companyName: "BCIC Swiss GmbH",
-                addressLine1: "Lättichstrasse 6",
-                city: "Baar",
-                countryCode: data.origin_country || "CH",
-                zipCode: "6340",
-                contactName: "Eric Aubry",
-                contactPhoneNumber: "+41 786195928"
+                companyName: data.pickup?.address?.companyName || "BCIC Swiss GmbH",
+                addressLine1: data.pickup?.address?.addressLine1 || "Lättichstrasse 6",
+                city: data.pickup?.address?.city || "Baar",
+                countryCode: data.pickup?.address?.countryCode || data.origin_country || "CH",
+                zipCode: data.pickup?.address?.zipCode || "6340",
+                contactName: data.pickup?.address?.contactName || "Eric Aubry",
+                contactPhoneNumber: data.pickup?.address?.contactPhoneNumber || "+41 786195928"
             }
         },
         delivery: {
-            companyName: data.dest_company || "Test Receiver GmbH",
-            addressLine1: data.dest_address || "Main Street 1",
-            city: data.dest_city || "Krefeld",
-            countryCode: data.dest_country || "DE",
-            zipCode: data.dest_zip || "47807",
-            contactName: "Receiver",
-            contactPhoneNumber: "+44 12345678",
-            residential: false
+            companyName: data.delivery?.companyName || data.dest_company || "Test Receiver GmbH",
+            addressLine1: data.delivery?.addressLine1 || data.dest_address || "Main Street 1",
+            city: data.delivery?.city || data.dest_city || "Krefeld",
+            countryCode: data.delivery?.countryCode || data.dest_country || "DE",
+            zipCode: data.delivery?.zipCode || data.dest_zip || "47807",
+            contactName: data.delivery?.contactName || "Receiver",
+            contactPhoneNumber: data.delivery?.contactPhoneNumber || "+44 12345678",
+            residential: data.delivery?.residential !== undefined ? data.delivery.residential : false
         },
         paymentInformation: {
             shippingChargesPayment: {
-                paymentType: "SENDER"
+                paymentType: data.paymentInformation?.shippingChargesPayment?.paymentType || "SENDER"
             },
             dutiesAndTaxesPayment: {
-                paymentType: "RECEIVER"
+                paymentType: data.paymentInformation?.dutiesAndTaxesPayment?.paymentType || "RECEIVER"
             }
         },
         serviceOptions: {
-            packageType: "PARCELS",
-            serviceCode: data.serviceCode || "DSVAirExpress"
+            packageType: data.serviceOptions?.packageType || "PARCELS",
+            serviceCode: data.serviceOptions?.serviceCode || data.serviceCode || "DSVAirExpress"
         },
-        dimensionUnit: "CM",
-        weightUnit: "KG",
-        packages: [
+        dimensionUnit: data.dimensionUnit || "CM",
+        weightUnit: data.weightUnit || "KG",
+        packages: data.packages || [
             {
                 length: 10,
                 width: 10,
@@ -57,9 +58,9 @@ exports.buildBookingPayload = (data) => {
                 grossWeight: parseFloat(data.weight || 2.5)
             }
         ],
-        commodities: [
+        commodities: data.commodities || [
             {
-                originCountryCode: data.origin_country || "CH",
+                originCountryCode: data.pickup?.address?.countryCode || data.origin_country || "CH",
                 goodsDescription: data.commodity || "Industrial Circuit Boards",
                 goodsValue: {
                     currencyCode: "CHF",
@@ -68,6 +69,8 @@ exports.buildBookingPayload = (data) => {
             }
         ]
     };
+
+    return payload;
 };
 
 exports.buildQuotePayload = (data) => {
