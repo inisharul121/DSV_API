@@ -212,120 +212,120 @@
                                 class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
+            </div>
 
-                <!-- STEP 3: BOOKING INFORMATION -->
-                <div id="wizard-step-3" class="wizard-content hidden">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                        <div class="form-card">
-                            <h3><i class="fas fa-truck-loading" style="color: var(--accent);"></i> Pickup Information
-                            </h3>
-                            <div class="form-row">
-                                <div class="input-group">
-                                    <label class="input-label">Collect Date</label>
-                                    <input type="date" class="input-field" id="wizard-pickup-date">
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Company</label>
-                                    <input type="text" class="input-field" id="wizard-pickup-company"
-                                        value="Swiss Logistics">
-                                </div>
+            <!-- STEP 3: BOOKING INFORMATION -->
+            <div id="wizard-step-3" class="wizard-content hidden">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="form-card">
+                        <h3><i class="fas fa-truck-loading" style="color: var(--accent);"></i> Pickup Information
+                        </h3>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">Collect Date</label>
+                                <input type="date" class="input-field" id="wizard-pickup-date">
                             </div>
                             <div class="input-group">
-                                <label class="input-label">Address</label>
-                                <input type="text" class="input-field" id="wizard-pickup-address"
-                                    value="Bahnhofstrasse 12">
-                            </div>
-                            <div class="form-row">
-                                <div class="input-group">
-                                    <label class="input-label">City</label>
-                                    <input type="text" class="input-field" id="wizard-pickup-city" value="Zurich">
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Zip Code</label>
-                                    <input type="text" class="input-field" id="wizard-pickup-zip" value="8001">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="input-group">
-                                    <label class="input-label">Contact Name</label>
-                                    <input type="text" class="input-field" value="Hans Schmidt">
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Phone</label>
-                                    <input type="text" class="input-field" value="+41 44 123 45 67">
-                                </div>
+                                <label class="input-label">Company</label>
+                                <input type="text" class="input-field" id="wizard-pickup-company"
+                                    value="Swiss Logistics">
                             </div>
                         </div>
-                        <div class="form-card">
-                            <h3><i class="fas fa-map-marker-alt" style="color: var(--success);"></i> Delivery
-                                Information</h3>
+                        <div class="input-group">
+                            <label class="input-label">Address</label>
+                            <input type="text" class="input-field" id="wizard-pickup-address" value="Bahnhofstrasse 12">
+                        </div>
+                        <div class="form-row">
                             <div class="input-group">
-                                <label class="input-label">Company Name</label>
-                                <input type="text" class="input-field" id="wizard-dest-company" placeholder="e.g. BCIC">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Address</label>
-                                <input type="text" class="input-field" id="wizard-dest-address"
-                                    placeholder="e.g. 123 Main St">
-                            </div>
-                            <div class="form-row">
-                                <div class="input-group">
-                                    <label class="input-label">City</label>
-                                    <input type="text" class="input-field" id="wizard-dest-city">
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Zip Code</label>
-                                    <input type="text" class="input-field" id="wizard-dest-zip">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="input-group">
-                                    <label class="input-label">Contact Name</label>
-                                    <input type="text" class="input-field" id="wizard-dest-contact">
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Phone</label>
-                                    <input type="text" class="input-field" id="wizard-dest-phone">
-                                </div>
+                                <label class="input-label">City</label>
+                                <input type="text" class="input-field" id="wizard-pickup-city" value="Zurich">
                             </div>
                             <div class="input-group">
-                                <label class="input-label">Contact Email</label>
-                                <input type="email" class="input-field" id="wizard-dest-email">
+                                <label class="input-label">Zip Code</label>
+                                <input type="text" class="input-field" id="wizard-pickup-zip" value="8001">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">Contact Name</label>
+                                <input type="text" class="input-field" value="Hans Schmidt">
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Phone</label>
+                                <input type="text" class="input-field" value="+41 44 123 45 67">
                             </div>
                         </div>
                     </div>
-                    <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
-                        <button type="button" class="btn-primary" style="background: var(--text-muted);"
-                            id="btn-prev-step-3"><i class="fas fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" id="btn-next-step-3">Next <i
-                                class="fas fa-arrow-right"></i></button>
+                    <div class="form-card">
+                        <h3><i class="fas fa-map-marker-alt" style="color: var(--success);"></i> Delivery
+                            Information</h3>
+                        <div class="input-group">
+                            <label class="input-label">Company Name</label>
+                            <input type="text" class="input-field" id="wizard-dest-company" placeholder="e.g. BCIC">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Address</label>
+                            <input type="text" class="input-field" id="wizard-dest-address"
+                                placeholder="e.g. 123 Main St">
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">City</label>
+                                <input type="text" class="input-field" id="wizard-dest-city">
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Zip Code</label>
+                                <input type="text" class="input-field" id="wizard-dest-zip">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">Contact Name</label>
+                                <input type="text" class="input-field" id="wizard-dest-contact">
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Phone</label>
+                                <input type="text" class="input-field" id="wizard-dest-phone">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Contact Email</label>
+                            <input type="email" class="input-field" id="wizard-dest-email">
+                        </div>
                     </div>
                 </div>
-
-                <!-- STEP 4: FINALIZE -->
-                <div id="wizard-step-4" class="wizard-content hidden">
-                    <div style="max-width: 600px; margin: 0 auto; text-align: center;">
-                        <i class="fas fa-file-invoice-dollar"
-                            style="font-size: 4rem; color: var(--accent); margin-bottom: 2rem;"></i>
-                        <h2>Review & Confirm</h2>
-                        <p style="color: var(--text-muted); margin-bottom: 2rem;">Please review your shipment details
-                            and
-                            generated Proforma Invoice before booking.</p>
-
-                        <div class="stat-card" style="text-align: left; margin-bottom: 2rem;">
-                            <div id="final-pricing-summary"></div>
-                        </div>
-
-                        <button type="button" class="btn-primary" id="btn-final-book"
-                            style="width: 100%; font-size: 1.2rem; padding: 1.25rem;">
-                            <i class="fas fa-check-circle"></i> Confirm DSV Booking
-                        </button>
-                        <button type="button" id="btn-prev-step-4"
-                            style="background: none; border: none; color: var(--text-muted); margin-top: 1rem; cursor: pointer;">
-                            Go Back and Edit
-                        </button>
-                    </div>
+                <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
+                    <button type="button" class="btn-primary" style="background: var(--text-muted);"
+                        id="btn-prev-step-3"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button type="button" class="btn-primary" id="btn-next-step-3">Next <i
+                            class="fas fa-arrow-right"></i></button>
                 </div>
+            </div>
+
+            <!-- STEP 4: FINALIZE -->
+            <div id="wizard-step-4" class="wizard-content hidden">
+                <div style="max-width: 600px; margin: 0 auto; text-align: center;">
+                    <i class="fas fa-file-invoice-dollar"
+                        style="font-size: 4rem; color: var(--accent); margin-bottom: 2rem;"></i>
+                    <h2>Review & Confirm</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Please review your shipment details
+                        and
+                        generated Proforma Invoice before booking.</p>
+
+                    <div class="stat-card" style="text-align: left; margin-bottom: 2rem;">
+                        <div id="final-pricing-summary"></div>
+                    </div>
+
+                    <button type="button" class="btn-primary" id="btn-final-book"
+                        style="width: 100%; font-size: 1.2rem; padding: 1.25rem;">
+                        <i class="fas fa-check-circle"></i> Confirm DSV Booking
+                    </button>
+                    <button type="button" id="btn-prev-step-4"
+                        style="background: none; border: none; color: var(--text-muted); margin-top: 1rem; cursor: pointer;">
+                        Go Back and Edit
+                    </button>
+                </div>
+            </div>
         </section>
 
         <!-- DASHBOARD VIEW -->
