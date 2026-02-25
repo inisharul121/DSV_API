@@ -180,7 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (result.success) {
-                    showToast(`Success! Booking ID: ${result.bookingId}`, 'success');
+                    const labelLink = result.labelUrl
+                        ? `<br><a href="${result.labelUrl}" target="_blank" style="color:white; text-decoration:underline;">Download Label PDF</a>`
+                        : '';
+                    showToast(`Success! Booking ID: ${result.bookingId}${labelLink}`, 'success');
                     bookingForm.reset();
                 } else {
                     const errorMsg = result.error?.message || result.error || 'Failed to create booking';
@@ -337,8 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- SHIPPING WIZARD LOGIC ---
     let currentStep = 1;
-    const wizardForm1 = document.getElementById('wizard-form-1');
-    const pricingResultContainer = document.getElementById('pricing-result-container');
 
     // Wizard Navigation
     function goToStep(step) {
@@ -359,48 +360,50 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Step 2 Presets
-    window.setBox = (l, w, h) => {
-        document.getElementById('box-length').value = l;
-        document.getElementById('box-width').value = w;
-        document.getElementById('box-height').value = h;
-        showToast(`Dimensions set: ${l}x${w}x${h}cm`, 'info');
-    };
-
-    // Step 1: Handle Change/Next
+    // Step 1: Delivery Options Logic
     const nextStep1 = document.getElementById('btn-next-step-1');
+    const primaryDirection = document.getElementById('wizard-primary-direction');
+
     if (nextStep1) {
         nextStep1.addEventListener('click', () => {
-            const country = wizardForm1.targetCountry.value;
-            if (!country) return showToast('Please select a country', 'error');
+            const dir = primaryDirection.value;
+            // Sync with Step 2's hidden/disabled direction
+            const secondaryDir = document.getElementById('wizard-direction');
+            if (secondaryDir) {
+                secondaryDir.value = dir;
+            }
             goToStep(2);
         });
     }
 
-    // Auto-Pricing on Step 1
-    if (wizardForm1) {
-        wizardForm1.addEventListener('change', async () => {
-            const country = wizardForm1.targetCountry.value;
+    // Step 2: Routes & Auto-Pricing Logic
+    const wizardForm2 = document.getElementById('wizard-form-2');
+    const pricingResultContainer = document.getElementById('pricing-result-container');
+
+    if (wizardForm2) {
+        wizardForm2.addEventListener('change', async () => {
+            const country = document.getElementById('wizard-target-country').value;
             if (!country) return;
 
             pricingResultContainer.innerHTML = '<div class="loader"></div> Calculating...';
 
             try {
+                const direction = document.getElementById('wizard-primary-direction').value;
                 const response = await fetch('/api/quotes', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         dsvAccount: 8004990000,
-                        pickupCountryCode: wizardForm1.direction.value === 'export' ? 'CH' : country,
-                        deliveryCountryCode: wizardForm1.direction.value === 'export' ? country : 'CH',
+                        pickupCountryCode: direction === 'export' ? 'CH' : country,
+                        deliveryCountryCode: direction === 'export' ? country : 'CH',
                         packageType: "PARCELS",
-                        defaultWeight: document.getElementById('wizard-weight').value
+                        defaultWeight: document.getElementById('wizard-weight-2').value || 2.5
                     })
                 });
 
                 const result = await response.json();
                 if (result.success && result.data.services?.length > 0) {
-                    const svc = result.data.services[0]; // Take premium/first
+                    const svc = result.data.services[0];
                     const b = svc.breakdown;
 
                     pricingResultContainer.innerHTML = `
@@ -409,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <tr><td class="label">Fuel+Pickup Surcharge</td><td class="value">CHF ${b.fuelSurcharge}</td></tr>
                             <tr><td class="label">Commission</td><td class="value">CHF ${b.commission}</td></tr>
                             <tr><td class="label">Home Delivery Charge</td><td class="value">CHF ${b.homeDeliveryCharge}</td></tr>
-                            <tr><td class="label">Total Price</td><td class="value">CHF ${b.totalPrice}</td></tr>
+                            <tr style="border-top: 2px solid var(--accent);"><td class="label" style="font-weight: 800;">Total Price</td><td class="value" style="font-weight: 800; color: var(--accent);">CHF ${b.totalPrice}</td></tr>
                         </table>
                     `;
                 } else {
@@ -421,86 +424,99 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Step 2: Dimensions
+    document.getElementById('btn-prev-step-2')?.addEventListener('click', () => goToStep(1));
     document.getElementById('btn-next-step-2')?.addEventListener('click', () => {
-        // Carry data to step 3/4
-        document.getElementById('wizard-dest-company').value = "Test Co"; // Placeholder
+        const country = document.getElementById('wizard-target-country').value;
+        if (!country) return showToast('Please select a country', 'error');
         goToStep(3);
     });
-    document.getElementById('btn-prev-step-2')?.addEventListener('click', () => goToStep(1));
 
-    // Step 3: Address
+    // Step 3: Dimensions
+    document.getElementById('btn-prev-step-3')?.addEventListener('click', () => goToStep(2));
     document.getElementById('btn-next-step-3')?.addEventListener('click', () => {
         const pricingHtml = pricingResultContainer.innerHTML;
-        document.getElementById('final-pricing-summary').innerHTML = pricingHtml;
+        const direction = document.getElementById('wizard-primary-direction').value;
+        const country = document.getElementById('wizard-target-country').value;
+        const weight = document.getElementById('wizard-weight-2').value;
+        const length = document.getElementById('box-length').value;
+        const width = document.getElementById('box-width').value;
+        const height = document.getElementById('box-height').value;
+
+        const summaryHtml = `
+            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                    <div><strong>Direction:</strong> ${direction === 'export' ? 'Switzerland to ' + country : country + ' to Switzerland'}</div>
+                    <div><strong>Weight:</strong> ${weight} kg</div>
+                    <div><strong>Box Size:</strong> ${length}x${width}x${height} cm</div>
+                    <div><strong>Est. Volume:</strong> ${(length * width * height / 1000).toFixed(2)} Liters</div>
+                </div>
+                <hr style="margin: 1.5rem 0; opacity: 0.1;">
+                ${pricingHtml}
+            </div>
+        `;
+        document.getElementById('final-pricing-summary').innerHTML = summaryHtml;
         goToStep(4);
     });
-    document.getElementById('btn-prev-step-3')?.addEventListener('click', () => goToStep(2));
 
-    // Step 4: Final Book
-    document.getElementById('btn-final-book')?.addEventListener('click', async () => {
-        const btn = document.getElementById('btn-final-book');
-        const originalContent = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Booking...';
+    // Step 4: Finalize
+    document.getElementById('btn-prev-step-4')?.addEventListener('click', () => goToStep(3));
 
-        showToast('Finalizing DSV Booking...', 'info');
+    // Step 2 Presets (Used in Step 3 now)
+    window.setBox = (l, w, h) => {
+        const len = document.getElementById('box-length');
+        const wid = document.getElementById('box-width');
+        const hei = document.getElementById('box-height');
+        if (len) len.value = l;
+        if (wid) wid.value = w;
+        if (hei) hei.value = h;
+        showToast(`Dimensions set: ${l}x${w}x${h}cm`, 'info');
+    };
 
-        try {
-            // Collect all data
-            const bookingData = {
-                shipmentData: {
-                    pickup: {
-                        companyName: document.getElementById('wizard-pickup-company').value,
-                        address: document.getElementById('wizard-pickup-address').value,
-                        city: document.getElementById('wizard-pickup-city').value,
-                        zipCode: document.getElementById('wizard-pickup-zip').value,
-                        countryCode: wizardForm1.direction.value === 'export' ? 'CH' : wizardForm1.targetCountry.value
-                    },
-                    delivery: {
-                        companyName: document.getElementById('wizard-dest-company').value,
-                        address: document.getElementById('wizard-dest-address').value,
-                        city: document.getElementById('wizard-dest-city').value,
-                        zipCode: document.getElementById('wizard-dest-zip').value,
-                        countryCode: wizardForm1.direction.value === 'export' ? wizardForm1.targetCountry.value : 'CH',
-                        contactName: document.getElementById('wizard-dest-contact').value,
-                        contactPhone: document.getElementById('wizard-dest-phone').value,
-                        contactEmail: document.getElementById('wizard-dest-email').value
-                    },
-                    weight: document.getElementById('wizard-weight').value,
-                    dimensions: {
-                        length: document.getElementById('box-length').value,
-                        width: document.getElementById('box-width').value,
-                        height: document.getElementById('box-height').value
-                    },
-                    packageType: "PARCELS" // Could be made dynamic later
-                }
-            };
+    // Step 4: Final Book (Transition to full Booking Form)
+    document.getElementById('btn-final-book')?.addEventListener('click', () => {
+        showToast('Preparing your booking form...', 'info');
 
-            const response = await fetch('/api/bookings/simple', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookingData)
-            });
+        // 1. Collect Wizard Data
+        const direction = document.getElementById('wizard-primary-direction').value;
+        const country = document.getElementById('wizard-target-country').value;
+        const weight = document.getElementById('wizard-weight-2').value;
+        const length = document.getElementById('box-length').value;
+        const width = document.getElementById('box-width').value;
+        const height = document.getElementById('box-height').value;
 
-            const result = await response.json();
-            if (result.success) {
-                showToast(`Success! Booking ID: ${result.bookingId}`, 'success');
-                // Redirect to orders or reset wizard
-                setTimeout(() => {
-                    const ordersNavItem = document.querySelector('[data-view="orders"]');
-                    if (ordersNavItem) ordersNavItem.click();
-                    goToStep(1);
-                }, 2000);
+        // 2. Map to Full Booking Form
+        const f = document.getElementById('booking-form');
+        if (f) {
+            if (direction === 'export') {
+                f.origin_country.value = 'CH';
+                f.dest_country.value = country;
             } else {
-                showToast(`Booking failed: ${result.error || 'Unknown error'}`, 'error');
+                f.origin_country.value = country;
+                f.dest_country.value = 'CH';
             }
-        } catch (err) {
-            showToast('Network error during booking', 'error');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalContent;
+            f.weight.value = weight;
+            f.length.value = length;
+            f.width.value = width;
+            f.height.value = height;
+
+            // Update the display price in the booking form too
+            const wizardPrice = document.querySelector('#pricing-result-container .value[style*="accent"]')?.innerText;
+            if (wizardPrice) {
+                document.getElementById('booking-price-display').innerText = wizardPrice;
+            }
         }
+
+        // 3. Switch to Orders view and show form
+        const ordersNavItem = document.querySelector('[data-view="orders"]');
+        if (ordersNavItem) ordersNavItem.click();
+
+        setTimeout(() => {
+            const bookingFormContainer = document.getElementById('booking-form-container');
+            if (bookingFormContainer) {
+                bookingFormContainer.classList.remove('hidden');
+                bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 300);
     });
     document.getElementById('btn-prev-step-4')?.addEventListener('click', () => goToStep(3));
 

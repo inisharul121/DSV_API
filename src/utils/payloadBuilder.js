@@ -1,5 +1,39 @@
 const config = require('../config/env');
 
+/**
+ * Ensures phone number matches DSV regex: ^[+]?[0-9]{1,4} [0-9]{1}[0-9 ]{1,}
+ * Requires a space after the country code.
+ */
+const formatPhoneNumber = (num) => {
+    if (!num) return num;
+    num = num.trim();
+
+    // If it already matches or has a space, return as is
+    if (num.includes(' ') || /^[+]?[0-9]{1,4} [0-9]/.test(num)) {
+        return num;
+    }
+
+    // Heuristic: If starts with + followed by digits, insert space after first 3 chars (+XX) 
+    // or first 4 chars (+XXX) if we want to be safe. 
+    // Most common: +4178... -> +41 78...
+    if (num.startsWith('+')) {
+        if (num.length > 5) {
+            // Check if it's +41... (Swiss)
+            if (num.startsWith('+41')) return '+41 ' + num.substring(3);
+            if (num.startsWith('+49')) return '+49 ' + num.substring(3);
+            if (num.startsWith('+45')) return '+45 ' + num.substring(3);
+            if (num.startsWith('+44')) return '+44 ' + num.substring(3);
+            if (num.startsWith('+1')) return '+1 ' + num.substring(2);
+
+            // Generic fallback: space after the + and first two digits
+            return num.substring(0, 3) + ' ' + num.substring(3);
+        }
+    }
+
+    // If no +, just return it (might still fail, but we'll add UI hints)
+    return num;
+};
+
 exports.buildBookingPayload = (data) => {
     // Current date for timing
     const now = new Date();
@@ -15,39 +49,55 @@ exports.buildBookingPayload = (data) => {
             requestPickup: data.pickup?.requestPickup !== undefined ? data.pickup.requestPickup : true,
             collectDateFrom: data.pickup?.collectDateFrom || formatDSVDate(collectFrom),
             collectDateTo: data.pickup?.collectDateTo || formatDSVDate(collectTo),
-            pickupInstructions: data.pickup?.pickupInstructions || "Ready at front desk",
+            pickupInstructions: data.pickup?.pickupInstructions || data.pickupInstructions || "Ready at front desk",
             address: {
-                companyName: data.pickup?.address?.companyName || "BCIC Swiss GmbH",
-                addressLine1: data.pickup?.address?.addressLine1 || "Lättichstrasse 6",
-                city: data.pickup?.address?.city || "Baar",
-                countryCode: data.pickup?.address?.countryCode || data.origin_country || "CH",
-                zipCode: data.pickup?.address?.zipCode || "6340",
-                contactName: data.pickup?.address?.contactName || "Eric Aubry",
-                contactPhoneNumber: data.pickup?.address?.contactPhoneNumber || "+41 786195928"
+                companyName: data.origin_company || data.pickup?.address?.companyName || "Sender",
+                addressLine1: data.origin_address || data.pickup?.address?.addressLine1 || "",
+                city: data.origin_city || data.pickup?.address?.city || "",
+                countryCode: data.origin_country || data.pickup?.address?.countryCode || "CH",
+                zipCode: data.origin_zip || data.pickup?.address?.zipCode || "",
+                contactName: data.origin_contact || data.pickup?.address?.contactName || "",
+                contactPhoneNumber: formatPhoneNumber(data.origin_phone || data.pickup?.address?.contactPhoneNumber || "")
             }
         },
         delivery: {
-            companyName: data.delivery?.companyName || data.dest_company || "Test Receiver GmbH",
-            addressLine1: data.delivery?.addressLine1 || data.dest_address || "Main Street 1",
-            city: data.delivery?.city || data.dest_city || "Krefeld",
-            countryCode: data.delivery?.countryCode || data.dest_country || "DE",
-            zipCode: data.delivery?.zipCode || data.dest_zip || "47807",
-            contactName: data.delivery?.contactName || "Receiver",
-            contactPhoneNumber: data.delivery?.contactPhoneNumber || "+44 12345678",
-            residential: data.delivery?.residential !== undefined ? data.delivery.residential : false
+            companyName: data.dest_company || data.delivery?.companyName || "Receiver",
+            addressLine1: data.dest_address || data.delivery?.addressLine1 || "",
+            city: data.dest_city || data.delivery?.city || "",
+            countryCode: data.dest_country || data.delivery?.countryCode || "DE",
+            zipCode: data.dest_zip || data.delivery?.zipCode || "",
+            contactName: data.dest_contact || data.delivery?.contactName || "",
+            contactPhoneNumber: formatPhoneNumber(data.dest_phone || data.delivery?.contactPhoneNumber || ""),
+            residential: data.delivery?.residential !== undefined ? data.delivery.residential : (data.residential === 'on' || data.residential === true)
         },
         paymentInformation: {
             shippingChargesPayment: {
-                paymentType: data.paymentInformation?.shippingChargesPayment?.paymentType || "SENDER"
+                paymentType: data.paymentInformation?.shippingChargesPayment?.paymentType || data.paymentType || "SENDER"
             },
             dutiesAndTaxesPayment: {
-                paymentType: data.paymentInformation?.dutiesAndTaxesPayment?.paymentType || "RECEIVER"
+                paymentType: data.paymentInformation?.dutiesAndTaxesPayment?.paymentType || data.dutiesType || "RECEIVER"
             }
         },
         serviceOptions: {
-            packageType: data.serviceOptions?.packageType || "PARCELS",
-            serviceCode: data.serviceOptions?.serviceCode || data.serviceCode || "DSVAirExpress"
+            packageType: data.serviceOptions?.packageType || data.packageType || "PARCELS",
+            serviceCode: data.serviceOptions?.serviceCode || data.serviceCode || "DSVAirExpress",
+            insurance: data.insuranceValue ? {
+                currencyCode: data.currencyCode || "CHF",
+                monetaryValue: parseFloat(data.insuranceValue)
+            } : undefined
         },
+        notifications: data.notif_code ? [
+            {
+                notificationCode: data.notif_code, // e.g. DEP, DEL
+                recipients: [data.notif_email]
+            }
+        ] : undefined,
+        references: data.ref_value ? [
+            {
+                referenceQualifier: data.ref_qualifier || "SHPR_REF",
+                referenceValue: data.ref_value
+            }
+        ] : undefined,
         dimensionUnit: data.dimensionUnit || "CM",
         weightUnit: data.weightUnit || "KG",
         packages: data.packages || [
@@ -60,11 +110,11 @@ exports.buildBookingPayload = (data) => {
         ],
         commodities: data.commodities || [
             {
-                originCountryCode: data.pickup?.address?.countryCode || data.origin_country || "CH",
-                goodsDescription: data.commodity || "Industrial Circuit Boards",
+                originCountryCode: data.commodity_origin || data.origin_country || "CH",
+                goodsDescription: data.commodity || "General Goods",
                 goodsValue: {
                     currencyCode: data.currencyCode || "CHF",
-                    monetaryValue: parseFloat(data.goodsValue || 100)
+                    monetaryValue: parseFloat(data.goodsValue || 0)
                 }
             }
         ]

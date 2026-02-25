@@ -508,3 +508,95 @@ th {
     border: 1px dashed #cbd5e1;
     margin-bottom: 1.5rem;
 }
+
+/* Comprehensive Booking Form & Wizard Enhancements */
+.form-section {
+    background: #fdfdfd;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sub-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 1.5rem 0 1rem 0;
+    color: var(--text-muted);
+}
+
+.form-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.radio-card {
+    cursor: pointer;
+    position: relative;
+}
+
+.radio-card input {
+    position: absolute;
+    opacity: 0;
+}
+
+.radio-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    transition: var(--transition-fast);
+}
+
+.radio-card input:checked+.radio-content {
+    border-color: var(--accent);
+    background: white;
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.radio-card input:checked+.radio-content i {
+    color: var(--accent);
+}
+
+.radio-content i {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+}
+
+.radio-content span {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.btn-preset {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-preset:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}

@@ -76,65 +76,97 @@
             <div class="wizard-progress">
                 <div class="wizard-step active" data-step="1">
                     <div class="step-number">1</div>
-                    <div class="step-label">Choose Countries</div>
+                    <div class="step-label">Delivery Options</div>
                 </div>
                 <div class="wizard-step" data-step="2">
                     <div class="step-number">2</div>
-                    <div class="step-label">Box Size</div>
+                    <div class="step-label">Choose Countries</div>
                 </div>
                 <div class="wizard-step" data-step="3">
                     <div class="step-number">3</div>
-                    <div class="step-label">Details & Address</div>
+                    <div class="step-label">Select Box Size</div>
                 </div>
                 <div class="wizard-step" data-step="4">
                     <div class="step-number">4</div>
-                    <div class="step-label">Finalize</div>
+                    <div class="step-label">Proforma Invoice</div>
                 </div>
             </div>
 
-            <!-- STEP 1: CHOOSE COUNTRIES -->
+            <!-- STEP 1: DELIVERY OPTIONS -->
             <div id="wizard-step-1" class="wizard-content">
+                <div class="form-card" style="max-width: 600px; margin: 0 auto;">
+                    <h3 style="margin-bottom: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">
+                        Step 1: Delivery Options</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Please select your primary delivery
+                        preference to customize your shipping journey.</p>
+                    <div class="input-group">
+                        <label class="input-label">I want to:</label>
+                        <select id="wizard-primary-direction" class="input-field"
+                            style="font-size: 1.1rem; padding: 1rem;">
+                            <option value="export">Ship items from Switzerland (Export)</option>
+                            <option value="import">Receive items in Switzerland (Import)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Destination Type:</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                            <label class="radio-card">
+                                <input type="radio" name="wizard-addr-type" value="business" checked>
+                                <div class="radio-content">
+                                    <i class="fas fa-building"></i>
+                                    <span>Business Address</span>
+                                </div>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="wizard-addr-type" value="home">
+                                <div class="radio-content">
+                                    <i class="fas fa-home"></i>
+                                    <span>Home Address</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                        <button type="button" class="btn-primary" id="btn-next-step-1">Continue to Routes <i
+                                class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: CHOOSE COUNTRIES -->
+            <div id="wizard-step-2" class="wizard-content hidden">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                     <div class="form-card">
-                        <h3 style="margin-bottom: 2rem;">Step 1: Route Details</h3>
-                        <form id="wizard-form-1">
+                        <h3 style="margin-bottom: 2rem;">Step 2: Choose Countries</h3>
+                        <form id="wizard-form-2">
                             <div class="input-group">
                                 <label class="input-label">Export/Import:</label>
-                                <select name="direction" class="input-field">
-                                    <option value="export">Export from Switzerland</option>
-                                    <option value="import">Import to Switzerland</option>
+                                <select name="direction" id="wizard-direction" class="input-field" disabled>
+                                    <option value="export">Export to Country</option>
+                                    <option value="import">Import from Country</option>
                                 </select>
                             </div>
                             <div class="input-group">
-                                <label class="input-label">Address Type:</label>
-                                <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
-                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500;">
-                                        <input type="radio" name="addressType" value="business" checked> Business
-                                        Address
-                                    </label>
-                                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500;">
-                                        <input type="radio" name="addressType" value="home"> Home Address
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="input-group">
                                 <label class="input-label">Select Country:</label>
-                                <select name="targetCountry" class="input-field">
+                                <select name="targetCountry" id="wizard-target-country" class="input-field" required>
                                     <option value="">Select Country</option>
                                     <option value="BD">BANGLADESH</option>
                                     <option value="DE">GERMANY</option>
                                     <option value="DK">DENMARK</option>
                                     <option value="GB">UNITED KINGDOM</option>
                                     <option value="US">UNITED STATES</option>
+                                    <option value="CH">SWITZERLAND</option>
                                 </select>
                             </div>
                             <div class="input-group">
                                 <label class="input-label">Weight (kg):</label>
-                                <input type="number" step="0.1" name="weight" id="wizard-weight" class="input-field"
-                                    value="2.5">
+                                <input type="number" step="0.1" name="weight" id="wizard-weight-2" class="input-field"
+                                    placeholder="e.g. 2.5">
                             </div>
-                            <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
-                                <button type="button" class="btn-primary" id="btn-next-step-1">Next <i
+                            <div style="margin-top: 2rem; display: flex; justify-content: space-between;">
+                                <button type="button" class="btn-primary" style="background: var(--text-muted);"
+                                    id="btn-prev-step-2"><i class="fas fa-arrow-left"></i> Back</button>
+                                <button type="button" class="btn-primary" id="btn-next-step-2">Next <i
                                         class="fas fa-arrow-right"></i></button>
                             </div>
                         </form>
@@ -149,8 +181,8 @@
                 </div>
             </div>
 
-            <!-- STEP 2: BOX DIMENSIONS -->
-            <div id="wizard-step-2" class="wizard-content hidden">
+            <!-- STEP 3: SELECT BOX SIZE -->
+            <div id="wizard-step-3" class="wizard-content hidden">
                 <div style="max-width: 900px; margin: 0 auto;">
                     <h2 style="text-align: center; font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem;">BOX
                         DIMENSIONS</h2>
@@ -193,110 +225,21 @@
                     </div>
                     <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
                         <button type="button" class="btn-primary" style="background: var(--text-muted);"
-                            id="btn-prev-step-2"><i class="fas fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" id="btn-next-step-2">Next <i
+                            id="btn-prev-step-3"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-primary" id="btn-next-step-3">Next <i
                                 class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
             </div>
 
-            <!-- STEP 3: BOOKING INFORMATION -->
-            <div id="wizard-step-3" class="wizard-content hidden">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <div class="form-card">
-                        <h3><i class="fas fa-truck-loading" style="color: var(--accent);"></i> Pickup Information
-                        </h3>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Collect Date</label>
-                                <input type="date" class="input-field" id="wizard-pickup-date">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Company</label>
-                                <input type="text" class="input-field" id="wizard-pickup-company"
-                                    value="Swiss Logistics">
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">Address</label>
-                            <input type="text" class="input-field" id="wizard-pickup-address" value="Bahnhofstrasse 12">
-                        </div>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">City</label>
-                                <input type="text" class="input-field" id="wizard-pickup-city" value="Zurich">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Zip Code</label>
-                                <input type="text" class="input-field" id="wizard-pickup-zip" value="8001">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Contact Name</label>
-                                <input type="text" class="input-field" value="Hans Schmidt">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Phone</label>
-                                <input type="text" class="input-field" value="+41 44 123 45 67">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-card">
-                        <h3><i class="fas fa-map-marker-alt" style="color: var(--success);"></i> Delivery
-                            Information</h3>
-                        <div class="input-group">
-                            <label class="input-label">Company Name</label>
-                            <input type="text" class="input-field" id="wizard-dest-company" placeholder="e.g. BCIC">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">Address</label>
-                            <input type="text" class="input-field" id="wizard-dest-address"
-                                placeholder="e.g. 123 Main St">
-                        </div>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">City</label>
-                                <input type="text" class="input-field" id="wizard-dest-city">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Zip Code</label>
-                                <input type="text" class="input-field" id="wizard-dest-zip">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Contact Name</label>
-                                <input type="text" class="input-field" id="wizard-dest-contact">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Phone</label>
-                                <input type="text" class="input-field" id="wizard-dest-phone">
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">Contact Email</label>
-                            <input type="email" class="input-field" id="wizard-dest-email">
-                        </div>
-                    </div>
-                </div>
-                <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
-                    <button type="button" class="btn-primary" style="background: var(--text-muted);"
-                        id="btn-prev-step-3"><i class="fas fa-arrow-left"></i> Back</button>
-                    <button type="button" class="btn-primary" id="btn-next-step-3">Next <i
-                            class="fas fa-arrow-right"></i></button>
-                </div>
-            </div>
-
-            <!-- STEP 4: FINALIZE -->
+            <!-- STEP 4: PROFORMA INVOICE -->
             <div id="wizard-step-4" class="wizard-content hidden">
                 <div style="max-width: 600px; margin: 0 auto; text-align: center;">
                     <i class="fas fa-file-invoice-dollar"
                         style="font-size: 4rem; color: var(--accent); margin-bottom: 2rem;"></i>
-                    <h2>Review & Confirm</h2>
+                    <h2>Proforma Invoice</h2>
                     <p style="color: var(--text-muted); margin-bottom: 2rem;">Please review your shipment details
-                        and
-                        generated Proforma Invoice before booking.</p>
+                        and generated Proforma Invoice before booking.</p>
 
                     <div class="stat-card" style="text-align: left; margin-bottom: 2rem;">
                         <div id="final-pricing-summary"></div>
@@ -477,177 +420,305 @@
             </div>
 
             <!-- Booking Form (Initially Hidden, shown as "modal" or inline) -->
+            <!-- Comprehensive One-Page Booking Form -->
             <div id="booking-form-container" class="hidden" style="margin-top: 2rem;">
-                <div class="form-card">
+                <div class="form-card" style="padding: 2.5rem;">
                     <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3>Create New Draft Booking</h3>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 1rem;">
+                        <h2 style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">BOOKING
+                            INFORMATION</h2>
                         <button id="btn-close-booking"
-                            style="background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--text-muted);">&times;</button>
+                            style="background:none; border:none; font-size:2rem; cursor:pointer; color: var(--text-muted);">&times;</button>
                     </div>
                     <form id="booking-form">
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">DSV Account Number</label>
-                                <input type="text" name="dsvAccount" class="input-field" value="8004990000">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
+                            <!-- COLUMN 1 -->
+                            <div class="booking-column">
+                                <section class="form-section">
+                                    <h3 class="section-title">Pickup Information</h3>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Collect Date From *</label>
+                                            <input type="datetime-local" name="collectDateFrom" class="input-field"
+                                                required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Collect Date To *</label>
+                                            <input type="datetime-local" name="collectDateTo" class="input-field"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Pickup Instructions</label>
+                                        <input type="text" name="pickupInstructions" class="input-field"
+                                            placeholder="e.g. handle with care">
+                                    </div>
+
+                                    <h4 class="sub-title">Pickup Address</h4>
+                                    <div class="input-group">
+                                        <label class="input-label">Company Name</label>
+                                        <input type="text" name="origin_company" class="input-field"
+                                            placeholder="e.g. BCIC Swiss GmbH">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Address *</label>
+                                        <input type="text" name="origin_address" class="input-field"
+                                            placeholder="Enter pickup address" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Zip Code</label>
+                                            <input type="text" name="origin_zip" class="input-field"
+                                                placeholder="e.g. 6340">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">City *</label>
+                                            <input type="text" name="origin_city" class="input-field"
+                                                placeholder="e.g. Baar" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Country Code *</label>
+                                            <input type="text" name="origin_country" class="input-field"
+                                                placeholder="e.g. CH" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Contact Name *</label>
+                                            <input type="text" name="origin_contact" class="input-field"
+                                                placeholder="e.g. John Doe" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Contact Phone *</label>
+                                            <input type="text" name="origin_phone" class="input-field"
+                                                placeholder="+41 78 619 59 28" required>
+                                            <small style="color: var(--text-muted); font-size: 0.7rem;">Format: +CC
+                                                Number</small>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Contact Email</label>
+                                            <input type="email" name="origin_email" class="input-field">
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section class="form-section">
+                                    <h3 class="section-title">Package Measurements</h3>
+                                    <div class="form-grid-4">
+                                        <div class="input-group">
+                                            <label class="input-label">Length (CM)</label>
+                                            <input type="number" name="length" class="input-field" value="10">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Width (CM)</label>
+                                            <input type="number" name="width" class="input-field" value="10">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Height (CM)</label>
+                                            <input type="number" name="height" class="input-field" value="10">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Gross Weight (KG) *</label>
+                                            <input type="number" step="0.1" name="weight" class="input-field"
+                                                placeholder="e.g. 2.5" required>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section class="form-section">
+                                    <h3 class="section-title">Commodities</h3>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Origin Country Code</label>
+                                            <input type="text" name="commodity_origin" class="input-field" value="CH">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Goods Description *</label>
+                                            <input type="text" name="commodity" class="input-field"
+                                                value="Nothing Important" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Currency Code *</label>
+                                            <select name="currencyCode" class="input-field">
+                                                <option value="CHF">CHF - Swiss Franc</option>
+                                                <option value="EUR" selected>EUR - Euro</option>
+                                                <option value="USD">USD - US Dollar</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Goods Monetary Value *</label>
+                                            <input type="number" name="goodsValue" class="input-field" value="60"
+                                                required>
+                                        </div>
+                                    </div>
+                                </section>
                             </div>
-                            <div class="input-group">
-                                <label class="input-label">Service Code</label>
-                                <select name="serviceCode" class="input-field">
-                                    <option value="DSVAirExpress">DSV Air Express</option>
-                                    <option value="DSVParcels">DSV Parcels</option>
-                                    <option value="DSVEconomy">DSV Economy</option>
-                                    <option value="DSVAirExpressImport">DSV Air Express Import</option>
-                                </select>
+
+                            <!-- COLUMN 2 -->
+                            <div class="booking-column">
+                                <section class="form-section">
+                                    <h3 class="section-title">Delivery Information</h3>
+                                    <div class="input-group">
+                                        <label class="input-label">Company Name</label>
+                                        <input type="text" name="dest_company" class="input-field"
+                                            placeholder="e.g. BCIC">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Address *</label>
+                                        <input type="text" name="dest_address" class="input-field" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Zip Code</label>
+                                            <input type="text" name="dest_zip" class="input-field">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">City *</label>
+                                            <input type="text" name="dest_city" class="input-field" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Country Code *</label>
+                                            <input type="text" name="dest_country" class="input-field"
+                                                placeholder="e.g. DE" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Contact Name *</label>
+                                            <input type="text" name="dest_contact" class="input-field" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Contact Phone *</label>
+                                            <input type="text" name="dest_phone" class="input-field"
+                                                placeholder="+49 151234567" required>
+                                            <small style="color: var(--text-muted); font-size: 0.7rem;">Format: +CC
+                                                Number</small>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Contact Email</label>
+                                            <input type="email" name="dest_email" class="input-field">
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                                        <input type="checkbox" name="residential" id="chk-residential">
+                                        <label for="chk-residential" style="font-weight: 500;">Residential
+                                            Address</label>
+                                    </div>
+                                </section>
+
+                                <section class="form-section">
+                                    <h3 class="section-title">Payment Information</h3>
+                                    <div class="input-group">
+                                        <label class="input-label">Shipping Charges Payment</label>
+                                        <select name="paymentType" class="input-field">
+                                            <option value="SENDER">Sender</option>
+                                            <option value="RECEIVER">Receiver</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Duties and Taxes Payment</label>
+                                        <select name="dutiesType" class="input-field">
+                                            <option value="SENDER">Sender (DDP)</option>
+                                            <option value="RECEIVER" selected>Receiver (DDU)</option>
+                                        </select>
+                                    </div>
+                                </section>
+
+                                <section class="form-section">
+                                    <h3 class="section-title">Service Options</h3>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Package Type</label>
+                                            <select name="packageType" class="input-field">
+                                                <option value="PARCELS">Parcels</option>
+                                                <option value="DOCUMENT">Document</option>
+                                                <option value="ENVELOPE">Envelope</option>
+                                            </select>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Service Code</label>
+                                            <select name="serviceCode" class="input-field">
+                                                <option value="DSVAirExpress">Air Express</option>
+                                                <option value="DSVEconomy">Economy</option>
+                                                <option value="DSVAirExpressImport">Air Express Import</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Insurance Value</label>
+                                            <input type="number" name="insuranceValue" class="input-field" value="30">
+                                        </div>
+                                    </div>
+                                </section>
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Package Type</label>
-                                <select name="packageType" class="input-field">
-                                    <option value="PARCELS">Parcels</option>
-                                    <option value="DOCUMENT">Document</option>
-                                    <option value="ENVELOPE">Envelope</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Weight (KG)</label>
-                                <input type="number" step="0.1" name="weight" class="input-field" value="2.5" required>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Dimensions (L x W x H cm)</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input type="number" name="length" class="input-field" placeholder="L" value="10">
-                                    <input type="number" name="width" class="input-field" placeholder="W" value="10">
-                                    <input type="number" name="height" class="input-field" placeholder="H" value="10">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Commodity Description</label>
-                                <input type="text" name="commodity" class="input-field" value="Industrial Parts"
-                                    placeholder="e.g. Industrial Parts">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Goods Value & Currency</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input type="number" name="goodsValue" class="input-field" value="100"
-                                        placeholder="Value">
-                                    <select name="currencyCode" class="input-field" style="width: 100px;">
-                                        <option value="CHF">CHF</option>
-                                        <option value="EUR">EUR</option>
-                                        <option value="USD">USD</option>
-                                        <option value="GBP">GBP</option>
+                        <!-- Full Width Sections -->
+                        <section class="form-section" style="margin-top: 2rem;">
+                            <h3 class="section-title">Notifications</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <div class="input-group">
+                                    <label class="input-label">Notification Code *</label>
+                                    <select name="notif_code" class="input-field">
+                                        <option value="DEP">DEP - Departure notifications</option>
+                                        <option value="DEL">DEL - Delivery notifications</option>
+                                        <option value="EXC">EXC - Exception notifications</option>
                                     </select>
                                 </div>
-                            </div>
-                        </div>
-
-                        <h3 style="margin-top: 1.5rem;">Sender / Pickup Information</h3>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Company Name</label>
-                                <input type="text" name="origin_company" class="input-field" value="BCIC Swiss GmbH"
-                                    placeholder="e.g. BCIC Swiss GmbH">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Address</label>
-                                <input type="text" name="origin_address" class="input-field" value="Lättichstrasse 6"
-                                    placeholder="e.g. Lättichstrasse 6">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">City</label>
-                                <input type="text" name="origin_city" class="input-field" value="Baar"
-                                    placeholder="e.g. Baar">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Zip Code</label>
-                                <input type="text" name="origin_zip" class="input-field" value="6340"
-                                    placeholder="e.g. 6340">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Country (ISO)</label>
-                                <input type="text" name="origin_country" class="input-field" value="CH"
-                                    placeholder="e.g. CH">
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Phone</label>
-                                <input type="text" name="origin_phone" class="input-field" value="+41 786195928"
-                                    placeholder="e.g. +41 786195928">
-                            </div>
-                        </div>
-
-                        <h3>Receiver Information</h3>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Company Name</label>
-                                <input type="text" name="dest_company" class="input-field"
-                                    placeholder="Test Receiver GmbH" required>
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Address</label>
-                                <input type="text" name="dest_address" class="input-field" placeholder="Main Street 1"
-                                    required>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">City</label>
-                                <input type="text" name="dest_city" class="input-field" value="Krefeld"
-                                    placeholder="e.g. Krefeld" required>
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Zip Code (5 digits for DE)</label>
-                                <input type="text" name="dest_zip" class="input-field" value="47807"
-                                    placeholder="e.g. 47807" required>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label class="input-label">Country (ISO)</label>
-                                <input type="text" name="dest_country" class="input-field" value="DE"
-                                    placeholder="e.g. DE" required>
-                            </div>
-                            <div class="input-group">
-                                <label class="input-label">Weight (KG)</label>
-                                <input type="number" step="0.1" name="weight" class="input-field" value="2.5" required>
-                            </div>
-                        </div>
-
-                        <div class="form-row"
-                            style="align-items: flex-end; margin-top: 1rem; padding: 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 8px;">
-                            <div class="input-group" style="flex: 2;">
-                                <label class="input-label">Price Estimate</label>
-                                <div id="booking-price-display"
-                                    style="font-size: 1.25rem; font-weight: 800; color: var(--accent);">
-                                    --.00 EUR
+                                <div class="input-group">
+                                    <label class="input-label">Recipients (DEP) *</label>
+                                    <input type="text" name="notif_email" class="input-field"
+                                        placeholder="recipient@example.com">
                                 </div>
-                                <small style="color: var(--text-muted);">Estimated rate based on details above.</small>
                             </div>
-                            <div class="input-group" style="flex: 1;">
+                        </section>
+
+                        <section class="form-section">
+                            <h3 class="section-title">References</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <div class="input-group">
+                                    <label class="input-label">Qualifier</label>
+                                    <select name="ref_qualifier" class="input-field">
+                                        <option value="SHPR_REF">SHPR_REF - Shipper reference</option>
+                                        <option value="CUST_REF">CUST_REF - Customer reference</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Reference</label>
+                                    <input type="text" name="ref_value" class="input-field" placeholder="ABCD1234">
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Price Summary & Submission -->
+                        <div class="form-row"
+                            style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(37, 99, 235, 0.05); border-radius: 12px; align-items: flex-end;">
+                            <input type="hidden" name="dsvAccount" value="8004990000">
+                            <div class="input-group" style="flex: 2;">
+                                <label class="input-label" style="font-weight: 800;">Price Estimate</label>
+                                <div id="booking-price-display"
+                                    style="font-size: 1.75rem; font-weight: 900; color: var(--accent);">--.00 CHF</div>
+                                <small style="color: var(--text-muted);">Approximate rate excluding taxes and special
+                                    surcharges.</small>
+                            </div>
+                            <div class="input-group" style="flex: 1; display: flex; gap: 1rem;">
                                 <button type="button" id="btn-get-booking-quote" class="btn-primary"
-                                    style="width: 100%; background: var(--success);">
+                                    style="flex: 1; background: var(--success); padding: 1rem;">
                                     <i class="fas fa-calculator"></i> Get Quote
+                                </button>
+                                <button type="submit" class="btn-primary"
+                                    style="flex: 2; padding: 1rem; font-size: 1.1rem;">
+                                    Submit Booking
                                 </button>
                             </div>
                         </div>
-
-                        <button type="submit" class="btn-primary" style="margin-top: 1.5rem;">Generate DSV
-                            Booking</button>
                     </form>
                 </div>
             </div>

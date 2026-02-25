@@ -34,14 +34,9 @@ exports.createSimpleBooking = async (req, res) => {
         console.log('Sending Payload to DSV:', JSON.stringify(dsvPayload, null, 2));
 
         // 1. Submit Draft Booking
-        // Endpoint: /booking/v2/bookings
-        // Endpoint: /booking/v2/bookings
-        // Config base is https://api.dsv.com/my-demo
         const bookingUrl = `${config.dsv.endpoints.booking}/booking/v2/bookings`;
-
         const draftResponse = await dsvClient.post(bookingUrl, dsvPayload);
 
-        // Response format usually contains shipmentIdentificationNumber
         const bookingId = draftResponse.data.shipmentIdentificationNumber || draftResponse.data.bookingId;
 
         if (!bookingId) {
@@ -49,22 +44,31 @@ exports.createSimpleBooking = async (req, res) => {
             throw new Error('Failed to create booking: No Booking ID or Shipment ID returned');
         }
 
-        console.log(`Shipment Created: ${bookingId}`);
+        console.log(`Draft Shipment Created: ${bookingId}`);
 
-        // 2. Confirm Booking (If needed, or just return draft ID for now)
-        // Note: For simple bookings in the docs, "Submit Draft" is step 1.
-        // There is a separate endpoint to confirm/label if we want labels immediately.
-        // Endpoint: /booking/v2/bookings/{bookingId}/labels (implied from "Confirm draft... download labels")
-        // However, docs say "Confirm draft booking and download package label(s)" 
-        // usually is a PUT or POST to /bookings/{id}/confirm or similar.
-        // Let's assume for this step we just return the bookingId as success for the draft.
-        // Start simple.
+        // 2. Confirm Booking and Get Labels
+        // Endpoint: /booking/v2/bookings/{bookingId}/labels
+        const labelUrl = `${config.dsv.endpoints.booking}/booking/v2/bookings/${bookingId}/labels`;
+
+        console.log(`Confirming and requesting labels for: ${bookingId}`);
+        const labelResponse = await dsvClient.post(labelUrl, {
+            labelFormat: "PDF"
+        });
+
+        // The response format for labels often contains base64 data in packageLabels or similar
+        // Let's assume the DSV API returns an object with label data.
+        let savedLabelPath = null;
+        if (labelResponse.data && labelResponse.data.packageLabels && labelResponse.data.packageLabels.length > 0) {
+            const labelContent = labelResponse.data.packageLabels[0].labelContent;
+            savedLabelPath = await saveLabel(labelContent, bookingId);
+            console.log(`Label saved to: ${savedLabelPath}`);
+        }
 
         res.status(201).json({
             success: true,
             bookingId,
-            shipmentId: bookingId, // DSV often uses same ID or returns shipmentId separately. Using bookingId for now.
-            labelUrl: null, // Label generation would be a next step
+            shipmentId: bookingId,
+            labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
             trackingUrl: `https://track.dsv.com?bookingId=${bookingId}`
         });
 

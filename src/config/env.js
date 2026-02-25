@@ -26,8 +26,8 @@ module.exports = {
         },
     },
     certification: {
-        enabled: process.env.CERTIFICATION_MODE === 'true',
-        testId: process.env.CERTIFICATION_TEST_ID,
+        enabled: process.env.CERTIFICATION_MODE === 'true' || false,
+        testId: process.env.CERTIFICATION_TEST_ID || '',
     },
     paths: {
         labels: path.resolve(process.env.LABEL_STORAGE_PATH || './public/labels'),
