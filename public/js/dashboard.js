@@ -338,11 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const wizardForm1 = document.getElementById('wizard-form-1');
     const pricingResultContainer = document.getElementById('pricing-result-container');
 
+    // Wizard Navigation
     function goToStep(step) {
         // Hide all steps
         document.querySelectorAll('.wizard-content').forEach(el => el.classList.add('hidden'));
-        // Show target step
-        document.getElementById(`wizard-step-${step}`).classList.remove('hidden');
+        const targetStepEl = document.getElementById(`wizard-step-${step}`);
+        if (targetStepEl) targetStepEl.classList.remove('hidden');
 
         // Update Progress Bar
         document.querySelectorAll('.wizard-step').forEach(el => {
@@ -355,6 +356,14 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStep = step;
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // Step 2 Presets
+    window.setBox = (l, w, h) => {
+        document.getElementById('box-length').value = l;
+        document.getElementById('box-width').value = w;
+        document.getElementById('box-height').value = h;
+        showToast(`Dimensions set: ${l}x${w}x${h}cm`, 'info');
+    };
 
     // Step 1: Handle Change/Next
     const nextStep1 = document.getElementById('btn-next-step-1');
@@ -428,13 +437,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Step 4: Final Book
     document.getElementById('btn-final-book')?.addEventListener('click', async () => {
+        const btn = document.getElementById('btn-final-book');
+        const originalContent = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Booking...';
+
         showToast('Finalizing DSV Booking...', 'info');
-        // Reuse createSimpleBooking logic here
-        // For brevity in demo, we trigger a success
-        setTimeout(() => {
-            showToast('Shipment Booked Successfully!', 'success');
-            goToStep(1);
-        }, 1500);
+
+        try {
+            // Collect all data
+            const bookingData = {
+                shipmentData: {
+                    pickup: {
+                        companyName: document.getElementById('wizard-pickup-company').value,
+                        address: document.getElementById('wizard-pickup-address').value,
+                        city: document.getElementById('wizard-pickup-city').value,
+                        zipCode: document.getElementById('wizard-pickup-zip').value,
+                        countryCode: wizardForm1.direction.value === 'export' ? 'CH' : wizardForm1.targetCountry.value
+                    },
+                    delivery: {
+                        companyName: document.getElementById('wizard-dest-company').value,
+                        address: document.getElementById('wizard-dest-address').value,
+                        city: document.getElementById('wizard-dest-city').value,
+                        zipCode: document.getElementById('wizard-dest-zip').value,
+                        countryCode: wizardForm1.direction.value === 'export' ? wizardForm1.targetCountry.value : 'CH',
+                        contactName: document.getElementById('wizard-dest-contact').value,
+                        contactPhone: document.getElementById('wizard-dest-phone').value,
+                        contactEmail: document.getElementById('wizard-dest-email').value
+                    },
+                    weight: wizardForm1.weight.value,
+                    dimensions: {
+                        length: document.getElementById('box-length').value,
+                        width: document.getElementById('box-width').value,
+                        height: document.getElementById('box-height').value
+                    }
+                }
+            };
+
+            const response = await fetch('/api/bookings/simple', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingData)
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                showToast(`Success! Booking ID: ${result.bookingId}`, 'success');
+                // Redirect to orders or reset wizard
+                setTimeout(() => {
+                    const ordersNavItem = document.querySelector('[data-view="orders"]');
+                    if (ordersNavItem) ordersNavItem.click();
+                    goToStep(1);
+                }, 2000);
+            } else {
+                showToast(`Booking failed: ${result.error || 'Unknown error'}`, 'error');
+            }
+        } catch (err) {
+            showToast('Network error during booking', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+        }
     });
     document.getElementById('btn-prev-step-4')?.addEventListener('click', () => goToStep(3));
 
