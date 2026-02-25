@@ -163,8 +163,8 @@
 
             <!-- Removed wizard-step-2 since it is merged into step-1 -->
 
-            <!-- STEP 3: SELECT BOX SIZE -->
-            <div id="wizard-step-3" class="wizard-content hidden">
+            <!-- STEP 2: SELECT BOX SIZE -->
+            <div id="wizard-step-2" class="wizard-content hidden">
                 <div style="max-width: 900px; margin: 0 auto;">
                     <h2 style="text-align: center; font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem;">BOX
                         DIMENSIONS</h2>
@@ -173,14 +173,8 @@
                         no surprise surcharges from DSV.
                     </p>
 
-                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 3rem; align-items: start;">
-                        <div class="box-preview">
-                            <img src="https://img.icons8.com/isometric/512/cardboard-box.png"
-                                style="width: 180px; opacity: 0.8;" alt="Box Preview">
-                            <div style="margin-top: 1rem; color: var(--text-muted); font-weight: 600;">Live Dimension
-                                Preview</div>
-                        </div>
-                        <div class="form-card" style="padding: 2rem;">
+                    <div class="form-card" style="max-width: 600px; margin: 0 auto; padding: 2.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
                             <div class="input-group">
                                 <label class="input-label">Length (cm):</label>
                                 <input type="number" name="length" id="box-length" class="input-field" value="75">
@@ -193,29 +187,36 @@
                                 <label class="input-label">Height (cm):</label>
                                 <input type="number" name="height" id="box-height" class="input-field" value="35">
                             </div>
-                            <div style="margin-top: 1.5rem;">
-                                <div
-                                    style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted);">
-                                    NOT SURE ABOUT THE SIZE?</div>
-                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                    <button class="btn-preset" onclick="setBox(32,24,3)">A4 Env</button>
-                                    <button class="btn-preset" onclick="setBox(35,20,15)">Shoe Box</button>
-                                    <button class="btn-preset" onclick="setBox(75,35,35)">Moving Box</button>
-                                </div>
+                        </div>
+
+                        <div style="margin-top: 2.5rem;">
+                            <div
+                                style="font-size: 0.9rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                                Not Sure About the Size?</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <button class="btn-preset" onclick="setBox(32,24,3)">A4
+                                    Envelope 32X24X3</button>
+                                <button class="btn-preset" onclick="setBox(23,14,5)">Two
+                                    Books 23X14X5</button>
+                                <button class="btn-preset" onclick="setBox(35,20,15)">Shoe
+                                    Box 35X20X15</button>
+                                <button class="btn-preset" onclick="setBox(75,35,35)">Moving
+                                    Box 75X35X35</button>
                             </div>
                         </div>
                     </div>
+
                     <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
                         <button type="button" class="btn-primary" style="background: var(--text-muted);"
-                            id="btn-prev-step-3"><i class="fas fa-arrow-left"></i> Back</button>
-                        <button type="button" class="btn-primary" id="btn-next-step-3">Next <i
+                            id="btn-prev-step-2"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn-primary" id="btn-next-step-2">Next <i
                                 class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
             </div>
 
-            <!-- STEP 4: PROFORMA INVOICE -->
-            <div id="wizard-step-4" class="wizard-content hidden">
+            <!-- STEP 3: PROFORMA INVOICE -->
+            <div id="wizard-step-3" class="wizard-content hidden">
                 <div style="max-width: 600px; margin: 0 auto; text-align: center;">
                     <i class="fas fa-file-invoice-dollar"
                         style="font-size: 4rem; color: var(--accent); margin-bottom: 2rem;"></i>
@@ -231,7 +232,7 @@
                         style="width: 100%; font-size: 1.2rem; padding: 1.25rem;">
                         <i class="fas fa-check-circle"></i> Confirm DSV Booking
                     </button>
-                    <button type="button" id="btn-prev-step-4"
+                    <button type="button" id="btn-prev-step-3"
                         style="background: none; border: none; color: var(--text-muted); margin-top: 1rem; cursor: pointer;">
                         Go Back and Edit
                     </button>

@@ -433,13 +433,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-prev-step-2')?.addEventListener('click', () => goToStep(1));
     document.getElementById('btn-next-step-2')?.addEventListener('click', () => {
-        // In the new flow, step 2 is dimensions, so next is step 3 (final)
-        goToStep(3);
-    });
-
-    // Step 3: Dimensions
-    document.getElementById('btn-prev-step-3')?.addEventListener('click', () => goToStep(2));
-    document.getElementById('btn-next-step-3')?.addEventListener('click', () => {
         const pricingHtml = pricingResultContainer.innerHTML;
         const direction = document.getElementById('wizard-primary-direction').value;
         const country = document.getElementById('wizard-target-country').value;
@@ -461,10 +454,10 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         document.getElementById('final-pricing-summary').innerHTML = summaryHtml;
-        goToStep(3); // Going to final step
+        goToStep(3); // Go to Proforma
     });
 
-    // Step 3 (Final) finalize
+    // Step 3 (Final)
     document.getElementById('btn-prev-step-3')?.addEventListener('click', () => goToStep(2));
 
     // Step 2 Presets (Used in Step 3 now)
@@ -522,8 +515,6 @@ document.addEventListener('DOMContentLoaded', () => {
             bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
         }
     });
-    document.getElementById('btn-prev-step-3')?.addEventListener('click', () => goToStep(2));
-
 
     // Unified Tracking Logic
     async function handleTracking(shipmentId) {

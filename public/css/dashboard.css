@@ -585,18 +585,20 @@ th {
 }
 
 .btn-preset {
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    background: #f0ad4e;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: white;
     cursor: pointer;
     transition: var(--transition-fast);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-preset:hover {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
+    background: #ec971f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
