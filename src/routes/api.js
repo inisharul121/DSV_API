@@ -19,6 +19,7 @@ router.post('/bookings/complex', upload.any(), bookingController.createComplexBo
 router.post('/bookings/:draftId/documents', upload.single('file'), documentController.uploadDocument);
 
 // Tracking
+router.get('/orders', trackingController.getShipments);
 router.get('/tracking/shipments/:shipmentId', trackingController.getShipmentDetails);
 router.get('/tracking/shipments/:shipmentId/events', trackingController.getShipmentEvents);
 router.get('/tracking/awb/:awbNumber/events', trackingController.getShipmentEventsByAWB);

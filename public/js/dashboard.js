@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 sec.classList.remove('active');
                 if (sec.id === `view-${view}`) {
                     sec.classList.add('active');
+                    // Trigger data fetch for specific views
+                    if (view === 'orders') fetchOrders();
                 }
             });
         });
@@ -580,6 +582,54 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
+    // Orders Logic
+    async function fetchOrders() {
+        const ordersTableBody = document.querySelector('#view-orders tbody');
+        if (!ordersTableBody) return;
+
+        ordersTableBody.innerHTML = '<tr><td colspan="6" style="padding: 2rem; text-align: center;"><div class="loader"></div> Loading real order data...</td></tr>';
+
+        try {
+            const response = await fetch('/api/orders');
+            const result = await response.json();
+
+            if (result.success && result.data.length > 0) {
+                renderOrders(result.data);
+            } else if (result.success) {
+                ordersTableBody.innerHTML = '<tr><td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-muted);">No active orders found.</td></tr>';
+            } else {
+                ordersTableBody.innerHTML = `<tr><td colspan="6" style="padding: 2rem; text-align: center; color: var(--error);">Error: ${result.error || 'Failed to fetch orders'}</td></tr>`;
+            }
+        } catch (err) {
+            console.error('Fetch orders error:', err);
+            ordersTableBody.innerHTML = '<tr><td colspan="6" style="padding: 2rem; text-align: center; color: var(--error);">Network error fetching orders.</td></tr>';
+        }
+    }
+
+    function renderOrders(orders) {
+        const ordersTableBody = document.querySelector('#view-orders tbody');
+        ordersTableBody.innerHTML = orders.map(order => `
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 1rem; font-weight: 600;">#${order.shipmentId}</td>
+                <td style="padding: 1rem;">${order.receiver.companyName}</td>
+                <td style="padding: 1rem;">${new Date(order.pickup.collectDateFrom).toLocaleDateString()}</td>
+                <td style="padding: 1rem;">
+                    <span style="padding: 0.25rem 0.75rem; border-radius: 20px; background: rgba(16, 185, 129, 0.1); color: var(--success); font-size: 0.75rem;">
+                        ${order.serviceOptions.serviceCode}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">${order.packages[0].grossWeight} ${order.weightUnit}</td>
+                <td style="padding: 1rem;">
+                    <i class="fas fa-search" style="cursor:pointer; color: var(--accent); margin-right: 0.5rem;" onclick="handleTracking('${order.shipmentId}')"></i>
+                    <i class="fas fa-ellipsis-h" style="cursor:pointer; color: var(--text-muted);"></i>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Expose handleTracking to window for onclick in rendered rows
+    window.handleTracking = handleTracking;
+
     // Toast Function
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
@@ -596,4 +646,8 @@ document.addEventListener('DOMContentLoaded', () => {
             toast.classList.remove('show');
         }, 3000);
     }
+
+    // Load initial orders if we land on orders view
+    const initialView = document.querySelector('.nav-item.active')?.getAttribute('data-view');
+    if (initialView === 'orders') fetchOrders();
 });

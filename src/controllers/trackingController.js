@@ -100,3 +100,42 @@ exports.getShipmentEventsByCarrierID = async (req, res) => {
 // Legacy support or generic tracking
 exports.trackShipment = exports.getShipmentDetails;
 
+/**
+ * List shipments for the account
+ * GET /api/orders
+ */
+exports.getShipments = async (req, res) => {
+    try {
+        const account = req.query.dsvAccount || config.dsv.account;
+        console.log(`[Tracking Controller] Fetching shipments for account: ${account}`);
+
+        // Fallback IDs if no search endpoint is identified
+        const knownIds = ['14620184'];
+
+        // In a Production scenario, we would use a dedicated search/list endpoint.
+        // For XP, if no list endpoint is provided, we might keep a local DB or fetch by ID.
+        const shipmentPromises = knownIds.map(id => {
+            const url = `${config.dsv.endpoints.tracking}/shipmentDetails/${id}`;
+            return dsvClient.get(url)
+                .then(r => r.data.shipment)
+                .catch(err => {
+                    console.error(`Failed to fetch shipment ${id}:`, err.message);
+                    return null;
+                });
+        });
+
+        const shipments = (await Promise.all(shipmentPromises)).filter(s => s !== null);
+
+        res.json({
+            success: true,
+            data: shipments
+        });
+    } catch (error) {
+        console.error('List Shipments Error:', error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            success: false,
+            error: error.response?.data || error.message
+        });
+    }
+};
+
