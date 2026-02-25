@@ -52,9 +52,9 @@ exports.buildBookingPayload = (data) => {
         weightUnit: data.weightUnit || "KG",
         packages: data.packages || [
             {
-                length: 10,
-                width: 10,
-                height: 10,
+                length: parseFloat(data.length || 10),
+                width: parseFloat(data.width || 10),
+                height: parseFloat(data.height || 10),
                 grossWeight: parseFloat(data.weight || 2.5)
             }
         ],
@@ -63,8 +63,8 @@ exports.buildBookingPayload = (data) => {
                 originCountryCode: data.pickup?.address?.countryCode || data.origin_country || "CH",
                 goodsDescription: data.commodity || "Industrial Circuit Boards",
                 goodsValue: {
-                    currencyCode: "CHF",
-                    monetaryValue: 100
+                    currencyCode: data.currencyCode || "CHF",
+                    monetaryValue: parseFloat(data.goodsValue || 100)
                 }
             }
         ]

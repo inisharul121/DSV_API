@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 deliveryCountryCode: bookingData.dest_country,
                 deliveryCity: bookingData.dest_city,
                 deliveryZipCode: bookingData.dest_zip,
-                packageType: "PARCELS", // Default for the simple form
+                packageType: bookingData.packageType || "PARCELS",
                 defaultWeight: bookingData.weight
             };
 
@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         pickupCountryCode: wizardForm1.direction.value === 'export' ? 'CH' : country,
                         deliveryCountryCode: wizardForm1.direction.value === 'export' ? country : 'CH',
                         packageType: "PARCELS",
-                        defaultWeight: wizardForm1.weight.value
+                        defaultWeight: document.getElementById('wizard-weight').value
                     })
                 });
 
@@ -467,12 +467,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         contactPhone: document.getElementById('wizard-dest-phone').value,
                         contactEmail: document.getElementById('wizard-dest-email').value
                     },
-                    weight: wizardForm1.weight.value,
+                    weight: document.getElementById('wizard-weight').value,
                     dimensions: {
                         length: document.getElementById('box-length').value,
                         width: document.getElementById('box-width').value,
                         height: document.getElementById('box-height').value
-                    }
+                    },
+                    packageType: "PARCELS" // Could be made dynamic later
                 }
             };
 
