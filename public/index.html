@@ -215,27 +215,327 @@
                 </div>
             </div>
 
-            <!-- STEP 3: PROFORMA INVOICE -->
+            <!-- STEP 3: BOOKING FORM -->
             <div id="wizard-step-3" class="wizard-content hidden">
-                <div style="max-width: 600px; margin: 0 auto; text-align: center;">
-                    <i class="fas fa-file-invoice-dollar"
-                        style="font-size: 4rem; color: var(--accent); margin-bottom: 2rem;"></i>
-                    <h2>Proforma Invoice</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Please review your shipment details
-                        and generated Proforma Invoice before booking.</p>
-
-                    <div class="stat-card" style="text-align: left; margin-bottom: 2rem;">
-                        <div id="final-pricing-summary"></div>
+                <div class="form-card" style="padding: 2.5rem; max-width: 1200px; margin: 0 auto; background: white;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 1rem;">
+                        <h2 style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">BOOKING
+                            INFORMATION</h2>
+                        <div id="wizard-summary-badge"
+                            style="background: var(--accent); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                            WIZARD DATA ATTACHED
+                        </div>
                     </div>
 
-                    <button type="button" class="btn-primary" id="btn-final-book"
-                        style="width: 100%; font-size: 1.2rem; padding: 1.25rem;">
-                        <i class="fas fa-check-circle"></i> Confirm DSV Booking
-                    </button>
-                    <button type="button" id="btn-prev-step-3"
-                        style="background: none; border: none; color: var(--text-muted); margin-top: 1rem; cursor: pointer;">
-                        Go Back and Edit
-                    </button>
+                    <form id="wizard-booking-form">
+                        <!-- Grid Layout matching the image -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+
+                            <!-- LEFT COLUMN -->
+                            <div>
+                                <!-- Pickup Information -->
+                                <div class="form-section-clean">
+                                    <h3 class="section-title-clean">Pickup Information</h3>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Collect Date From *</label>
+                                            <input type="datetime-local" name="collectDateFrom" class="input-field"
+                                                required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">Collect Date To *</label>
+                                            <input type="datetime-local" name="collectDateTo" class="input-field"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Pickup Instructions</label>
+                                        <input type="text" name="pickupInstructions" class="input-field"
+                                            placeholder="Ready at front desk" value="Ready at front desk">
+                                    </div>
+
+                                    <h4 class="sub-title-clean">Pickup Address</h4>
+                                    <div class="input-group">
+                                        <label class="input-label">Company Name</label>
+                                        <input type="text" name="origin_company" class="input-field"
+                                            value="BCIC Swiss GmbH">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Address *</label>
+                                        <input type="text" name="origin_address" class="input-field"
+                                            value="Lättichstrasse 6" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Zip Code</label>
+                                            <input type="text" name="origin_zip" class="input-field" value="6340">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">City *</label>
+                                            <input type="text" name="origin_city" class="input-field" value="Baar"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Country Code *</label>
+                                        <select name="origin_country" class="input-field" required>
+                                            <option value="CH" selected>Switzerland</option>
+                                            <option value="GB">United Kingdom</option>
+                                            <option value="BD">Bangladesh</option>
+                                            <option value="SE">Sweden</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Contact Name *</label>
+                                        <input type="text" name="origin_contact" class="input-field"
+                                            value="Mazharul Sheikh" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Contact Phone *</label>
+                                        <input type="text" name="origin_phone" class="input-field" value="+41786195928"
+                                            required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Contact Email</label>
+                                        <input type="email" name="origin_email" class="input-field"
+                                            value="rony.sheikh@bcic-swiss.com">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RIGHT COLUMN -->
+                            <div>
+                                <!-- Delivery Information -->
+                                <div class="form-section-clean">
+                                    <h3 class="section-title-clean">Delivery Information</h3>
+                                    <div class="input-group">
+                                        <label class="input-label">Company Name</label>
+                                        <input type="text" name="dest_company" class="input-field"
+                                            value="BCIC Swiss GmbH">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Address *</label>
+                                        <input type="text" name="dest_address" class="input-field"
+                                            value="Lättichstrasse 6" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Zip Code</label>
+                                        <input type="text" name="dest_zip" class="input-field" value="6340">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">City *</label>
+                                        <input type="text" name="dest_city" class="input-field" value="Baar" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Country Code *</label>
+                                        <select name="dest_country" class="input-field" required>
+                                            <option value="CH" selected>Switzerland</option>
+                                            <option value="GB">United Kingdom</option>
+                                            <option value="BD">Bangladesh</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Contact Name *</label>
+                                        <input type="text" name="dest_contact" class="input-field"
+                                            value="Mazharul Sheikh" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Contact Phone *</label>
+                                        <input type="text" name="dest_phone" class="input-field" value="+41786195928"
+                                            required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Contact Email</label>
+                                        <input type="email" name="dest_email" class="input-field"
+                                            value="rony.sheikh@bcic-swiss.com">
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="checkbox" name="residential" id="chk-residential-wizard">
+                                        <label for="chk-residential-wizard"
+                                            style="font-size: 0.85rem;">Residential</label>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Information -->
+                                <div class="form-section-clean" style="margin-top: 1.5rem;">
+                                    <h3 class="section-title-clean">Payment Information</h3>
+                                    <div class="input-group">
+                                        <label class="input-label">Shipping Charges Payment</label>
+                                        <select name="paymentType" class="input-field">
+                                            <option value="SENDER">Sender</option>
+                                            <option value="RECEIVER">Receiver</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Duties and Taxes Payment</label>
+                                        <select name="dutiesType" class="input-field">
+                                            <option value="SENDER">Sender</option>
+                                            <option value="RECEIVER" selected>Receiver</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Full Width Sections -->
+
+                        <!-- Service Options -->
+                        <div class="form-section-clean">
+                            <h3 class="section-title-clean">Service Options</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div class="input-group">
+                                    <label class="input-label">Package Type</label>
+                                    <select name="packageType" class="input-field">
+                                        <option value="PARCELS">Parcels</option>
+                                        <option value="DOCUMENT">Document</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Service Code</label>
+                                    <select name="serviceCode" class="input-field">
+                                        <option value="AirExpress">AirExpress</option>
+                                        <option value="Economy">Economy</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Currency Code *</label>
+                                    <select name="currencyCode" class="input-field">
+                                        <option value="CHF">CHF - Swiss Franc</option>
+                                        <option value="EUR" selected>EUR - Euro</option>
+                                        <option value="USD">USD - US Dollar</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Insurance Value *</label>
+                                    <input type="number" name="insuranceValue" class="input-field" value="30">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Package Measurements -->
+                        <div class="form-section-clean">
+                            <h3 class="section-title-clean">Package Measurements</h3>
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                                <div class="input-group">
+                                    <label class="input-label">Length (CM)</label>
+                                    <input type="number" name="length" class="input-field" value="75">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Width (CM)</label>
+                                    <input type="number" name="width" class="input-field" value="35">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Height (CM)</label>
+                                    <input type="number" name="height" class="input-field" value="35">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Gross Weight (KG) *</label>
+                                    <input type="number" step="0.1" name="weight" class="input-field" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Commodities -->
+                        <div class="form-section-clean">
+                            <h3 class="section-title-clean">Commodities</h3>
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                                <div class="input-group">
+                                    <label class="input-label">Origin Country Code</label>
+                                    <select name="commodity_origin" class="input-field">
+                                        <option value="CH" selected>Switzerland</option>
+                                        <option value="GB">United Kingdom</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Goods Description *</label>
+                                    <input type="text" name="commodity" class="input-field" value="Nothing important"
+                                        required>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Currency Code *</label>
+                                    <select name="commodity_currency" class="input-field">
+                                        <option value="EUR" selected>EUR - Euro</option>
+                                        <option value="CHF">CHF</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Goods Monetary Value *</label>
+                                    <input type="number" name="goodsValue" class="input-field" value="60" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notifications -->
+                        <div class="form-section-clean">
+                            <h3 class="section-title-clean">Notifications</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div class="input-group">
+                                    <label class="input-label">Notification Code *</label>
+                                    <select name="notif_code_1" class="input-field">
+                                        <option value="DEP">DEP - Departure notifications</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Recipients (DEP) *</label>
+                                    <input type="text" name="notif_email_1" class="input-field"
+                                        value="recipient1@receiver.com">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Notification Code</label>
+                                    <select name="notif_code_2" class="input-field">
+                                        <option value="EXC">EXC - Exception notifications</option>
+                                    </select>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                                    <div class="input-group">
+                                        <label class="input-label">Recipients (EXC) *</label>
+                                        <input type="text" name="notif_email_2" class="input-field"
+                                            value="recipient1@receiver.com">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Language</label>
+                                        <select name="notif_lang" class="input-field">
+                                            <option value="EN">EN</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- References -->
+                        <div class="form-section-clean">
+                            <h3 class="section-title-clean">References</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div class="input-group">
+                                    <label class="input-label">Qualifier</label>
+                                    <select name="ref_qualifier" class="input-field">
+                                        <option value="SHPR_REF">SHPR_REF - Shipper reference</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Reference</label>
+                                    <input type="text" name="ref_value" class="input-field" value="ABCD1234">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            style="margin-top: 3rem; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+                            <div id="wizard-price-estimate"
+                                style="font-size: 1.5rem; font-weight: 800; color: var(--accent);">
+                                Loading Final Estimate...
+                            </div>
+                            <button type="submit" class="btn-primary" id="btn-wizard-final-book"
+                                style="width: 300px; padding: 1rem; border-radius: 4px; background: #e65100;">
+                                Submit Booking
+                            </button>
+                            <button type="button" id="btn-back-to-step-2"
+                                style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem;">
+                                <i class="fas fa-arrow-left"></i> Back to Dimensions
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>
@@ -369,308 +669,6 @@
                 </div>
             </div>
 
-            <!-- Booking Form (Initially Hidden, shown as "modal" or inline) -->
-            <!-- Comprehensive One-Page Booking Form -->
-            <div id="booking-form-container" class="hidden" style="margin-top: 2rem;">
-                <div class="form-card" style="padding: 2.5rem;">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 1rem;">
-                        <h2 style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">BOOKING
-                            INFORMATION</h2>
-                        <button id="btn-close-booking"
-                            style="background:none; border:none; font-size:2rem; cursor:pointer; color: var(--text-muted);">&times;</button>
-                    </div>
-                    <form id="booking-form">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
-                            <!-- COLUMN 1 -->
-                            <div class="booking-column">
-                                <section class="form-section">
-                                    <h3 class="section-title">Pickup Information</h3>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Collect Date From *</label>
-                                            <input type="datetime-local" name="collectDateFrom" class="input-field"
-                                                required>
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Collect Date To *</label>
-                                            <input type="datetime-local" name="collectDateTo" class="input-field"
-                                                required>
-                                        </div>
-                                    </div>
-                                    <div class="input-group">
-                                        <label class="input-label">Pickup Instructions</label>
-                                        <input type="text" name="pickupInstructions" class="input-field"
-                                            placeholder="e.g. handle with care">
-                                    </div>
-
-                                    <h4 class="sub-title">Pickup Address</h4>
-                                    <div class="input-group">
-                                        <label class="input-label">Company Name</label>
-                                        <input type="text" name="origin_company" class="input-field"
-                                            value="BCIC Swiss GmbH">
-                                    </div>
-                                    <div class="input-group">
-                                        <label class="input-label">Address *</label>
-                                        <input type="text" name="origin_address" class="input-field"
-                                            value="Lättichstrasse 6" required>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Zip Code</label>
-                                            <input type="text" name="origin_zip" class="input-field" value="6340">
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">City *</label>
-                                            <input type="text" name="origin_city" class="input-field" value="Baar"
-                                                required>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Country Code *</label>
-                                            <input type="text" name="origin_country" class="input-field" value="CH"
-                                                required>
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Contact Name *</label>
-                                            <input type="text" name="origin_contact" class="input-field"
-                                                value="Eric Aubry" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Contact Phone *</label>
-                                            <input type="text" name="origin_phone" class="input-field"
-                                                value="+41 786195928" required>
-                                            <small style="color: var(--text-muted); font-size: 0.7rem;">Format: +CC
-                                                Number</small>
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Contact Email</label>
-                                            <input type="email" name="origin_email" class="input-field">
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section class="form-section">
-                                    <h3 class="section-title">Package Measurements</h3>
-                                    <div class="form-grid-4">
-                                        <div class="input-group">
-                                            <label class="input-label">Length (CM)</label>
-                                            <input type="number" name="length" class="input-field" value="10">
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Width (CM)</label>
-                                            <input type="number" name="width" class="input-field" value="10">
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Height (CM)</label>
-                                            <input type="number" name="height" class="input-field" value="10">
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Gross Weight (KG) *</label>
-                                            <input type="number" step="0.1" name="weight" class="input-field"
-                                                placeholder="e.g. 2.5" required>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section class="form-section">
-                                    <h3 class="section-title">Commodities</h3>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Origin Country Code</label>
-                                            <input type="text" name="commodity_origin" class="input-field" value="CH">
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Goods Description *</label>
-                                            <input type="text" name="commodity" class="input-field"
-                                                value="Nothing Important" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Currency Code *</label>
-                                            <select name="currencyCode" class="input-field">
-                                                <option value="CHF">CHF - Swiss Franc</option>
-                                                <option value="EUR" selected>EUR - Euro</option>
-                                                <option value="USD">USD - US Dollar</option>
-                                            </select>
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Goods Monetary Value *</label>
-                                            <input type="number" name="goodsValue" class="input-field" value="60"
-                                                required>
-                                        </div>
-                                    </div>
-                                </section>
-                            </div>
-
-                            <!-- COLUMN 2 -->
-                            <div class="booking-column">
-                                <section class="form-section">
-                                    <h3 class="section-title">Delivery Information</h3>
-                                    <div class="input-group">
-                                        <label class="input-label">Company Name</label>
-                                        <input type="text" name="dest_company" class="input-field"
-                                            placeholder="e.g. BCIC">
-                                    </div>
-                                    <div class="input-group">
-                                        <label class="input-label">Address *</label>
-                                        <input type="text" name="dest_address" class="input-field" required>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Zip Code</label>
-                                            <input type="text" name="dest_zip" class="input-field">
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">City *</label>
-                                            <input type="text" name="dest_city" class="input-field" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Country Code *</label>
-                                            <input type="text" name="dest_country" class="input-field"
-                                                placeholder="e.g. DE" required>
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Contact Name *</label>
-                                            <input type="text" name="dest_contact" class="input-field" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Contact Phone *</label>
-                                            <input type="text" name="dest_phone" class="input-field"
-                                                placeholder="+49 151234567" required>
-                                            <small style="color: var(--text-muted); font-size: 0.7rem;">Format: +CC
-                                                Number</small>
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Contact Email</label>
-                                            <input type="email" name="dest_email" class="input-field">
-                                        </div>
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
-                                        <input type="checkbox" name="residential" id="chk-residential">
-                                        <label for="chk-residential" style="font-weight: 500;">Residential
-                                            Address</label>
-                                    </div>
-                                </section>
-
-                                <section class="form-section">
-                                    <h3 class="section-title">Payment Information</h3>
-                                    <div class="input-group">
-                                        <label class="input-label">Shipping Charges Payment</label>
-                                        <select name="paymentType" class="input-field">
-                                            <option value="SENDER">Sender</option>
-                                            <option value="RECEIVER">Receiver</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-group">
-                                        <label class="input-label">Duties and Taxes Payment</label>
-                                        <select name="dutiesType" class="input-field">
-                                            <option value="SENDER">Sender (DDP)</option>
-                                            <option value="RECEIVER" selected>Receiver (DDU)</option>
-                                        </select>
-                                    </div>
-                                </section>
-
-                                <section class="form-section">
-                                    <h3 class="section-title">Service Options</h3>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Package Type</label>
-                                            <select name="packageType" class="input-field">
-                                                <option value="PARCELS">Parcels</option>
-                                                <option value="DOCUMENT">Document</option>
-                                                <option value="ENVELOPE">Envelope</option>
-                                            </select>
-                                        </div>
-                                        <div class="input-group">
-                                            <label class="input-label">Service Code</label>
-                                            <select name="serviceCode" class="input-field">
-                                                <option value="DSVAirExpress">Air Express</option>
-                                                <option value="DSVEconomy">Economy</option>
-                                                <option value="DSVAirExpressImport">Air Express Import</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="input-group">
-                                            <label class="input-label">Insurance Value</label>
-                                            <input type="number" name="insuranceValue" class="input-field" value="30">
-                                        </div>
-                                    </div>
-                                </section>
-                            </div>
-                        </div>
-
-                        <!-- Full Width Sections -->
-                        <section class="form-section" style="margin-top: 2rem;">
-                            <h3 class="section-title">Notifications</h3>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                                <div class="input-group">
-                                    <label class="input-label">Notification Code *</label>
-                                    <select name="notif_code" class="input-field">
-                                        <option value="DEP">DEP - Departure notifications</option>
-                                        <option value="DEL">DEL - Delivery notifications</option>
-                                        <option value="EXC">EXC - Exception notifications</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Recipients (DEP) *</label>
-                                    <input type="text" name="notif_email" class="input-field"
-                                        placeholder="recipient@example.com">
-                                </div>
-                            </div>
-                        </section>
-
-                        <section class="form-section">
-                            <h3 class="section-title">References</h3>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                                <div class="input-group">
-                                    <label class="input-label">Qualifier</label>
-                                    <select name="ref_qualifier" class="input-field">
-                                        <option value="SHPR_REF">SHPR_REF - Shipper reference</option>
-                                        <option value="CUST_REF">CUST_REF - Customer reference</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label class="input-label">Reference</label>
-                                    <input type="text" name="ref_value" class="input-field" placeholder="ABCD1234">
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Price Summary & Submission -->
-                        <div class="form-row"
-                            style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(37, 99, 235, 0.05); border-radius: 12px; align-items: flex-end;">
-                            <input type="hidden" name="dsvAccount" value="8004990000">
-                            <div class="input-group" style="flex: 2;">
-                                <label class="input-label" style="font-weight: 800;">Price Estimate</label>
-                                <div id="booking-price-display"
-                                    style="font-size: 1.75rem; font-weight: 900; color: var(--accent);">--.00 CHF</div>
-                                <small style="color: var(--text-muted);">Approximate rate excluding taxes and special
-                                    surcharges.</small>
-                            </div>
-                            <div class="input-group" style="flex: 1; display: flex; gap: 1rem;">
-                                <button type="button" id="btn-get-booking-quote" class="btn-primary"
-                                    style="flex: 1; background: var(--success); padding: 1rem;">
-                                    <i class="fas fa-calculator"></i> Get Quote
-                                </button>
-                                <button type="submit" class="btn-primary"
-                                    style="flex: 2; padding: 1rem; font-size: 1.1rem;">
-                                    Submit Booking
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </section>
 
         <!-- SHIPMENTS VIEW -->

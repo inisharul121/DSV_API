@@ -131,22 +131,31 @@ exports.buildQuotePayload = (data) => {
     const now = new Date();
     const collectDateStr = data.collectDate || now.toISOString().split('T')[0];
 
+    // Extraction helpers for nested structures (common in Wizard/Certification)
+    const pickupCountry = data.pickupCountryCode || data.pickup?.address?.countryCode || data.origin_country || "DK";
+    const pickupCity = data.pickupCity || data.pickup?.address?.city || data.origin_city || undefined;
+    const pickupZip = data.pickupZipCode || data.pickup?.address?.zipCode || data.origin_zip || undefined;
+
+    const deliveryCountry = data.deliveryCountryCode || data.delivery?.countryCode || data.dest_country || "DE";
+    const deliveryCity = data.deliveryCity || data.delivery?.city || data.dest_city || undefined;
+    const deliveryZip = data.deliveryZipCode || data.delivery?.address?.zipCode || data.dest_zip || undefined;
+
     return {
         dsvAccount: parseInt(data.dsvAccount || config.dsv.account),
-        pickupCountryCode: data.pickupCountryCode || "DK",
-        pickupCity: data.pickupCity || undefined,
-        pickupZipCode: data.pickupZipCode || undefined,
-        deliveryCountryCode: data.deliveryCountryCode || "DE",
-        deliveryCity: data.deliveryCity || undefined,
-        deliveryZipCode: data.deliveryZipCode || undefined,
+        pickupCountryCode: pickupCountry.trim().substring(0, 2).toUpperCase(),
+        pickupCity: pickupCity,
+        pickupZipCode: pickupZip,
+        deliveryCountryCode: deliveryCountry.trim().substring(0, 2).toUpperCase(),
+        deliveryCity: deliveryCity,
+        deliveryZipCode: deliveryZip,
         residentialDelivery: data.residentialDelivery === true || data.residentialDelivery === 'true',
         serviceOptions: {
             packageType: data.packageType || "PARCELS", // PARCELS / DOCUMENT / ENVELOPE
             saturdayDelivery: data.saturdayDelivery === true || data.saturdayDelivery === 'true',
             timeOption: data.timeOption || undefined,
-            insurance: data.insuranceCurrency ? {
-                currencyCode: data.insuranceCurrency,
-                monetaryValue: parseFloat(data.insuranceValue)
+            insurance: (data.insuranceValue || data.insuranceCurrency) ? {
+                currencyCode: data.insuranceCurrency || data.currencyCode || "CHF",
+                monetaryValue: parseFloat(data.insuranceValue || 0)
             } : undefined
         },
         ddp: data.ddp === true || data.ddp === 'true',

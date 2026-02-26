@@ -431,35 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
         radio.addEventListener('change', handleMergedPricing);
     });
 
-    document.getElementById('btn-prev-step-2')?.addEventListener('click', () => goToStep(1));
-    document.getElementById('btn-next-step-2')?.addEventListener('click', () => {
-        const pricingHtml = pricingResultContainer.innerHTML;
-        const direction = document.getElementById('wizard-primary-direction').value;
-        const country = document.getElementById('wizard-target-country').value;
-        const weight = document.getElementById('wizard-weight-2').value;
-        const length = document.getElementById('box-length').value;
-        const width = document.getElementById('box-width').value;
-        const height = document.getElementById('box-height').value;
-
-        const summaryHtml = `
-            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
-                    <div><strong>Direction:</strong> ${direction === 'export' ? 'Switzerland to ' + country : country + ' to Switzerland'}</div>
-                    <div><strong>Weight:</strong> ${weight} kg</div>
-                    <div><strong>Box Size:</strong> ${length}x${width}x${height} cm</div>
-                    <div><strong>Est. Volume:</strong> ${(length * width * height / 1000).toFixed(2)} Liters</div>
-                </div>
-                <hr style="margin: 1.5rem 0; opacity: 0.1;">
-                ${pricingHtml}
-            </div>
-        `;
-        document.getElementById('final-pricing-summary').innerHTML = summaryHtml;
-        goToStep(3); // Go to Proforma
-    });
-
-    // Step 3 (Final)
-    document.getElementById('btn-prev-step-3')?.addEventListener('click', () => goToStep(2));
-
     // Step 2 Presets (Used in Step 3 now)
     window.setBox = (l, w, h) => {
         const len = document.getElementById('box-length');
@@ -471,50 +442,116 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(`Dimensions set: ${l}x${w}x${h}cm`, 'info');
     };
 
-    // Step 4: Final Book (Transition to full Booking Form)
-    document.getElementById('btn-final-book')?.addEventListener('click', () => {
-        showToast('Preparing your booking form...', 'info');
+    // Step 4: Final Book (Transition to full Booking Form in Step 3)
+    const btnNextStep2 = document.getElementById('btn-next-step-2');
+    const wizardBookingForm = document.getElementById('wizard-booking-form');
 
-        // 1. Collect Wizard Data
-        const direction = document.getElementById('wizard-primary-direction').value;
-        const country = document.getElementById('wizard-target-country').value;
-        const weight = document.getElementById('wizard-weight-2').value;
-        const length = document.getElementById('box-length').value;
-        const width = document.getElementById('box-width').value;
-        const height = document.getElementById('box-height').value;
+    if (btnNextStep2) {
+        btnNextStep2.addEventListener('click', () => {
+            showToast('Preparing your booking form...', 'info');
 
-        // 2. Map to Full Booking Form
-        const f = document.getElementById('booking-form');
-        if (f) {
-            if (direction === 'export') {
-                f.origin_country.value = 'CH';
-                f.dest_country.value = country;
-            } else {
-                f.origin_country.value = country;
-                f.dest_country.value = 'CH';
+            // 1. Collect Wizard Data
+            const direction = document.getElementById('wizard-primary-direction').value;
+            const country = document.getElementById('wizard-target-country').value;
+            const weight = document.getElementById('wizard-weight-2').value;
+            const length = document.getElementById('box-length').value;
+            const width = document.getElementById('box-width').value;
+            const height = document.getElementById('box-height').value;
+
+            // 2. Map to Full Booking Form
+            const f = wizardBookingForm;
+            if (f) {
+                if (direction === 'export') {
+                    f.origin_country.value = 'CH';
+                    f.dest_country.value = country;
+                } else {
+                    f.origin_country.value = country;
+                    f.dest_country.value = 'CH';
+                }
+                f.weight.value = weight;
+                f.length.value = length;
+                f.width.value = width;
+                f.height.value = height;
+
+                // Set default pickup window: today 09:00 – 13:00
+                const now = new Date();
+                const pad = (n) => n < 10 ? '0' + n : n;
+                const formatDTLocal = (date) => {
+                    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+                };
+
+                const fromDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0);
+                const toDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 13, 0);
+
+                if (f.collectDateFrom) f.collectDateFrom.value = formatDTLocal(fromDate);
+                if (f.collectDateTo) f.collectDateTo.value = formatDTLocal(toDate);
+
+                // Update the display price in Step 3
+                const wizardPrice = document.querySelector('#pricing-result-container .value[style*="accent"]')?.innerText;
+                const priceDisplay = document.getElementById('wizard-price-estimate');
+                if (wizardPrice && priceDisplay) {
+                    priceDisplay.innerText = `Final Estimate: ${wizardPrice}`;
+                }
             }
-            f.weight.value = weight;
-            f.length.value = length;
-            f.width.value = width;
-            f.height.value = height;
 
-            // Update the display price in the booking form too
-            const wizardPrice = document.querySelector('#pricing-result-container .value[style*="accent"]')?.innerText;
-            if (wizardPrice) {
-                document.getElementById('booking-price-display').innerText = wizardPrice;
+            goToStep(3); // Go to the full form in Step 3
+            showToast('Form pre-populated from wizard', 'success');
+        });
+    }
+
+    // Step 3 Navigation Back
+    document.getElementById('btn-back-to-step-2')?.addEventListener('click', () => goToStep(2));
+
+    // Final Wizard Booking Submission
+    if (wizardBookingForm) {
+        wizardBookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('btn-wizard-final-book');
+            const originalBtnText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
+
+            const formData = new FormData(wizardBookingForm);
+            const data = Object.fromEntries(formData.entries());
+
+            // Add dsvAccount explicitly if not in form
+            data.dsvAccount = "8004990000";
+
+            showToast('Submitting final booking to DSV...', 'info');
+
+            try {
+                const response = await fetch('/api/bookings/simple', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ shipmentData: data })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const labelLink = result.labelUrl
+                        ? `<br><a href="${result.labelUrl}" target="_blank" style="color:white; text-decoration:underline;">Download Label PDF</a>`
+                        : '';
+                    showToast(`Success! Booking ID: ${result.bookingId}${labelLink}`, 'success');
+                    wizardBookingForm.reset();
+                    // Optional: redirect to dashboard or orders
+                    setTimeout(() => {
+                        const dashNav = document.querySelector('[data-view="dashboard"]');
+                        if (dashNav) dashNav.click();
+                    }, 3000);
+                } else {
+                    const errorMsg = result.error?.message || result.error || 'Failed to create booking';
+                    showToast(`Error: ${errorMsg}`, 'error');
+                }
+            } catch (err) {
+                console.error('Wizard booking error:', err);
+                showToast('Network error during booking', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
             }
-        }
-
-        // 3. Show booking form within the same view
-        showToast('Processing your data...', 'success');
-
-        // Hide wizard steps and show form
-        document.querySelectorAll('.wizard-content').forEach(el => el.classList.add('hidden'));
-        if (bookingFormContainer) {
-            bookingFormContainer.classList.remove('hidden');
-            bookingFormContainer.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
+        });
+    }
 
     // Unified Tracking Logic
     async function handleTracking(shipmentId) {
