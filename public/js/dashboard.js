@@ -486,6 +486,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (f.collectDateFrom) f.collectDateFrom.value = formatDTLocal(fromDate);
                 if (f.collectDateTo) f.collectDateTo.value = formatDTLocal(toDate);
 
+                // Set dynamic defaults based on country to save time
+                if (country === 'GB') {
+                    if (!f.dest_zip.value) f.dest_zip.value = 'EC2V 7HQ';
+                    if (!f.dest_city.value) f.dest_city.value = 'London';
+                } else if (country === 'DE') {
+                    if (!f.dest_zip.value) f.dest_zip.value = '10115';
+                    if (!f.dest_city.value) f.dest_city.value = 'Berlin';
+                } else if (country === 'CH') {
+                    if (!f.dest_zip.value) f.dest_zip.value = '6340';
+                    if (!f.dest_city.value) f.dest_city.value = 'Baar';
+                }
+
+                // Make direction and country fields read-only in Step 3
+                if (f.origin_country) f.origin_country.disabled = true;
+                if (f.dest_country) f.dest_country.disabled = true;
+
                 // Update the display price in Step 3
                 const wizardPrice = document.querySelector('#pricing-result-container .value[style*="accent"]')?.innerText;
                 const priceDisplay = document.getElementById('wizard-price-estimate');
@@ -514,6 +530,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const formData = new FormData(wizardBookingForm);
             const data = Object.fromEntries(formData.entries());
+
+            // Add disabled fields explicitly (FormData ignores them)
+            if (wizardBookingForm.origin_country) data.origin_country = wizardBookingForm.origin_country.value;
+            if (wizardBookingForm.dest_country) data.dest_country = wizardBookingForm.dest_country.value;
 
             // Add dsvAccount explicitly if not in form
             data.dsvAccount = "8004990000";
@@ -676,6 +696,50 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
+    // --- ZIP CODE LOOKUP LOGIC ---
+    const lookupZip = async (zipInput, cityInput, countryInput) => {
+        const zip = zipInput.value.trim();
+        const country = countryInput.value;
+
+        if (!zip || zip.length < 3 || !country) return;
+
+        // Specialized UK handling (Postcodes often have spaces)
+        let cleanZip = zip.toUpperCase();
+        if (country === 'GB') cleanZip = cleanZip.replace(/\s/g, '');
+
+        try {
+            // Zippopotam.us API: https://api.zippopotam.us/country/zip
+            const response = await fetch(`https://api.zippopotam.us/${country.toLowerCase()}/${cleanZip}`);
+            const data = await response.json();
+
+            if (data && data.places && data.places.length > 0) {
+                const place = data.places[0];
+                cityInput.value = place['place name'];
+                showToast(`Location found: ${place['place name']}`, 'info');
+            }
+        } catch (err) {
+            console.warn('Zip lookup failed:', err);
+        }
+    };
+
+    // Attach listeners to wizard form
+    const wizardZipOrigin = wizardBookingForm.querySelector('[name="origin_zip"]');
+    const wizardCityOrigin = wizardBookingForm.querySelector('[name="origin_city"]');
+    const wizardCountryOrigin = wizardBookingForm.querySelector('[name="origin_country"]');
+
+    const wizardZipDest = wizardBookingForm.querySelector('[name="dest_zip"]');
+    const wizardCityDest = wizardBookingForm.querySelector('[name="dest_city"]');
+    const wizardCountryDest = wizardBookingForm.querySelector('[name="dest_country"]');
+
+    let lookupTimeout;
+    const debouncedLookup = (z, ci, co) => {
+        clearTimeout(lookupTimeout);
+        lookupTimeout = setTimeout(() => lookupZip(z, ci, co), 500);
+    };
+
+    if (wizardZipOrigin) wizardZipOrigin.addEventListener('input', () => debouncedLookup(wizardZipOrigin, wizardCityOrigin, wizardCountryOrigin));
+    if (wizardZipDest) wizardZipDest.addEventListener('input', () => debouncedLookup(wizardZipDest, wizardCityDest, wizardCountryDest));
+
     // Expose handleTracking to window for onclick in rendered rows
     window.handleTracking = handleTracking;
 
@@ -684,6 +748,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const toast = document.getElementById('toast');
         const icon = document.getElementById('toast-icon');
         const msg = document.getElementById('toast-message');
+
+        if (!toast || !msg) return console.log('Toast UI missing:', message);
 
         toast.className = `toast show ${type}`;
         msg.innerText = message;
