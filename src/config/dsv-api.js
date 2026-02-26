@@ -28,28 +28,41 @@ console.log('----------------------');
 
 // Request interceptor for dynamic auth or logging if needed
 dsvClient.interceptors.request.use(request => {
-    // Switch subscription key if it's a tracking request
-    const isTracking = request.url.includes('/tracking') || request.url.includes('/shipments') || request.url.includes('/awbs') || request.url.includes('/carriers') || request.url.includes('Events') || request.url.includes('Details');
-    const isQuote = request.url.includes('/compare');
+    const url = request.url;
+    const isQuote = url.includes('/comparator') || url.includes('/compare');
+    const isTracking = url.includes('/tracking') || url.includes('/awbs') || url.includes('/carriers') || url.includes('Events') || url.includes('Details');
+    const isLabel = url.includes('/labels');
+
+    // Helper to clean all auth variations before setting correct ones
+    const cleanAuth = () => {
+        delete request.headers['dsv-subscription-key'];
+        delete request.headers['DSV-Subscription-Key'];
+        delete request.headers['dsv-service-auth'];
+        delete request.headers['DSV-Service-Auth'];
+        delete request.headers['x-pat'];
+        delete request.headers['X-PAT'];
+    };
 
     if (isQuote) {
-        delete request.headers['dsv-subscription-key'];
-        delete request.headers['dsv-service-auth'];
-        delete request.headers['x-pat'];
-        request.headers['dsv-subscription-key'] = config.dsv.quotePrimaryKey;
-        request.headers['dsv-service-auth'] = config.dsv.quoteServiceAuth;
-        request.headers['x-pat'] = config.dsv.pat; // Note: Quote-specific PAT currently causes 500 error, using global PAT which reaches business logic.
-        console.log(`[DSV API] Using Quote Auth for: ${request.url}`);
-    } else if (isTracking) {
-        // Use Title-Case for Tracking API
-        delete request.headers['dsv-subscription-key'];
-        delete request.headers['dsv-service-auth'];
+        cleanAuth();
+        // Fallback to main sub key if quote specific one is missing 
+        request.headers['DSV-Subscription-Key'] = config.dsv.quotePrimaryKey || config.dsv.subscriptionKey;
+        request.headers['dsv-service-auth'] = config.dsv.quoteServiceAuth || config.dsv.serviceAuth;
+        request.headers['x-pat'] = config.dsv.quotePat || config.dsv.pat;
+        console.log(`[DSV API] Using Quote Auth for: ${url}`);
+    } else if (isTracking && !isLabel) {
+        cleanAuth();
         request.headers['DSV-Subscription-Key'] = config.dsv.trackingSubscriptionKey;
-        request.headers['dsv-service-auth'] = config.dsv.trackingServiceAuth; // Testing case sensitivity
-        request.headers['Cache-Control'] = 'no-cache';
-        console.log(`[DSV API] Using Tracking Auth for: ${request.url}`);
+        request.headers['dsv-service-auth'] = config.dsv.trackingServiceAuth;
+        request.headers['x-pat'] = config.dsv.pat;
+        console.log(`[DSV API] Using Tracking Auth for: ${url}`);
     } else {
-        console.log(`[DSV API] Using Booking Auth for: ${request.url}`);
+        // Booking & Labels (GET or POST)
+        cleanAuth();
+        request.headers['DSV-Subscription-Key'] = config.dsv.subscriptionKey;
+        request.headers['dsv-service-auth'] = config.dsv.serviceAuth;
+        request.headers['x-pat'] = config.dsv.pat;
+        console.log(`[DSV API] Using Booking/Label Auth for: ${url}`);
     }
 
     // Add Certification Header if enabled

@@ -49,8 +49,9 @@ exports.createSimpleBooking = async (req, res) => {
         // 2. Confirm Booking and Get Labels
         // Try fallback paths if one fails
         const pathsToTry = [
-            `${config.dsv.endpoints.booking}/booking/v2/bookings/${bookingId}/labels`,
-            `${config.dsv.endpoints.booking}/booking/v2/shipments/${bookingId}/labels`
+            `${config.dsv.endpoints.booking}/v2/bookings/labels/${bookingId}?labelFormat=PDF`,
+            `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${bookingId}?labelFormat=PDF`,
+            `${config.dsv.endpoints.booking}/booking/v2/shipments/${bookingId}/labels?labelFormat=PDF`
         ];
 
         let labelResponse = null;
@@ -58,16 +59,17 @@ exports.createSimpleBooking = async (req, res) => {
 
         for (const url of pathsToTry) {
             try {
-                console.log(`Attempting to get labels from: ${url}`);
-                labelResponse = await dsvClient.post(url, {
-                    labelFormat: "PDF"
-                });
-                if (labelResponse.status === 200 || labelResponse.status === 201) {
-                    console.log(`Labels found successfully at: ${url}`);
+                console.log(`[BOOKING] Attempting label retrieval from: ${url}`);
+                // Switch to GET for labels
+                const response = await dsvClient.get(url);
+
+                if (response.data && (response.data.labelResults || response.data.packageLabels)) {
+                    labelResponse = response.data;
+                    console.log(`[BOOKING] Labels retrieved successfully from: ${url}`);
                     break;
                 }
             } catch (err) {
-                console.warn(`Path failed: ${url} (${err.response?.status || err.message})`);
+                console.warn(`[BOOKING] Path failed: ${url} (${err.response?.status || err.message})`);
                 lastError = err;
             }
         }

@@ -51,23 +51,44 @@ exports.getShipmentLabels = async (req, res) => {
         const { shipmentId } = req.params;
         const { labelFormat = 'PDF' } = req.query;
 
-        // POST /booking/v2/bookings/labels/{shipmentId}?labelFormat={labelFormat}
-        const labelUrl = `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${shipmentId}?labelFormat=${labelFormat}`;
+        // Try both common patterns for confirmed shipments
+        const pathsToTry = [
+            `${config.dsv.endpoints.booking}/v2/bookings/labels/${shipmentId}?labelFormat=${labelFormat}`,
+            `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${shipmentId}?labelFormat=${labelFormat}`,
+            `${config.dsv.endpoints.booking}/booking/v2/shipments/${shipmentId}/labels?labelFormat=${labelFormat}`,
+            `${config.dsv.endpoints.booking}/v2/bookings/labels/${shipmentId}`,
+            `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${shipmentId}`,
+            `${config.dsv.endpoints.booking}/booking/v2/shipments/${shipmentId}/labels`
+        ];
 
-        console.log(`[LABEL] Requesting label for ${shipmentId} (Format: ${labelFormat})`);
+        let lastError = null;
+        for (const url of pathsToTry) {
+            try {
+                console.log(`[LABEL] Attempting retrieval from: ${url}`);
+                // Switch to GET as per user's successful snippet
+                const response = await dsvClient.get(url);
 
-        const response = await dsvClient.post(labelUrl, {});
+                if (response.data && (response.data.labelResults || response.data.packageLabels)) {
+                    console.log(`[LABEL] Success at: ${url}`);
+                    return res.json({
+                        success: true,
+                        data: response.data
+                    });
+                }
+            } catch (err) {
+                console.warn(`[LABEL] Path failed: ${url} (${err.response?.status || err.message})`);
+                lastError = err;
+            }
+        }
 
-        res.json({
-            success: true,
-            data: response.data
-        });
+        throw lastError || new Error('All label retrieval paths failed');
 
     } catch (error) {
-        console.error('Label Retrieval Error:', error.response?.data || error.message);
+        const errorData = error.response?.data || error.message;
+        console.error('Label Retrieval Error:', errorData);
         res.status(error.response?.status || 500).json({
             success: false,
-            error: error.response?.data || error.message
+            error: errorData
         });
     }
 };
