@@ -50,19 +50,37 @@ const Shipments = () => {
     const handleDownloadLabel = async (shipmentId) => {
         setDownloading(shipmentId);
         try {
-            const response = await dsvApi.post(`/bookings/${shipmentId}/labels`, {}, {
-                responseType: 'blob'
-            });
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `Label_${shipmentId}.pdf`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            const response = await dsvApi.post(`/bookings/${shipmentId}/labels`, {});
+
+            if (response.data.success && (response.data.data.labelResults || response.data.data.packageLabels)) {
+                const labelData = response.data.data.labelResults?.[0]?.labelContent ||
+                    response.data.data.packageLabels?.[0]?.labelContent;
+
+                if (labelData) {
+                    const byteCharacters = atob(labelData);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `Label_${shipmentId}.pdf`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                } else {
+                    alert('Label content is empty.');
+                }
+            } else {
+                alert('No labels found for this shipment.');
+            }
         } catch (err) {
             console.error('Download error:', err);
-            alert('Could not download label. Please try again later.');
+            alert('Could not download label. Ensure the Shipment ID is valid and has been confirmed.');
         } finally {
             setDownloading(null);
         }

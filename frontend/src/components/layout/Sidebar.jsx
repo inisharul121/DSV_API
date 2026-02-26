@@ -7,7 +7,8 @@ import {
     Users,
     CreditCard,
     BarChart3,
-    UserCircle
+    UserCircle,
+    FileText
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -16,6 +17,7 @@ const Sidebar = () => {
         { name: 'Shipping Wizard', path: '/booking', icon: <Package size={20} /> },
         { name: 'Quotes', path: '/quotes', icon: <CreditCard size={20} /> },
         { name: 'Shipments', path: '/shipments', icon: <Truck size={20} /> },
+        { name: 'Labels', path: '/labels', icon: <FileText size={20} /> },
         { name: 'Customers', path: '/customers', icon: <Users size={20} /> },
         { name: 'Payments', path: '/payments', icon: <CreditCard size={20} /> },
         { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} /> },
