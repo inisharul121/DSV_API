@@ -714,7 +714,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
                 <td style="padding: 1rem;">${order.packages[0].grossWeight} ${order.weightUnit}</td>
                 <td style="padding: 1rem;">
-                    <i class="fas fa-search" style="cursor:pointer; color: var(--accent); margin-right: 0.5rem;" onclick="handleTracking('${order.shipmentId}')"></i>
+                    <i class="fas fa-search" style="cursor:pointer; color: var(--accent); margin-right: 0.5rem;" onclick="handleTracking('${order.shipmentId}')" title="Track"></i>
+                    <i class="fas fa-download" style="cursor:pointer; color: var(--success); margin-right: 0.5rem;" onclick="handleDownloadLabel('${order.shipmentId}')" title="Download Label"></i>
                     <i class="fas fa-ellipsis-h" style="cursor:pointer; color: var(--text-muted);"></i>
                 </td>
             </tr>
@@ -764,6 +765,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (wizardZipOrigin) wizardZipOrigin.addEventListener('input', () => debouncedLookup(wizardZipOrigin, wizardCityOrigin, wizardCountryOrigin));
     if (wizardZipDest) wizardZipDest.addEventListener('input', () => debouncedLookup(wizardZipDest, wizardCityDest, wizardCountryDest));
+
+    // --- LABEL DOWNLOAD LOGIC ---
+    const btnDownloadLabel = document.getElementById('btn-download-label');
+    const labelShipmentInput = document.getElementById('label-shipment-id');
+
+    async function handleDownloadLabel(shipmentId) {
+        if (!shipmentId) return;
+        showToast(`Fetching label for #${shipmentId}...`, 'info');
+
+        try {
+            const response = await fetch(`/api/bookings/${shipmentId}/labels`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const result = await response.json();
+
+            if (result.success && result.data.labelResults?.length > 0) {
+                const label = result.data.labelResults[0].shippingLabel[0];
+                const base64Data = label.labelData;
+                const binaryData = atob(base64Data);
+                const arrayBuffer = new ArrayBuffer(binaryData.length);
+                const uintArray = new Uint8Array(arrayBuffer);
+
+                for (let i = 0; i < binaryData.length; i++) {
+                    uintArray[i] = binaryData.charCodeAt(i);
+                }
+
+                const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `Label-${shipmentId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                showToast('Label downloaded successfully', 'success');
+            } else {
+                throw new Error(result.error?.message || 'No labels found for this shipment');
+            }
+        } catch (err) {
+            console.error('Label fail:', err);
+            showToast(`Failed to get label: ${err.message}`, 'error');
+        }
+    }
+
+    if (btnDownloadLabel) {
+        btnDownloadLabel.addEventListener('click', () => {
+            const sid = labelShipmentInput.value.trim();
+            if (!sid) return showToast('Please enter a Shipment ID', 'error');
+            handleDownloadLabel(sid);
+        });
+    }
+
+    // Expose handleDownloadLabel to window for onclick in rendered rows
+    window.handleDownloadLabel = handleDownloadLabel;
 
     // Expose handleTracking to window for onclick in rendered rows
     window.handleTracking = handleTracking;

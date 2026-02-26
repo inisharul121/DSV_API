@@ -45,3 +45,29 @@ exports.uploadDocument = async (req, res) => {
         });
     }
 };
+
+exports.getShipmentLabels = async (req, res) => {
+    try {
+        const { shipmentId } = req.params;
+        const { labelFormat = 'PDF' } = req.query;
+
+        // POST /booking/v2/bookings/labels/{shipmentId}?labelFormat={labelFormat}
+        const labelUrl = `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${shipmentId}?labelFormat=${labelFormat}`;
+
+        console.log(`[LABEL] Requesting label for ${shipmentId} (Format: ${labelFormat})`);
+
+        const response = await dsvClient.post(labelUrl, {});
+
+        res.json({
+            success: true,
+            data: response.data
+        });
+
+    } catch (error) {
+        console.error('Label Retrieval Error:', error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            success: false,
+            error: error.response?.data || error.message
+        });
+    }
+};

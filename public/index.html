@@ -1022,7 +1022,20 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="stat-card">
+                    <h3>Download Shipment Label</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Enter Shipment ID to
+                        retrieve and download your PDF label.</p>
+                    <div class="form-group" style="display: flex; gap: 1rem;">
+                        <input type="text" id="label-shipment-id" class="input-field"
+                            placeholder="Shipment ID (e.g., 12345)">
+                        <button id="btn-download-label" class="btn-primary"><i class="fas fa-download"></i> Download
+                            PDF</button>
+                    </div>
+                </div>
+
+                <div class="stat-card" style="grid-column: span 2;">
                     <h3>Recent Shipments</h3>
                     <div style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse;">

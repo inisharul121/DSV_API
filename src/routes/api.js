@@ -26,6 +26,7 @@ router.post('/bookings/complex', upload.any(), bookingController.createComplexBo
 
 // Document Upload
 router.post('/bookings/:draftId/documents', upload.single('file'), documentController.uploadDocument);
+router.post('/bookings/:shipmentId/labels', documentController.getShipmentLabels);
 
 // Tracking
 router.get('/orders', trackingController.getShipments);
