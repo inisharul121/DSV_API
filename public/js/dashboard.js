@@ -369,6 +369,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const weightInput = document.getElementById('wizard-weight-2');
     const pricingResultContainer = document.getElementById('pricing-result-container');
 
+    // EXPOSE setBox TO WINDOW
+    window.setBox = (l, w, h) => {
+        const len = document.getElementById('box-length');
+        const wid = document.getElementById('box-width');
+        const hei = document.getElementById('box-height');
+
+        if (len) { len.value = l; len.dispatchEvent(new Event('input')); }
+        if (wid) { wid.value = w; wid.dispatchEvent(new Event('input')); }
+        if (hei) { hei.value = h; hei.dispatchEvent(new Event('input')); }
+
+        if (typeof showToast === 'function') {
+            showToast(`Dimensions set: ${l}x${w}x${h}cm`, 'info');
+        }
+    };
+
     if (nextStep1) {
         nextStep1.addEventListener('click', () => {
             const country = targetCountry.value;
@@ -376,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const weight = weightInput.value;
             if (!weight || weight <= 0) return showToast('Please enter a valid weight', 'error');
 
-            goToStep(2); // In the new flow, Step 2 is dimensions
+            goToStep(2);
         });
     }
 
@@ -397,7 +412,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     pickupCountryCode: direction === 'export' ? 'CH' : country,
                     deliveryCountryCode: direction === 'export' ? country : 'CH',
                     packageType: "PARCELS",
-                    defaultWeight: weightInput.value || 2.5
+                    weight: weightInput.value || 2.5,
+                    length: document.getElementById('box-length')?.value || 10,
+                    width: document.getElementById('box-width')?.value || 10,
+                    height: document.getElementById('box-height')?.value || 10
                 })
             });
 
@@ -425,22 +443,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (primaryDirection) primaryDirection.addEventListener('change', handleMergedPricing);
     if (targetCountry) targetCountry.addEventListener('change', handleMergedPricing);
-    if (weightInput) weightInput.addEventListener('input', handleMergedPricing); // Use input for live weight updates
+    if (weightInput) weightInput.addEventListener('input', handleMergedPricing);
+
+    // Also trigger on dimension changes in Step 2
+    ['box-length', 'box-width', 'box-height'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', handleMergedPricing);
+    });
 
     document.querySelectorAll('[name="wizard-addr-type"]').forEach(radio => {
         radio.addEventListener('change', handleMergedPricing);
     });
 
-    // Step 2 Presets (Used in Step 3 now)
-    window.setBox = (l, w, h) => {
-        const len = document.getElementById('box-length');
-        const wid = document.getElementById('box-width');
-        const hei = document.getElementById('box-height');
-        if (len) len.value = l;
-        if (wid) wid.value = w;
-        if (hei) hei.value = h;
-        showToast(`Dimensions set: ${l}x${w}x${h}cm`, 'info');
-    };
+    // Centralized event listener for box presets (CSP compliant)
+    document.querySelectorAll('.btn-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const l = btn.getAttribute('data-l');
+            const w = btn.getAttribute('data-w');
+            const h = btn.getAttribute('data-h');
+            if (typeof window.setBox === 'function') {
+                window.setBox(l, w, h);
+            }
+        });
+    });
 
     // Step 4: Final Book (Transition to full Booking Form in Step 3)
     const btnNextStep2 = document.getElementById('btn-next-step-2');

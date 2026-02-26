@@ -46,7 +46,8 @@ exports.getQuotes = async (req, res) => {
 
     } catch (error) {
         const errorData = error.response?.data || error.message;
-        console.error('DSV Quote API Error Details:', JSON.stringify(errorData, null, 2));
+        console.error('DSV Quote API Error - STATUS:', error.response?.status);
+        console.error('DSV Quote API Error - FULL BODY:', JSON.stringify(errorData, null, 2));
 
         res.status(error.response?.status || 500).json({
             success: false,
