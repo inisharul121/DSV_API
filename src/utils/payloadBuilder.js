@@ -89,15 +89,15 @@ exports.buildBookingPayload = (data) => {
                 monetaryValue: parseFloat(data.insuranceValue)
             } : undefined
         },
-        notifications: data.notif_code ? [
-            {
-                notificationCode: data.notif_code, // e.g. DEP, DEL
-                recipients: [data.notif_email]
-            }
-        ] : undefined,
+        notifications: (() => {
+            const notifs = [];
+            if (data.notif_code_1 && data.notif_email_1) notifs.push({ notificationCode: data.notif_code_1, recipients: [data.notif_email_1] });
+            if (data.notif_code_2 && data.notif_email_2) notifs.push({ notificationCode: data.notif_code_2, recipients: [data.notif_email_2] });
+            return notifs.length > 0 ? notifs : undefined;
+        })(),
         references: data.ref_value ? [
             {
-                referenceQualifier: data.ref_qualifier || "SHPR_REF",
+                qualifier: data.ref_qualifier || "SHPR_REF",
                 referenceValue: data.ref_value
             }
         ] : undefined,
