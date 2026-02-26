@@ -1,0 +1,66 @@
+TC1
+Domestic shipment / Single package shipment / Express service shipment
+Create a shipment with:
+Same country for pickup and delivery
+1 package
+Package Type: Parcels
+Service: DSVAirExpress
+
+
+
+TC2
+European shipment / Single package shipment / Express service shipment
+Create a shipment with:
+Pickup and delivery countries are different
+Delivery country is a membership of the European Union
+1 package
+Package Type: Parcels
+Service: DSVAirExpress
+
+
+
+TC3
+Worldwide shipment / Single package shipment / Express service shipment
+Create a shipment with:
+Pickup and delivery countries are different
+Delivery country is located outside the European Union
+1 package
+Goods value is mandatory
+Package Type: Parcels
+Service: DSVAirExpress
+
+TC4
+Multiple packages shipment
+Create a shipment with:
+2+ packages
+Package Type: Parcels
+Service: DSVAirExpress
+
+TC5
+Economy shipment
+Create a shipment with:
+One or more packages
+Package Type: Parcels
+Service: DSVEconomy
+
+TC6
+Envelope Shipment
+Create a shipment with:
+Only 1 package allowed
+Package type: Envelope
+Weight: 300g
+Service: DSVAirExpress
+
+TC7
+Document Shipment
+Create a shipment with:
+One or more packages
+Package Type: Document
+Service: DSVAirExpress
+
+TC8
+Import Shipment
+Create an import shipment with:
+One or more packages
+Service: DSVAirExpressImport
+

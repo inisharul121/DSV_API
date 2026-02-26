@@ -319,13 +319,21 @@
                                         <input type="text" name="dest_address" class="input-field"
                                             value="Lättichstrasse 6" required>
                                     </div>
-                                    <div class="input-group">
-                                        <label class="input-label">Zip Code</label>
-                                        <input type="text" name="dest_zip" class="input-field" value="6340">
+                                    <div class="form-row">
+                                        <div class="input-group">
+                                            <label class="input-label">Zip Code</label>
+                                            <input type="text" name="dest_zip" class="input-field" value="6340">
+                                        </div>
+                                        <div class="input-group">
+                                            <label class="input-label">City *</label>
+                                            <input type="text" name="dest_city" class="input-field" value="Baar"
+                                                required>
+                                        </div>
                                     </div>
                                     <div class="input-group">
-                                        <label class="input-label">City *</label>
-                                        <input type="text" name="dest_city" class="input-field" value="Baar" required>
+                                        <label class="input-label">State (Required for US/CA)</label>
+                                        <input type="text" name="dest_state" class="input-field"
+                                            placeholder="e.g. NY (for New York)">
                                     </div>
                                     <div class="input-group">
                                         <label class="input-label">Country Code *</label>
@@ -389,13 +397,15 @@
                                     <select name="packageType" class="input-field">
                                         <option value="PARCELS">Parcels</option>
                                         <option value="DOCUMENT">Document</option>
+                                        <option value="ENVELOPE">Envelope</option>
                                     </select>
                                 </div>
                                 <div class="input-group">
                                     <label class="input-label">Service Code</label>
                                     <select name="serviceCode" class="input-field">
-                                        <option value="AirExpress">AirExpress</option>
-                                        <option value="Economy">Economy</option>
+                                        <option value="DSVAirExpress">DSV Air Express</option>
+                                        <option value="DSVEconomy">DSV Economy</option>
+                                        <option value="DSVAirExpressImport">DSV Air Express Import</option>
                                     </select>
                                 </div>
                                 <div class="input-group">
@@ -408,7 +418,8 @@
                                 </div>
                                 <div class="input-group">
                                     <label class="input-label">Insurance Value *</label>
-                                    <input type="number" name="insuranceValue" class="input-field" value="30">
+                                    <input type="number" name="insuranceValue" class="input-field" value="0"
+                                        placeholder="0 = no insurance">
                                 </div>
                             </div>
                         </div>
@@ -430,8 +441,28 @@
                                     <input type="number" name="height" class="input-field" value="35">
                                 </div>
                                 <div class="input-group">
-                                    <label class="input-label">Gross Weight (KG) *</label>
+                                    <label class="input-label">Gross Weight 1 (KG) *</label>
                                     <input type="number" step="0.1" name="weight" class="input-field" required>
+                                </div>
+                            </div>
+                            <!-- Package 2 (Optional) -->
+                            <div
+                                style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                                <div class="input-group">
+                                    <label class="input-label">Length 2 (CM)</label>
+                                    <input type="number" name="length2" class="input-field">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Width 2 (CM)</label>
+                                    <input type="number" name="width2" class="input-field">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Height 2 (CM)</label>
+                                    <input type="number" name="height2" class="input-field">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Gross Weight 2 (KG)</label>
+                                    <input type="number" step="0.1" name="weight2" class="input-field">
                                 </div>
                             </div>
                         </div>

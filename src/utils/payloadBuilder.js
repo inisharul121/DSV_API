@@ -43,15 +43,21 @@ exports.buildBookingPayload = (data) => {
     const collectFrom = new Date(now.getTime() + (2 * 60 * 60 * 1000)); // 2 hours from now
     const collectTo = new Date(now.getTime() + (6 * 60 * 60 * 1000));   // 6 hours from now
 
-    const formatDSVDate = (date) => date.toISOString().split('.')[0] + 'Z';
+    const formatDSVDate = (date) => {
+        if (!date) return undefined;
+        const d = (typeof date === 'string') ? new Date(date) : date;
+        // Ensure it's a valid date, otherwise return original string or now
+        if (isNaN(d.getTime())) return date;
+        return d.toISOString().split('.')[0] + 'Z';
+    };
 
     // Base structure with defaults
     const payload = {
         dsvAccount: parseInt(data.dsvAccount || config.dsv.account),
         pickup: {
             requestPickup: data.pickup?.requestPickup !== undefined ? data.pickup.requestPickup : true,
-            collectDateFrom: data.pickup?.collectDateFrom || formatDSVDate(collectFrom),
-            collectDateTo: data.pickup?.collectDateTo || formatDSVDate(collectTo),
+            collectDateFrom: formatDSVDate(data.collectDateFrom || data.pickup?.collectDateFrom || collectFrom),
+            collectDateTo: formatDSVDate(data.collectDateTo || data.pickup?.collectDateTo || collectTo),
             pickupInstructions: data.pickup?.pickupInstructions || data.pickupInstructions || "Ready at front desk",
             address: {
                 companyName: data.origin_company || data.pickup?.address?.companyName || "Sender",
@@ -67,6 +73,7 @@ exports.buildBookingPayload = (data) => {
             companyName: data.dest_company || data.delivery?.companyName || "Receiver",
             addressLine1: data.dest_address || data.delivery?.addressLine1 || "",
             city: data.dest_city || data.delivery?.city || "",
+            state: data.dest_state || data.delivery?.state || undefined,
             countryCode: (data.dest_country || data.delivery?.countryCode || "DE").trim().substring(0, 2).toUpperCase(),
             zipCode: data.dest_zip || data.delivery?.zipCode || "",
             contactName: data.dest_contact || data.delivery?.contactName || "",
@@ -84,7 +91,7 @@ exports.buildBookingPayload = (data) => {
         serviceOptions: {
             packageType: data.serviceOptions?.packageType || data.packageType || "PARCELS",
             serviceCode: data.serviceOptions?.serviceCode || data.serviceCode || "DSVAirExpress",
-            insurance: data.insuranceValue ? {
+            insurance: (data.insuranceValue && parseFloat(data.insuranceValue) > 0) ? {
                 currencyCode: data.currencyCode || "CHF",
                 monetaryValue: parseFloat(data.insuranceValue)
             } : undefined
@@ -98,29 +105,41 @@ exports.buildBookingPayload = (data) => {
         references: data.ref_value ? [
             {
                 qualifier: data.ref_qualifier || "SHPR_REF",
-                referenceValue: data.ref_value
+                value: data.ref_value
             }
         ] : undefined,
         dimensionUnit: data.dimensionUnit || "CM",
         weightUnit: data.weightUnit || "KG",
-        packages: data.packages || [
-            {
-                length: parseFloat(data.length || 10),
-                width: parseFloat(data.width || 10),
-                height: parseFloat(data.height || 10),
-                grossWeight: parseFloat(data.weight || 2.5)
+        packages: (() => {
+            const pkgs = [];
+            if (data.length && data.width && data.height && data.weight) {
+                pkgs.push({
+                    length: parseFloat(data.length),
+                    width: parseFloat(data.width),
+                    height: parseFloat(data.height),
+                    grossWeight: parseFloat(data.weight)
+                });
             }
-        ],
-        commodities: data.commodities || [
+            if (data.length2 && data.width2 && data.height2 && data.weight2) {
+                pkgs.push({
+                    length: parseFloat(data.length2),
+                    width: parseFloat(data.width2),
+                    height: parseFloat(data.height2),
+                    grossWeight: parseFloat(data.weight2)
+                });
+            }
+            return pkgs.length > 0 ? pkgs : [{ length: 1, width: 1, height: 1, grossWeight: 0.1 }]; // Simple fallback
+        })(),
+        commodities: (data.goodsValue && parseFloat(data.goodsValue) > 0) ? [
             {
                 originCountryCode: data.commodity_origin || data.origin_country || "CH",
                 goodsDescription: data.commodity || "General Goods",
                 goodsValue: {
-                    currencyCode: data.currencyCode || "CHF",
-                    monetaryValue: parseFloat(data.goodsValue || 0)
+                    currencyCode: data.commodity_currency || data.currencyCode || "CHF",
+                    monetaryValue: parseFloat(data.goodsValue)
                 }
             }
-        ]
+        ] : undefined
     };
 
     return payload;

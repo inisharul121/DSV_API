@@ -73,10 +73,11 @@ exports.createSimpleBooking = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('DSV API Error:', error.response?.data || error.message);
+        const errorData = error.response?.data || error.message;
+        console.error('DSV API Error Body:', JSON.stringify(errorData, null, 2));
         res.status(error.response?.status || 500).json({
             success: false,
-            error: error.response?.data || error.message
+            error: errorData
         });
     }
 };
