@@ -54,6 +54,26 @@ exports.buildBookingPayload = (data) => {
     // Base structure with defaults
     const payload = {
         dsvAccount: parseInt(data.dsvAccount || config.dsv.account),
+        sender: {
+            companyName: data.origin_company || data.pickup?.address?.companyName || "Sender",
+            addressLine1: data.origin_address || data.pickup?.address?.addressLine1 || "",
+            city: data.origin_city || data.pickup?.address?.city || "",
+            countryCode: (data.origin_country || data.pickup?.address?.countryCode || "CH").trim().substring(0, 2).toUpperCase(),
+            zipCode: data.origin_zip || data.pickup?.address?.zipCode || "",
+            contactName: data.origin_contact || data.pickup?.address?.contactName || "",
+            contactPhoneNumber: formatPhoneNumber(data.origin_phone || data.pickup?.address?.contactPhoneNumber || "")
+        },
+        receiver: {
+            companyName: data.dest_company || data.delivery?.companyName || "Receiver",
+            addressLine1: data.dest_address || data.delivery?.addressLine1 || "",
+            city: data.dest_city || data.delivery?.city || "",
+            state: data.dest_state || data.delivery?.state || undefined,
+            countryCode: (data.dest_country || data.delivery?.countryCode || "DE").trim().substring(0, 2).toUpperCase(),
+            zipCode: data.dest_zip || data.delivery?.zipCode || "",
+            contactName: data.dest_contact || data.delivery?.contactName || "",
+            contactPhoneNumber: formatPhoneNumber(data.dest_phone || data.delivery?.contactPhoneNumber || ""),
+            residential: data.delivery?.residential !== undefined ? data.delivery.residential : (data.residential === 'on' || data.residential === true)
+        },
         pickup: {
             requestPickup: data.pickup?.requestPickup !== undefined ? data.pickup.requestPickup : true,
             collectDateFrom: formatDSVDate(data.collectDateFrom || data.pickup?.collectDateFrom || collectFrom),
@@ -102,10 +122,10 @@ exports.buildBookingPayload = (data) => {
             if (data.notif_code_2 && data.notif_email_2) notifs.push({ notificationCode: data.notif_code_2, recipients: [data.notif_email_2] });
             return notifs.length > 0 ? notifs : undefined;
         })(),
-        references: data.ref_value ? [
+        references: (data.ref_value && data.ref_value.trim() !== "") ? [
             {
                 qualifier: data.ref_qualifier || "SHPR_REF",
-                value: data.ref_value
+                reference: data.ref_value
             }
         ] : undefined,
         dimensionUnit: data.dimensionUnit || "CM",
@@ -150,35 +170,26 @@ exports.buildQuotePayload = (data) => {
     const now = new Date();
     const collectDateStr = data.collectDate || now.toISOString().split('T')[0];
 
-    // Extraction helpers for nested structures (common in Wizard/Certification)
-    const pickupCountry = data.pickupCountryCode || data.pickup?.address?.countryCode || data.origin_country || "DK";
-    const pickupCity = data.pickupCity || data.pickup?.address?.city || data.origin_city || undefined;
-    const pickupZip = data.pickupZipCode || data.pickup?.address?.zipCode || data.origin_zip || undefined;
-
+    const pickupCountry = data.pickupCountryCode || data.pickup?.address?.countryCode || data.origin_country || "CH";
     const deliveryCountry = data.deliveryCountryCode || data.delivery?.countryCode || data.dest_country || "DE";
-    const deliveryCity = data.deliveryCity || data.delivery?.city || data.dest_city || undefined;
-    const deliveryZip = data.deliveryZipCode || data.delivery?.address?.zipCode || data.dest_zip || undefined;
 
     return {
         dsvAccount: parseInt(data.dsvAccount || config.dsv.account),
         pickupCountryCode: pickupCountry.trim().substring(0, 2).toUpperCase(),
-        pickupCity: pickupCity,
-        pickupZipCode: pickupZip,
+        pickupCity: data.pickupCity || data.pickup?.address?.city || data.origin_city || "Baar",
+        pickupZipCode: data.pickupZipCode || data.pickup?.address?.zipCode || data.origin_zip || "6340",
         deliveryCountryCode: deliveryCountry.trim().substring(0, 2).toUpperCase(),
-        deliveryCity: deliveryCity,
-        deliveryZipCode: deliveryZip,
+        deliveryCity: data.deliveryCity || data.delivery?.city || data.dest_city || undefined,
+        deliveryZipCode: data.deliveryZipCode || data.delivery?.address?.zipCode || data.dest_zip || undefined,
         residentialDelivery: data.residentialDelivery === true || data.residentialDelivery === 'true',
         serviceOptions: {
-            packageType: data.packageType || "PARCELS", // PARCELS / DOCUMENT / ENVELOPE
+            packageType: data.packageType || "PARCELS",
             saturdayDelivery: data.saturdayDelivery === true || data.saturdayDelivery === 'true',
-            timeOption: data.timeOption || undefined,
             insurance: (data.insuranceValue || data.insuranceCurrency) ? {
                 currencyCode: data.insuranceCurrency || data.currencyCode || "CHF",
                 monetaryValue: parseFloat(data.insuranceValue || 0)
             } : undefined
         },
-        ddp: data.ddp === true || data.ddp === 'true',
-        specialContent: data.specialContent || null,
         dimensionUnit: data.dimensionUnit || "CM",
         weightUnit: data.weightUnit || "KG",
         packages: data.packages && data.packages.length > 0 ? data.packages.map(p => ({
@@ -187,10 +198,10 @@ exports.buildQuotePayload = (data) => {
             height: p.height ? parseFloat(p.height) : undefined,
             grossWeight: parseFloat(p.grossWeight || p.weight || 1.0)
         })) : [{
-            length: parseFloat(data.defaultLength || 10),
-            width: parseFloat(data.defaultWidth || 10),
-            height: parseFloat(data.defaultHeight || 10),
-            grossWeight: parseFloat(data.defaultWeight || 1.0)
+            length: parseFloat(data.length || 10),
+            width: parseFloat(data.width || 10),
+            height: parseFloat(data.height || 10),
+            grossWeight: parseFloat(data.weight || 1.0)
         }],
         collectDate: collectDateStr
     };

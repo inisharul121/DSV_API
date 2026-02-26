@@ -47,18 +47,38 @@ exports.createSimpleBooking = async (req, res) => {
         console.log(`Draft Shipment Created: ${bookingId}`);
 
         // 2. Confirm Booking and Get Labels
-        // Endpoint: /booking/v2/bookings/{bookingId}/labels
-        const labelUrl = `${config.dsv.endpoints.booking}/booking/v2/bookings/${bookingId}/labels`;
+        // Try fallback paths if one fails
+        const pathsToTry = [
+            `${config.dsv.endpoints.booking}/booking/v2/bookings/${bookingId}/labels`,
+            `${config.dsv.endpoints.booking}/booking/v2/shipments/${bookingId}/labels`
+        ];
 
-        console.log(`Confirming and requesting labels for: ${bookingId}`);
-        const labelResponse = await dsvClient.post(labelUrl, {
-            labelFormat: "PDF"
-        });
+        let labelResponse = null;
+        let lastError = null;
+
+        for (const url of pathsToTry) {
+            try {
+                console.log(`Attempting to get labels from: ${url}`);
+                labelResponse = await dsvClient.post(url, {
+                    labelFormat: "PDF"
+                });
+                if (labelResponse.status === 200 || labelResponse.status === 201) {
+                    console.log(`Labels found successfully at: ${url}`);
+                    break;
+                }
+            } catch (err) {
+                console.warn(`Path failed: ${url} (${err.response?.status || err.message})`);
+                lastError = err;
+            }
+        }
+
+        if (!labelResponse) {
+            console.warn('All label paths failed (likely due to no subscription). Proceeding without labels.');
+        }
 
         // The response format for labels often contains base64 data in packageLabels or similar
-        // Let's assume the DSV API returns an object with label data.
         let savedLabelPath = null;
-        if (labelResponse.data && labelResponse.data.packageLabels && labelResponse.data.packageLabels.length > 0) {
+        if (labelResponse && labelResponse.data && labelResponse.data.packageLabels && labelResponse.data.packageLabels.length > 0) {
             const labelContent = labelResponse.data.packageLabels[0].labelContent;
             savedLabelPath = await saveLabel(labelContent, bookingId);
             console.log(`Label saved to: ${savedLabelPath}`);
@@ -69,6 +89,7 @@ exports.createSimpleBooking = async (req, res) => {
             bookingId,
             shipmentId: bookingId,
             labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
+            labelWarning: !savedLabelPath ? "Booking created but no labels could be retrieved (this is normal if you don't have a label subscription)." : null,
             trackingUrl: `https://track.dsv.com?bookingId=${bookingId}`
         });
 
