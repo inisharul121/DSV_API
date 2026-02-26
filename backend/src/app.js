@@ -1,0 +1,42 @@
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const path = require('path');
+const config = require('./config/env');
+const authMiddleware = require('./middleware/auth');
+
+const app = express();
+
+// Security & Utility Middleware
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// API Routes
+const apiRoutes = require('./routes/api');
+app.use('/api', authMiddleware, apiRoutes);
+
+// Root route for health check
+app.get('/', (req, res) => {
+    res.json({ message: 'DSV XPress API is operational', version: '2.0.0' });
+});
+
+// Error Handling
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: config.env === 'development' ? err.message : undefined
+    });
+});
+
+// Start Server
+if (require.main === module) {
+    app.listen(config.port, () => {
+        console.log(`Server running on port ${config.port} in ${config.env} mode`);
+    });
+}
+
+module.exports = app;
