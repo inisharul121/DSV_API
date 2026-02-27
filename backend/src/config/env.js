@@ -34,5 +34,14 @@ module.exports = {
     },
     upload: {
         maxSize: process.env.MAX_UPLOAD_SIZE || '10mb',
+    },
+    database: {
+        host: process.env.DB_HOST || '127.0.0.1',
+        port: parseInt(process.env.DB_PORT || '3306', 10),
+        username: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+        database: process.env.DB_NAME || 'dsv_shipping_db',
+        dialect: process.env.DB_DIALECT || 'mysql',
+        logging: process.env.NODE_ENV === 'development' ? console.log : false
     }
 };

@@ -19,7 +19,9 @@
     "express": "^5.2.1",
     "form-data": "^4.0.5",
     "helmet": "^8.1.0",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "mysql2": "^3.18.2",
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
     "jest": "^30.2.0",
