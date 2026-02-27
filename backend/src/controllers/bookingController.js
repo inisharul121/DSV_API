@@ -2,6 +2,7 @@ const dsvClient = require('../config/dsv-api');
 const path = require('path');
 const fs = require('fs');
 const config = require('../config/env');
+const labelExtractor = require('../utils/labelExtractor');
 // const labelGenerator = require('../utils/labelGenerator'); // TODO: Implement this
 
 // Helper to save label from base64 or buffer
@@ -49,18 +50,9 @@ exports.createSimpleBooking = async (req, res) => {
         // 2. Confirm Booking and Get Labels
         // Try fallback paths if one fails
         const pathsToTry = [
-            // Standard XP v2 paths
             `${config.dsv.endpoints.booking}/v2/bookings/labels/${bookingId}?labelFormat=PDF`,
-            `${config.dsv.endpoints.booking}/v2/shipments/${bookingId}/labels?labelFormat=PDF`,
-            // Paths with /booking prefix
             `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${bookingId}?labelFormat=PDF`,
-            `${config.dsv.endpoints.booking}/booking/v2/shipments/${bookingId}/labels?labelFormat=PDF`,
-            // v1 paths (fallback)
-            `${config.dsv.endpoints.booking}/v1/bookings/labels/${bookingId}?labelFormat=PDF`,
-            `${config.dsv.endpoints.booking}/v1/shipments/${bookingId}/labels?labelFormat=PDF`,
-            // No version prefix
-            `${config.dsv.endpoints.booking}/bookings/labels/${bookingId}?labelFormat=PDF`,
-            `${config.dsv.endpoints.booking}/shipments/${bookingId}/labels?labelFormat=PDF`
+            `${config.dsv.endpoints.booking}/booking/v2/shipments/${bookingId}/labels?labelFormat=PDF`
         ];
 
         let labelResponse = null;
@@ -91,17 +83,13 @@ exports.createSimpleBooking = async (req, res) => {
 
         let savedLabelPath = null;
         if (labelResponse) {
-            const packageLabels = labelResponse.packageLabels || [];
-            const labelResults = labelResponse.labelResults || [];
+            const labelContent = labelExtractor.extractLabelContent(labelResponse);
 
-            // Try to get label content from either field
-            const labelItem = (packageLabels.length > 0) ? packageLabels[0] : (labelResults.length > 0 ? labelResults[0] : null);
-
-            if (labelItem && labelItem.labelContent) {
-                savedLabelPath = await saveLabel(labelItem.labelContent, bookingId);
+            if (labelContent) {
+                savedLabelPath = await saveLabel(labelContent, bookingId);
                 console.log(`Label saved to: ${savedLabelPath}`);
             } else {
-                console.warn('[BOOKING] labelResponse received but contained no labelContent in packageLabels or labelResults.');
+                console.warn('[BOOKING] labelResponse received but contained no valid labelContent or shippingLabel.');
             }
         }
 

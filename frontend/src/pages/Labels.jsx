@@ -23,13 +23,8 @@ const Labels = () => {
 
             const response = await dsvApi.post(`/bookings/${shipmentId}/labels`, {});
 
-            console.log('[LABEL] Frontend received:', response.data);
-
-            if (response.data.success && (response.data.data.labelResults || response.data.data.packageLabels || response.data.data.labelContent)) {
-                const data = response.data.data;
-                const labelData = (data.labelResults?.[0]?.labelContent) ||
-                    (data.packageLabels?.[0]?.labelContent) ||
-                    (data.labelContent);
+            if (response.data.success) {
+                const labelData = response.data.pdfBase64;
 
                 if (labelData) {
                     const byteCharacters = atob(labelData);
@@ -50,11 +45,10 @@ const Labels = () => {
 
                     setSuccess(`Label for ${shipmentId} downloaded successfully!`);
                 } else {
-                    const keys = Object.keys(data.labelResults?.[0] || data.packageLabels?.[0] || data || {}).join(', ');
-                    alert(`Label structure found, but no PDF content (labelContent) inside. Found keys: ${keys}`);
+                    setError('No PDF content was found in the label response. Please contact support.');
                 }
             } else {
-                setError('No labels found for this Shipment ID. The shipment might not be confirmed, or labels are still being generated.');
+                setError('No labels found for this Shipment ID. Ensure the shipment has been confirmed.');
             }
         } catch (err) {
             console.error('Label download error:', err);
