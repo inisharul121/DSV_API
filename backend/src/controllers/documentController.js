@@ -53,30 +53,61 @@ exports.getShipmentLabels = async (req, res) => {
 
         // Try both common patterns for confirmed shipments
         const pathsToTry = [
+            // Standard XP v2 paths
             `${config.dsv.endpoints.booking}/v2/bookings/labels/${shipmentId}?labelFormat=${labelFormat}`,
+            `${config.dsv.endpoints.booking}/v2/shipments/${shipmentId}/labels?labelFormat=${labelFormat}`,
+            // Paths with /booking prefix
             `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${shipmentId}?labelFormat=${labelFormat}`,
             `${config.dsv.endpoints.booking}/booking/v2/shipments/${shipmentId}/labels?labelFormat=${labelFormat}`,
-            `${config.dsv.endpoints.booking}/v2/bookings/labels/${shipmentId}`,
-            `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${shipmentId}`,
-            `${config.dsv.endpoints.booking}/booking/v2/shipments/${shipmentId}/labels`
+            // v1 paths (fallback)
+            `${config.dsv.endpoints.booking}/v1/bookings/labels/${shipmentId}?labelFormat=${labelFormat}`,
+            `${config.dsv.endpoints.booking}/v1/shipments/${shipmentId}/labels?labelFormat=${labelFormat}`,
+            // No version prefix (some XP endpoints use this)
+            `${config.dsv.endpoints.booking}/bookings/labels/${shipmentId}?labelFormat=${labelFormat}`,
+            `${config.dsv.endpoints.booking}/shipments/${shipmentId}/labels?labelFormat=${labelFormat}`
         ];
 
         let lastError = null;
         for (const url of pathsToTry) {
             try {
                 console.log(`[LABEL] Attempting retrieval from: ${url}`);
-                // Switch to GET as per user's successful snippet
                 const response = await dsvClient.get(url);
 
-                if (response.data && (response.data.labelResults || response.data.packageLabels)) {
-                    console.log(`[LABEL] Success at: ${url}`);
+                // Debug log the actual structure
+                console.log(`[LABEL] Response Keys for ${url}:`, Object.keys(response.data || {}).join(', '));
+                if (response.data.packageLabels?.length > 0) {
+                    console.log(`[LABEL] packageLabels[0] keys:`, Object.keys(response.data.packageLabels[0]).join(', '));
+                    if (response.data.packageLabels[0].labelContent) {
+                        console.log(`[LABEL] labelContent found in packageLabels[0] (Length: ${response.data.packageLabels[0].labelContent.length})`);
+                    } else {
+                        console.log(`[LABEL] labelContent MISSING in packageLabels[0]`);
+                    }
+                }
+                if (response.data.labelResults?.length > 0) {
+                    console.log(`[LABEL] labelResults[0] keys:`, Object.keys(response.data.labelResults[0]).join(', '));
+                    if (response.data.labelResults[0].labelContent) {
+                        console.log(`[LABEL] labelContent found in labelResults[0] (Length: ${response.data.labelResults[0].labelContent.length})`);
+                    } else {
+                        console.log(`[LABEL] labelContent MISSING in labelResults[0]`);
+                    }
+                }
+
+                const hasLabelResults = response.data?.labelResults && Array.isArray(response.data.labelResults) && response.data.labelResults.length > 0;
+                const hasPackageLabels = response.data?.packageLabels && Array.isArray(response.data.packageLabels) && response.data.packageLabels.length > 0;
+
+                if (hasLabelResults || hasPackageLabels) {
+                    console.log(`[LABEL] Valid label structure found at: ${url}`);
                     return res.json({
                         success: true,
                         data: response.data
                     });
+                } else {
+                    console.warn(`[LABEL] Response from ${url} was successful but contained no labels.`);
                 }
             } catch (err) {
-                console.warn(`[LABEL] Path failed: ${url} (${err.response?.status || err.message})`);
+                const status = err.response?.status;
+                const message = err.response?.data?.message || err.message;
+                console.warn(`[LABEL] Path failed: ${url} (${status}: ${message})`);
                 lastError = err;
             }
         }

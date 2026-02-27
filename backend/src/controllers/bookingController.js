@@ -49,9 +49,18 @@ exports.createSimpleBooking = async (req, res) => {
         // 2. Confirm Booking and Get Labels
         // Try fallback paths if one fails
         const pathsToTry = [
+            // Standard XP v2 paths
             `${config.dsv.endpoints.booking}/v2/bookings/labels/${bookingId}?labelFormat=PDF`,
+            `${config.dsv.endpoints.booking}/v2/shipments/${bookingId}/labels?labelFormat=PDF`,
+            // Paths with /booking prefix
             `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${bookingId}?labelFormat=PDF`,
-            `${config.dsv.endpoints.booking}/booking/v2/shipments/${bookingId}/labels?labelFormat=PDF`
+            `${config.dsv.endpoints.booking}/booking/v2/shipments/${bookingId}/labels?labelFormat=PDF`,
+            // v1 paths (fallback)
+            `${config.dsv.endpoints.booking}/v1/bookings/labels/${bookingId}?labelFormat=PDF`,
+            `${config.dsv.endpoints.booking}/v1/shipments/${bookingId}/labels?labelFormat=PDF`,
+            // No version prefix
+            `${config.dsv.endpoints.booking}/bookings/labels/${bookingId}?labelFormat=PDF`,
+            `${config.dsv.endpoints.booking}/shipments/${bookingId}/labels?labelFormat=PDF`
         ];
 
         let labelResponse = null;
@@ -69,7 +78,9 @@ exports.createSimpleBooking = async (req, res) => {
                     break;
                 }
             } catch (err) {
-                console.warn(`[BOOKING] Path failed: ${url} (${err.response?.status || err.message})`);
+                const status = err.response?.status;
+                const message = err.response?.data?.message || err.message;
+                console.warn(`[BOOKING] Path failed: ${url} (${status}: ${message})`);
                 lastError = err;
             }
         }
@@ -78,12 +89,20 @@ exports.createSimpleBooking = async (req, res) => {
             console.warn('All label paths failed (likely due to no subscription). Proceeding without labels.');
         }
 
-        // The response format for labels often contains base64 data in packageLabels or similar
         let savedLabelPath = null;
-        if (labelResponse && labelResponse.data && labelResponse.data.packageLabels && labelResponse.data.packageLabels.length > 0) {
-            const labelContent = labelResponse.data.packageLabels[0].labelContent;
-            savedLabelPath = await saveLabel(labelContent, bookingId);
-            console.log(`Label saved to: ${savedLabelPath}`);
+        if (labelResponse) {
+            const packageLabels = labelResponse.packageLabels || [];
+            const labelResults = labelResponse.labelResults || [];
+
+            // Try to get label content from either field
+            const labelItem = (packageLabels.length > 0) ? packageLabels[0] : (labelResults.length > 0 ? labelResults[0] : null);
+
+            if (labelItem && labelItem.labelContent) {
+                savedLabelPath = await saveLabel(labelItem.labelContent, bookingId);
+                console.log(`Label saved to: ${savedLabelPath}`);
+            } else {
+                console.warn('[BOOKING] labelResponse received but contained no labelContent in packageLabels or labelResults.');
+            }
         }
 
         res.status(201).json({
