@@ -11,6 +11,7 @@ import Labels from './pages/Labels';
 
 import Home from './pages/Home';
 import About from './pages/About';
+import Support from './pages/Support';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         {/* Public Landing Page */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/support" element={<Support />} />
 
         {/* Private Dashboard Area */}
         <Route element={<Layout />}>
