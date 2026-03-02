@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Truck, Loader2, Calendar, MapPin, Clock, Download, FileText, ChevronRight } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
@@ -8,6 +9,7 @@ const Shipments = () => {
     const [trackingData, setTrackingData] = useState(null);
     const [error, setError] = useState(null);
     const [downloading, setDownloading] = useState(null);
+    const [searchParams] = useSearchParams();
 
     // Mock recent shipments for UI
     const recentShipments = [
@@ -46,6 +48,13 @@ const Shipments = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const id = searchParams.get('id');
+        if (id) {
+            handleTrack(null, id);
+        }
+    }, [searchParams]);
 
     const handleDownloadLabel = async (shipmentId) => {
         setDownloading(shipmentId);

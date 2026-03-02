@@ -60,7 +60,7 @@ const About = () => {
             }}>
                 <div style={{ display: 'flex', gap: '2rem', height: '100%', alignItems: 'center' }}>
                     <Link to="/" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Home</Link>
-                    <Link to="/tracking" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Tracking</Link>
+                    <Link to="/shipments" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Tracking</Link>
                     <Link to="/about" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>About</Link>
                     <Link to="/support" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Support</Link>
                     <Link to="/contact" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Contact</Link>
@@ -246,7 +246,7 @@ const About = () => {
                         <h4 style={{ marginBottom: '2.5rem', borderBottom: '2px solid #ff6600', display: 'inline-block', paddingBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '1px' }}>Useful Links</h4>
                         <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <li><Link to="/order" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Shipping</Link></li>
-                            <li><Link to="/tracking" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Tracking</Link></li>
+                            <li><Link to="/shipments" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Tracking</Link></li>
                             <li><Link to="/terms" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Terms & Conditions</Link></li>
                             <li><Link to="/contact" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Contact</Link></li>
                         </ul>

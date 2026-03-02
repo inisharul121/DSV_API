@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Truck, Package, Search, MapPin, ShieldCheck, Globe, Phone, Clock, ChevronDown } from 'lucide-react';
 
 const Home = () => {
     const [trackingNumber, setTrackingNumber] = useState('');
     const [currentSlide, setCurrentSlide] = useState(0);
+    const navigate = useNavigate();
 
     const heroImages = [
         "https://limbercargo.com/assets/images/002.jpg",
@@ -18,6 +19,13 @@ const Home = () => {
         }, 5000);
         return () => clearInterval(timer);
     }, [heroImages.length]);
+
+    const handleTrack = (e) => {
+        if (e) e.preventDefault();
+        if (trackingNumber.trim()) {
+            navigate(`/shipments?id=${encodeURIComponent(trackingNumber.trim())}`);
+        }
+    };
 
     return (
         <div className="home-container" style={{ fontWait: 400 }}>
@@ -76,7 +84,7 @@ const Home = () => {
             }}>
                 <div style={{ display: 'flex', gap: '2rem', height: '100%', alignItems: 'center' }}>
                     <Link to="/" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Home</Link>
-                    <Link to="/tracking" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Tracking</Link>
+                    <Link to="/shipments" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Tracking</Link>
                     <Link to="/about" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>About</Link>
                     <Link to="/support" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Support</Link>
                     <Link to="/contact" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Contact</Link>
@@ -149,8 +157,20 @@ const Home = () => {
                     <h3 style={{ color: '#003366', marginBottom: '1rem' }}>Tracking</h3>
                     <p style={{ color: '#666', marginBottom: '1.5rem' }}>Track your shipment to see the current status</p>
                     <div style={{ display: 'flex', gap: 0 }}>
-                        <input type="text" placeholder="Tracking Number" style={{ flex: 1, padding: '0.75rem', border: '1px solid #ddd', borderRadius: '4px 0 0 4px', fontSize: '0.9rem' }} />
-                        <button style={{ background: '#ff6600', color: 'white', padding: '0.75rem 1.25rem', border: 'none', borderRadius: '0 4px 4px 0', cursor: 'pointer', fontWeight: 700 }}>TRACK</button>
+                        <input
+                            type="text"
+                            placeholder="Tracking Number"
+                            value={trackingNumber}
+                            onChange={(e) => setTrackingNumber(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleTrack()}
+                            style={{ flex: 1, padding: '0.75rem', border: '1px solid #ddd', borderRadius: '4px 0 0 4px', fontSize: '0.9rem' }}
+                        />
+                        <button
+                            onClick={handleTrack}
+                            style={{ background: '#ff6600', color: 'white', padding: '0.75rem 1.25rem', border: 'none', borderRadius: '0 4px 4px 0', cursor: 'pointer', fontWeight: 700 }}
+                        >
+                            TRACK
+                        </button>
                     </div>
                 </div>
                 <div className="card" style={{ padding: '2.5rem', textAlign: 'center', background: 'white', boxShadow: '0 15px 35px rgba(0,0,0,0.1)', borderRadius: '8px' }}>
@@ -294,7 +314,7 @@ const Home = () => {
                         <h4 style={{ marginBottom: '2.5rem', borderBottom: '2px solid #ff6600', display: 'inline-block', paddingBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '1px' }}>Useful Links</h4>
                         <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <li><Link to="/order" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Shipping</Link></li>
-                            <li><Link to="/tracking" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Tracking</Link></li>
+                            <li><Link to="/shipments" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Tracking</Link></li>
                             <li><Link to="/terms" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Terms & Conditions</Link></li>
                             <li><Link to="/contact" style={{ color: '#999', textDecoration: 'none', fontSize: '0.9rem' }}>Contact</Link></li>
                         </ul>
