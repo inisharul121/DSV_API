@@ -36,7 +36,7 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
         commodity: {
             origin: 'CH',
             description: 'Shipping Goods',
-            currency: 'EUR',
+            currency: 'CHF',
             value: 60
         },
         notifications: {
