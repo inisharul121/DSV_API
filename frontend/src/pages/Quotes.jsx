@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Calculator, Filter, Download, Plus, MapPin, Package, Calendar, ArrowRight, Loader, ChevronDown, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
+import { countries } from '../utils/countries';
 
 const Quotes = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -95,8 +96,21 @@ const Quotes = () => {
                                 <MapPin size={16} /> ORIGIN
                             </h4>
                             <div className="input-group">
-                                <label className="input-label">Country Code (ISO)</label>
-                                <input name="pickupCountryCode" value={formData.pickupCountryCode} onChange={handleFormChange} className="input-field" placeholder="e.g. CH" required />
+                                <label className="input-label">Select Origin Country</label>
+                                <select
+                                    name="pickupCountryCode"
+                                    value={formData.pickupCountryCode}
+                                    onChange={handleFormChange}
+                                    className="input-field"
+                                    required
+                                >
+                                    <option value="">Select Country</option>
+                                    {countries.map(c => (
+                                        <option key={c.code} value={c.code}>
+                                            {c.name} ({c.code})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                 <div className="input-group">
@@ -116,8 +130,21 @@ const Quotes = () => {
                                 <MapPin size={16} color="red" /> DESTINATION
                             </h4>
                             <div className="input-group">
-                                <label className="input-label">Country Code (ISO)</label>
-                                <input name="deliveryCountryCode" value={formData.deliveryCountryCode} onChange={handleFormChange} className="input-field" placeholder="e.g. DE" required />
+                                <label className="input-label">Select Destination Country</label>
+                                <select
+                                    name="deliveryCountryCode"
+                                    value={formData.deliveryCountryCode}
+                                    onChange={handleFormChange}
+                                    className="input-field"
+                                    required
+                                >
+                                    <option value="">Select Country</option>
+                                    {countries.map(c => (
+                                        <option key={c.code} value={c.code}>
+                                            {c.name} ({c.code})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                 <div className="input-group">
