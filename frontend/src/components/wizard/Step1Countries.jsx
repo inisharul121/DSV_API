@@ -28,7 +28,7 @@ const Step1Countries = ({ data, updateData, onNext }) => {
             if (response.data.success && response.data.data.services?.length > 0) {
                 const svc = response.data.data.services[0];
                 const pricingData = {
-                    total: svc.totalDisplay,
+                    totalPrice: svc.totalDisplay,
                     currency: svc.currency,
                     breakdown: svc.detailedBreakdown
                 };
@@ -164,7 +164,7 @@ const Step1Countries = ({ data, updateData, onNext }) => {
                                 <tr style={{ borderTop: '2px solid var(--accent)' }}>
                                     <td className="label" style={{ padding: '1rem 0', fontWeight: 800, fontSize: '1rem' }}>Total Price</td>
                                     <td className="value" style={{ padding: '1rem 0', textAlign: 'right', fontWeight: 800, color: 'var(--accent)', fontSize: '1.2rem' }}>
-                                        {pricing.currency} {pricing.total}
+                                        {pricing.currency} {pricing.totalPrice}
                                     </td>
                                 </tr>
                             </tbody>

@@ -14,7 +14,7 @@ import {
 const Sidebar = () => {
     const navItems = [
         { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
-        { name: 'Shipping Wizard', path: '/booking', icon: <Package size={20} /> },
+        { name: 'Order', path: '/order', icon: <Package size={20} /> },
         { name: 'Quotes', path: '/quotes', icon: <CreditCard size={20} /> },
         { name: 'Shipments', path: '/shipments', icon: <Truck size={20} /> },
         { name: 'Labels', path: '/labels', icon: <FileText size={20} /> },

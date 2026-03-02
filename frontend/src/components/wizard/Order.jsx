@@ -3,7 +3,7 @@ import Step1Delivery from './Step1Countries'; // Renaming internal reference
 import Step2Dimensions from './Step2Dimensions';
 import Step3Booking from './Step3Addresses'; // Renaming internal reference
 
-const ShippingWizard = () => {
+const Order = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
         direction: 'export',
@@ -82,4 +82,4 @@ const ShippingWizard = () => {
     );
 };
 
-export default ShippingWizard;
+export default Order;
