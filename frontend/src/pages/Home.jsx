@@ -76,9 +76,6 @@ const Home = () => {
             }}>
                 <div style={{ display: 'flex', gap: '2rem', height: '100%', alignItems: 'center' }}>
                     <Link to="/" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Home</Link>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase' }}>
-                        SHIPPING <ChevronDown size={14} />
-                    </div>
                     <Link to="/tracking" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Tracking</Link>
                     <Link to="/about" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>About</Link>
                     <Link to="/support" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Support</Link>
