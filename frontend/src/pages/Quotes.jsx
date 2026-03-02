@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Calculator, Filter, Download, Plus, MapPin, Package, Calendar, ArrowRight, Loader } from 'lucide-react';
+import { Search, Calculator, Filter, Download, Plus, MapPin, Package, Calendar, ArrowRight, Loader, ChevronDown, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const Quotes = () => {
@@ -42,7 +42,7 @@ const Quotes = () => {
             const response = await dsvApi.post('/quotes', formData);
             if (response.data.success) {
                 setQuoteResults(response.data.data.services);
-                // Add to history (simulated for now as we don't have a DB for quotes history yet in this view)
+                // Add to history
                 if (response.data.data.services && response.data.data.services.length > 0) {
                     const firstSvc = response.data.data.services[0];
                     const newQuote = {
@@ -51,7 +51,7 @@ const Quotes = () => {
                         country: `${formData.deliveryCountryCode}`,
                         weight: `${formData.weight}kg`,
                         service: firstSvc.serviceDescription,
-                        price: `${firstSvc.rates.currency} ${firstSvc.rates.total}`
+                        price: `${firstSvc.currency} ${firstSvc.totalDisplay}`
                     };
                     setQuotes(prev => [newQuote, ...prev]);
                 }
@@ -171,25 +171,66 @@ const Quotes = () => {
                     {/* Results Table */}
                     {quoteResults && (
                         <div style={{ marginTop: '2rem', borderTop: '2px solid var(--accent)', paddingTop: '1.5rem', animation: 'slideUp 0.4s ease-out' }}>
-                            <h4 style={{ marginBottom: '1rem', color: 'var(--accent)' }}>Available Services</h4>
-                            <div style={{ display: 'grid', gap: '1rem' }}>
+                            <h4 style={{ marginBottom: '1.5rem', color: 'var(--accent)', fontWeight: 700 }}>Available Services</h4>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
                                 {quoteResults.map((svc, idx) => (
-                                    <div key={idx} className="card" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
-                                        <div>
-                                            <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{svc.serviceDescription}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>ETA: {svc.etaMin} - {svc.etaMax}</div>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--accent)' }}>
-                                                    {svc.rates.currency} {svc.rates.total}
+                                    <div key={idx} className="group bg-white rounded-xl border border-gray-100 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden" style={{ border: '1px solid #e2e8f0', borderRadius: '12px', background: 'white' }}>
+                                        <div style={{ padding: '1.5rem' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                    <div style={{ padding: '0.5rem', background: '#eff6ff', color: '#2563eb', borderRadius: '0.5rem' }}>
+                                                        <Truck size={20} />
+                                                    </div>
+                                                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b', textTransform: 'uppercase' }}>
+                                                        {svc.serviceCode || svc.serviceDescription}
+                                                    </h3>
                                                 </div>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Incl. Surcharges</div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1d4ed8' }}>
+                                                        {svc.currency} {svc.totalDisplay}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Total Price</div>
+                                                </div>
                                             </div>
-                                            <button className="btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                                                Select & Book
-                                            </button>
+
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem' }}>
+                                                <Calendar size={14} />
+                                                <span>Delivery: <strong>{svc.etaMin} - {svc.etaMax} Days</strong></span>
+                                            </div>
+
+                                            {/* Price Breakdown Section */}
+                                            <div style={{ paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const el = document.getElementById(`breakdown-${idx}`);
+                                                        if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+                                                    }}
+                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                                                >
+                                                    <span>Price Breakdown</span>
+                                                    <ChevronDown size={14} />
+                                                </button>
+
+                                                <div id={`breakdown-${idx}`} style={{ display: 'none', marginTop: '1rem' }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                        {svc.detailedBreakdown?.map((item, bIdx) => (
+                                                            <div key={bIdx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                                                                <span style={{ color: '#64748b' }}>{item.label}</span>
+                                                                <span style={{ fontWeight: 600, color: '#334155' }}>{svc.currency} {item.value}</span>
+                                                            </div>
+                                                        ))}
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 700, color: '#1d4ed8', paddingTop: '0.5rem', borderTop: '1px solid #f1f5f9', marginTop: '0.25rem' }}>
+                                                            <span>Total Amount</span>
+                                                            <span>{svc.currency} {svc.totalDisplay}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+                                        <button style={{ width: '100%', padding: '1rem', border: 'none', background: '#f8fafc', fontWeight: 700, color: '#475569', cursor: 'pointer', transition: 'all 0.2s', borderTop: '1px solid #f1f5f9' }}>
+                                            Select & Book
+                                        </button>
                                     </div>
                                 ))}
                             </div>

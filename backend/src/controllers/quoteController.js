@@ -16,25 +16,39 @@ exports.getQuotes = async (req, res) => {
 
         const quoteResponse = await dsvClient.post(quoteUrl, dsvPayload);
 
-        // Add Price Breakdown to each service to match user's old site
+        // Enhance each service with a detailed price breakdown
         if (quoteResponse.data.services) {
             quoteResponse.data.services = quoteResponse.data.services.map(svc => {
-                const total = parseFloat(svc.totalPrice);
+                const total = parseFloat(svc.totalPrice || (svc.rates && svc.rates.total) || 0);
 
-                // Simulate a realistic breakdown for the UI
-                const commission = 10.00; // Fixed commission as per screenshot example
-                const fuelSurcharge = (total * 0.15).toFixed(2); // 15% fuel
-                const basePrice = (total - commission - parseFloat(fuelSurcharge)).toFixed(2);
+                // If DSV provides a breakdown, use it, otherwise simulate a detailed one
+                const realBreakdown = svc.rates && svc.rates.priceBreakdown ? svc.rates.priceBreakdown : [];
+                const realSurcharges = svc.rates && svc.rates.otherSurcharges ? svc.rates.otherSurcharges : [];
+
+                // Combine real data into a standard format for the frontend
+                const detailedBreakdown = [
+                    ...realBreakdown.map(b => ({ label: b.description || 'Freight', value: b.monetaryValue })),
+                    ...realSurcharges.map(s => ({ label: s.description || 'Surcharge', value: s.monetaryValue }))
+                ];
+
+                // Fallback simulation if no breakdown items are found
+                if (detailedBreakdown.length === 0) {
+                    const commission = 10.00;
+                    const fuelSurcharge = (total * 0.15);
+                    const baseFreight = total - commission - fuelSurcharge;
+
+                    detailedBreakdown.push(
+                        { label: 'Base Freight', value: baseFreight.toFixed(2) },
+                        { label: 'Fuel Surcharge (15%)', value: fuelSurcharge.toFixed(2) },
+                        { label: 'Commission / Service Fee', value: commission.toFixed(2) }
+                    );
+                }
 
                 return {
                     ...svc,
-                    breakdown: {
-                        basePrice: basePrice,
-                        fuelSurcharge: fuelSurcharge,
-                        commission: commission.toFixed(2),
-                        homeDeliveryCharge: svc.serviceType === 'Home' ? "5.00" : "0.00",
-                        totalPrice: total.toFixed(2)
-                    }
+                    detailedBreakdown,
+                    totalDisplay: total.toFixed(2),
+                    currency: (svc.rates && svc.rates.currency) || 'CHF'
                 };
             });
         }
