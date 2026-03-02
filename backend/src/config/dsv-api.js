@@ -50,12 +50,18 @@ dsvClient.interceptors.request.use(request => {
         request.headers['dsv-service-auth'] = config.dsv.quoteServiceAuth || config.dsv.serviceAuth;
         request.headers['x-pat'] = config.dsv.quotePat || config.dsv.pat;
         console.log(`[DSV API] Using Quote Auth for: ${url}`);
+        console.log(`  Header DSV-Subscription-Key: ${mask(request.headers['DSV-Subscription-Key'])}`);
+        console.log(`  Header dsv-service-auth:     ${mask(request.headers['dsv-service-auth'])}`);
+        console.log(`  Header x-pat:                ${mask(request.headers['x-pat'])}`);
     } else if (isTracking && !isLabel) {
         cleanAuth();
         request.headers['DSV-Subscription-Key'] = config.dsv.trackingSubscriptionKey;
         request.headers['dsv-service-auth'] = config.dsv.trackingServiceAuth;
         request.headers['x-pat'] = config.dsv.pat;
         console.log(`[DSV API] Using Tracking Auth for: ${url}`);
+        console.log(`  Header DSV-Subscription-Key: ${mask(request.headers['DSV-Subscription-Key'])}`);
+        console.log(`  Header dsv-service-auth:     ${mask(request.headers['dsv-service-auth'])}`);
+        console.log(`  Header x-pat:                ${mask(request.headers['x-pat'])}`);
     } else {
         // Booking & Labels (GET or POST)
         cleanAuth();
@@ -63,6 +69,9 @@ dsvClient.interceptors.request.use(request => {
         request.headers['dsv-service-auth'] = config.dsv.serviceAuth;
         request.headers['x-pat'] = config.dsv.pat;
         console.log(`[DSV API] Using Booking/Label Auth for: ${url}`);
+        console.log(`  Header DSV-Subscription-Key: ${mask(request.headers['DSV-Subscription-Key'])}`);
+        console.log(`  Header dsv-service-auth:     ${mask(request.headers['dsv-service-auth'])}`);
+        console.log(`  Header x-pat:                ${mask(request.headers['x-pat'])}`);
     }
 
     // Add Certification Header if enabled
