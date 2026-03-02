@@ -27,8 +27,13 @@ const Step1Countries = ({ data, updateData, onNext }) => {
 
             if (response.data.success && response.data.data.services?.length > 0) {
                 const svc = response.data.data.services[0];
-                setPricing(svc.breakdown);
-                updateData({ pricing: svc.breakdown });
+                const pricingData = {
+                    total: svc.totalDisplay,
+                    currency: svc.currency,
+                    breakdown: svc.detailedBreakdown
+                };
+                setPricing(pricingData);
+                updateData({ pricing: pricingData });
             } else {
                 setPricing(null);
             }
@@ -110,7 +115,7 @@ const Step1Countries = ({ data, updateData, onNext }) => {
                     >
                         <option value="">Select Country</option>
                         {countries.map(c => (
-                            <option key={c.code} value={c.code}>{c.name}</option>
+                            <option key={c.code} value={c.code}>{c.name} ({c.code})</option>
                         ))}
                     </select>
                 </div>
@@ -148,15 +153,19 @@ const Step1Countries = ({ data, updateData, onNext }) => {
                             <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>Calculating rates...</p>
                         </div>
                     ) : pricing ? (
-                        <table className="pricing-table">
+                        <table className="pricing-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <tbody>
-                                <tr><td className="label">Base Price</td><td className="value">CHF {pricing.basePrice}</td></tr>
-                                <tr><td className="label">Fuel+Pickup Surcharge</td><td className="value">CHF {pricing.fuelSurcharge}</td></tr>
-                                <tr><td className="label">Commission</td><td className="value">CHF {pricing.commission}</td></tr>
-                                <tr><td className="label">Home Delivery Charge</td><td className="value">CHF {pricing.homeDeliveryCharge}</td></tr>
+                                {pricing.breakdown?.map((item, idx) => (
+                                    <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                        <td className="label" style={{ padding: '0.75rem 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{item.label}</td>
+                                        <td className="value" style={{ padding: '0.75rem 0', textAlign: 'right', fontWeight: 600 }}>{pricing.currency} {item.value}</td>
+                                    </tr>
+                                ))}
                                 <tr style={{ borderTop: '2px solid var(--accent)' }}>
-                                    <td className="label" style={{ fontWeight: 800 }}>Total Price</td>
-                                    <td className="value" style={{ fontWeight: 800, color: 'var(--accent)' }}>CHF {pricing.totalPrice}</td>
+                                    <td className="label" style={{ padding: '1rem 0', fontWeight: 800, fontSize: '1rem' }}>Total Price</td>
+                                    <td className="value" style={{ padding: '1rem 0', textAlign: 'right', fontWeight: 800, color: 'var(--accent)', fontSize: '1.2rem' }}>
+                                        {pricing.currency} {pricing.total}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
