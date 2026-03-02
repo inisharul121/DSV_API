@@ -225,8 +225,42 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Grow Your B2B Business Section */}
+            <section style={{ padding: '6rem 8%', display: 'flex', gap: '5rem', alignItems: 'center', background: '#fcfcfc' }}>
+                <div style={{ flex: 1.2 }}>
+                    <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1a1a1a', marginBottom: '1.5rem', lineHeight: 1.2 }}>
+                        GROW YOUR B2B BUSINESS <br /> WITH LIMBER CARGO !!!
+                    </h2>
+                    <div style={{ width: '60px', height: '3px', background: '#ff6600', marginBottom: '3rem' }}></div>
+
+                    <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <li style={{ display: 'flex', gap: '1rem', color: '#555', fontSize: '1rem', lineHeight: 1.6 }}>
+                            <span style={{ color: '#ff6600', fontSize: '1.5rem', lineHeight: 0.8 }}>•</span>
+                            We offer a unique 5-7 days worlwide express service for small, medium, and large-scale businesses.
+                        </li>
+                        <li style={{ display: 'flex', gap: '1rem', color: '#555', fontSize: '1rem', lineHeight: 1.6 }}>
+                            <span style={{ color: '#ff6600', fontSize: '1.5rem', lineHeight: 0.8 }}>•</span>
+                            We are here as a total solution for those of you who have a business depending on imported goods from made in Europe, UK and Switzerland, we help to make sending your products easier and less complicated till your hand or warehouse around the world.
+                        </li>
+                        <li style={{ display: 'flex', gap: '1rem', color: '#555', fontSize: '1rem', lineHeight: 1.6 }}>
+                            <span style={{ color: '#ff6600', fontSize: '1.5rem', lineHeight: 0.8 }}>•</span>
+                            <div>
+                                Our shipping range is huge which is include, Made in Europe/uk/Switzerland: Cosmetics, Watches, Clothing, Machineries, R&D material, Electronics, Pharma/medicine, supplement, food, chocolate, coffee etc etc.. No minimum oder! Let's Collaborate! Choose Limber for your worlwide logistics partner!
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                    <img
+                        src="https://limbercargo.com/assets/images/plane.jpg"
+                        alt="B2B Logistics"
+                        style={{ width: '100%', maxWidth: '600px' }}
+                    />
+                </div>
+            </section>
+
             {/* Special Services */}
-            <section style={{ padding: '8rem 8% 6rem', background: '#fcfcfc' }}>
+            <section style={{ padding: '8rem 8% 6rem', background: '#fff' }}>
                 <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
                     <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#003366', letterSpacing: '-1px' }}>OUR SPECIAL SERVICES</h2>
                     <div style={{ width: '60px', height: '4px', background: '#ff6600', margin: '1.5rem auto' }}></div>
@@ -256,7 +290,7 @@ const Home = () => {
             <footer style={{ background: '#111', color: 'white', padding: '6rem 8% 2rem' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4rem', marginBottom: '5rem' }}>
                     <div>
-                        <img src="https://limbercargo.com/assets/images/rony_limber_logo.jpg" alt="Limber Cargo" style={{ height: '50px', marginBottom: '2rem', filter: 'brightness(0) invert(1)' }} />
+                        <img src="https://limbercargo.com/assets/images/rony_limber_logo.jpg" alt="Limber Cargo" style={{ height: '70px', marginBottom: '2rem' }} />
                         <p style={{ color: '#999', fontSize: '0.9rem', lineHeight: 1.6 }}>Limber Cargo is a World-Class Global Supplier of Transport and logistics Solutions. Our Head office is in Switzerland and we have international network of partners and agents.</p>
                     </div>
                     <div>
