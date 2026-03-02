@@ -9,7 +9,7 @@ const Layout = () => {
     // Map routes to titles
     const getPageTitle = (pathname) => {
         switch (pathname) {
-            case '/': return 'Dashboard Overview';
+            case '/dashboard': return 'Dashboard Overview';
             case '/order': return 'Order';
             case '/shipments': return 'Shipment Management';
             case '/orders': return 'Order History';
@@ -23,7 +23,7 @@ const Layout = () => {
 
     const getPageSubtitle = (pathname) => {
         switch (pathname) {
-            case '/': return 'Welcome back, Islam! Here is what is happening today.';
+            case '/dashboard': return 'Welcome back, Islam! Here is what is happening today.';
             case '/order': return 'Follow the steps below to book a new order.';
             default: return 'Manage your DSV XPress operations.';
         }

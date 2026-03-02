@@ -13,7 +13,7 @@ import {
 
 const Sidebar = () => {
     const navItems = [
-        { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
+        { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
         { name: 'Order', path: '/order', icon: <Package size={20} /> },
         { name: 'Quotes', path: '/quotes', icon: <CreditCard size={20} /> },
         { name: 'Shipments', path: '/shipments', icon: <Truck size={20} /> },
@@ -27,9 +27,10 @@ const Sidebar = () => {
 
     return (
         <aside className="sidebar">
-            <div className="sidebar-header">
-                <div className="logo-icon">DSV</div>
-                <div className="logo-text">XPress</div>
+            <div className="sidebar-header" style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)' }}>
+                <Link to="/">
+                    <img src="https://limbercargo.com/assets/images/rony_limber_logo.jpg" alt="Limber Cargo" style={{ width: '100%', height: 'auto' }} />
+                </Link>
             </div>
 
             <nav className="sidebar-nav">

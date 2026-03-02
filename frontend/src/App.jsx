@@ -9,12 +9,18 @@ import Staff from './pages/Staff';
 import Customers from './pages/Customers';
 import Labels from './pages/Labels';
 
+import Home from './pages/Home';
+
 const App = () => {
   return (
     <Router>
       <Routes>
+        {/* Public Landing Page */}
+        <Route path="/" element={<Home />} />
+
+        {/* Private Dashboard Area */}
         <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/order" element={<Order />} />
           <Route path="/shipments" element={<Shipments />} />
           <Route path="/quotes" element={<Quotes />} />
