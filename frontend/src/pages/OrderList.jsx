@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ExternalLink, RefreshCw, FileText } from 'lucide-react';
-import axios from 'axios';
+import dsvApi from '../api/dsvApi';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     const fetchOrders = async () => {
         setLoading(true);
+        setError(null);
         try {
-            const response = await axios.get('/api/orders');
+            const response = await dsvApi.get('/orders');
             if (response.data.success) {
                 setOrders(response.data.data);
+            } else {
+                setError('Server returned an error.');
             }
-        } catch (error) {
-            console.error('Error fetching orders:', error);
+        } catch (err) {
+            console.error('Error fetching orders:', err);
+            setError(`Failed to load orders: ${err.message}`);
         } finally {
             setLoading(false);
         }
@@ -71,6 +78,13 @@ const OrderList = () => {
                     <div style={{ display: 'grid', placeItems: 'center', height: '300px', color: '#64748b' }}>
                         Loading order history...
                     </div>
+                ) : error ? (
+                    <div style={{ display: 'grid', placeItems: 'center', height: '300px', color: '#ef4444', textAlign: 'center' }}>
+                        <div>
+                            <p style={{ fontWeight: 600 }}>Could not load orders</p>
+                            <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>{error}</p>
+                        </div>
+                    </div>
                 ) : filteredOrders.length === 0 ? (
                     <div style={{ display: 'grid', placeItems: 'center', height: '300px', color: '#64748b' }}>
                         {searchTerm ? 'No orders match your search.' : 'No orders found.'}
@@ -121,7 +135,7 @@ const OrderList = () => {
                                             <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 {order.labelUrl && (
                                                     <a
-                                                        href={`${axios.defaults.baseURL || ''}${order.labelUrl}`}
+                                                        href={`${API_BASE_URL.replace('/api', '')}${order.labelUrl}`}
                                                         target="_blank"
                                                         rel="noreferrer"
                                                         style={{ color: '#64748b', textDecoration: 'none' }}

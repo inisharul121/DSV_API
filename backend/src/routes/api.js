@@ -30,7 +30,7 @@ router.post('/bookings/:draftId/documents', upload.single('file'), documentContr
 router.post('/bookings/:shipmentId/labels', documentController.getShipmentLabels);
 
 // Tracking
-router.get('/orders', trackingController.getShipments);
+router.get('/orders', orderController.getOrders);
 router.get('/tracking/shipments/:shipmentId', trackingController.getShipmentDetails);
 router.get('/tracking/shipments/:shipmentId/events', trackingController.getShipmentEvents);
 router.get('/tracking/awb/:awbNumber/events', trackingController.getShipmentEventsByAWB);

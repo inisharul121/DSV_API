@@ -39,8 +39,11 @@ if (require.main === module) {
     sequelize.sync({ alter: true })
         .then(() => {
             console.log('Database synced successfully');
-            app.listen(config.port, () => {
+            const server = app.listen(config.port, () => {
                 console.log(`Server running on port ${config.port} in ${config.env} mode`);
+            });
+            server.on('error', (err) => {
+                console.error('Server error:', err);
             });
         })
         .catch((err) => {

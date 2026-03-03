@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Ship, CheckCircle, Clock, AlertTriangle, ArrowRight, ExternalLink } from 'lucide-react';
-import axios from 'axios';
+import dsvApi from '../api/dsvApi';
 
 const StatCard = ({ icon: Icon, value, label, color, bgColor }) => (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem' }}>
@@ -21,7 +21,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get('/api/orders');
+                const response = await dsvApi.get('/orders');
                 if (response.data.success) {
                     setOrders(response.data.data);
                 }

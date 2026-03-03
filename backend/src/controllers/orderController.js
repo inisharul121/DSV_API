@@ -2,9 +2,11 @@ const Order = require('../models/Order');
 
 exports.getOrders = async (req, res) => {
     try {
+        console.log('[OrderController] Fetching all orders...');
         const orders = await Order.findAll({
             order: [['createdAt', 'DESC']]
         });
+        console.log(`[OrderController] Found ${orders.length} orders.`);
 
         res.json({
             success: true,
