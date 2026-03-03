@@ -135,10 +135,16 @@ const CustomerDashboard = () => {
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
                                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                                                 <Link
-                                                    to={`/shipments?id=${order.bookingId}`}
+                                                    to={`/portal/shipments?id=${order.bookingId}`}
                                                     style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
                                                 >
                                                     Track <ExternalLink size={14} />
+                                                </Link>
+                                                <Link
+                                                    to={`/portal/labels?id=${order.bookingId}`}
+                                                    style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
+                                                >
+                                                    Label <FileText size={14} />
                                                 </Link>
                                             </div>
                                         </td>

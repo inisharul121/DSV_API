@@ -41,6 +41,8 @@ const App = () => {
           <Route path="/portal/orders" element={<CustomerOrders />} />
           <Route path="/portal/profile" element={<CustomerProfile />} />
           <Route path="/portal/book" element={<Order />} />
+          <Route path="/portal/shipments" element={<Shipments />} />
+          <Route path="/portal/labels" element={<Labels />} />
         </Route>
 
         {/* Private Dashboard Area (Admin - Employee Side) */}

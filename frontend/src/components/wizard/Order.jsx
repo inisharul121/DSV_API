@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Step1Delivery from './Step1Countries'; // Renaming internal reference
 import Step2Dimensions from './Step2Dimensions';
 import Step3Booking from './Step3Addresses'; // Renaming internal reference
@@ -25,6 +25,22 @@ const Order = () => {
         receiver: {},
         pricing: null
     });
+
+    useEffect(() => {
+        const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || 'null');
+        if (customerInfo) {
+            setFormData(prev => ({
+                ...prev,
+                sender: {
+                    ...prev.sender,
+                    company: customerInfo.company || prev.sender.company,
+                    contact: customerInfo.name || prev.sender.contact,
+                    email: customerInfo.email || prev.sender.email,
+                    phone: customerInfo.phone || prev.sender.phone
+                }
+            }));
+        }
+    }, []);
 
     const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
     const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));

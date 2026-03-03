@@ -20,6 +20,8 @@ const CustomerLayout = () => {
         if (location.pathname === '/portal/orders') return { title: 'My Orders', subtitle: 'Detailed list of all your shipments.' };
         if (location.pathname === '/portal/profile') return { title: 'My Profile', subtitle: 'Manage your account settings.' };
         if (location.pathname === '/portal/book') return { title: 'Book Shipment', subtitle: 'Create a new shipment request.' };
+        if (location.pathname === '/portal/shipments') return { title: 'Track Shipment', subtitle: 'Monitor your cargo in real-time.' };
+        if (location.pathname === '/portal/labels') return { title: 'Download Label', subtitle: 'Retrieve your shipping documents.' };
         return { title: 'Customer Portal', subtitle: 'Manage your logistics with Limber Cargo.' };
     };
 

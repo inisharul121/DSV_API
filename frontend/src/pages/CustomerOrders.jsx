@@ -142,7 +142,7 @@ const CustomerOrders = () => {
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                 {order.labelUrl && (
                                                     <Link
-                                                        to={`/labels?id=${order.bookingId}`}
+                                                        to={`/portal/labels?id=${order.bookingId}`}
                                                         className="btn-secondary"
                                                         style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                                     >
@@ -150,7 +150,7 @@ const CustomerOrders = () => {
                                                     </Link>
                                                 )}
                                                 <Link
-                                                    to={`/shipments?id=${order.bookingId}`}
+                                                    to={`/portal/shipments?id=${order.bookingId}`}
                                                     style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#2563eb', textDecoration: 'none', fontWeight: 600, fontSize: '0.8rem' }}
                                                 >
                                                     <ExternalLink size={13} /> Track
