@@ -47,7 +47,7 @@ const CustomerLogin = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)',
+            background: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)',
             padding: '2rem'
         }}>
             <div style={{ width: '100%', maxWidth: '420px' }}>
@@ -58,9 +58,9 @@ const CustomerLogin = () => {
                         borderRadius: '16px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         margin: '0 auto 1rem',
-                        border: '1px solid rgba(37,99,235,0.3)'
+                        border: '1px solid rgba(255,102,0,0.3)'
                     }}>
-                        <Truck size={28} color="#60a5fa" />
+                        <Truck size={28} color="#ff6600" />
                     </div>
                     <h1 style={{ color: '#fff', fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>Limber Cargo</h1>
                     <p style={{ color: '#94a3b8', marginTop: '0.4rem' }}>Secure Access Portal</p>
@@ -72,7 +72,7 @@ const CustomerLogin = () => {
                             onClick={() => setRole('Customer')}
                             style={{
                                 flex: 1, padding: '0.6rem', borderRadius: '8px',
-                                background: role === 'Customer' ? '#2563eb' : '#0f172a',
+                                background: role === 'Customer' ? '#ff6600' : '#001a33',
                                 color: '#fff', border: '1px solid #334155', cursor: 'pointer',
                                 fontWeight: 600, fontSize: '0.85rem'
                             }}
@@ -83,7 +83,7 @@ const CustomerLogin = () => {
                             onClick={() => setRole('Admin')}
                             style={{
                                 flex: 1, padding: '0.6rem', borderRadius: '8px',
-                                background: role === 'Admin' ? '#2563eb' : '#0f172a',
+                                background: role === 'Admin' ? '#ff6600' : '#001a33',
                                 color: '#fff', border: '1px solid #334155', cursor: 'pointer',
                                 fontWeight: 600, fontSize: '0.85rem'
                             }}
@@ -92,7 +92,7 @@ const CustomerLogin = () => {
                         </button>
                     </div>
 
-                    <h2 style={{ color: '#f1f5f9', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>
+                    <h2 style={{ color: '#f1f5f9', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>
                         {role === 'Admin' ? 'Staff Sign In' : 'Client Sign In'}
                     </h2>
 
@@ -144,7 +144,7 @@ const CustomerLogin = () => {
                             disabled={loading}
                             style={{
                                 marginTop: '0.5rem', padding: '0.85rem',
-                                background: loading ? '#334155' : '#2563eb',
+                                background: loading ? '#334155' : '#ff6600',
                                 border: 'none', borderRadius: '10px',
                                 color: '#fff', fontWeight: 700, fontSize: '1rem',
                                 cursor: loading ? 'not-allowed' : 'pointer',
@@ -157,7 +157,7 @@ const CustomerLogin = () => {
 
                     <p style={{ color: '#64748b', textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem' }}>
                         Don't have an account?{' '}
-                        <Link to="/portal/register" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>Register here</Link>
+                        <Link to="/portal/register" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 600 }}>Register here</Link>
                     </p>
                 </div>
             </div>

@@ -47,16 +47,16 @@ const CustomerRegister = () => {
     return (
         <div style={{
             minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)', padding: '2rem'
+            background: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', padding: '2rem'
         }}>
             <div style={{ width: '100%', maxWidth: '460px' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <div style={{
                         width: '56px', height: '56px', background: 'rgba(37, 99, 235, 0.15)',
                         borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        margin: '0 auto 1rem', border: '1px solid rgba(37,99,235,0.3)'
+                        margin: '0 auto 1rem', border: '1px solid rgba(255,102,0,0.3)'
                     }}>
-                        <Truck size={28} color="#60a5fa" />
+                        <Truck size={28} color="#ff6600" />
                     </div>
                     <h1 style={{ color: '#fff', fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>Limber Cargo</h1>
                     <p style={{ color: '#94a3b8', marginTop: '0.4rem' }}>Create Your Account</p>
@@ -97,7 +97,7 @@ const CustomerRegister = () => {
                                     onClick={() => setForm(f => ({ ...f, role: 'Customer' }))}
                                     style={{
                                         flex: 1, padding: '0.6rem', borderRadius: '8px',
-                                        background: form.role === 'Customer' ? '#2563eb' : '#0f172a',
+                                        background: form.role === 'Customer' ? '#ff6600' : '#001a33',
                                         color: '#fff', border: '1px solid #334155', cursor: 'pointer',
                                         fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s'
                                     }}
@@ -109,7 +109,7 @@ const CustomerRegister = () => {
                                     onClick={() => setForm(f => ({ ...f, role: 'Admin' }))}
                                     style={{
                                         flex: 1, padding: '0.6rem', borderRadius: '8px',
-                                        background: form.role === 'Admin' ? '#2563eb' : '#0f172a',
+                                        background: form.role === 'Admin' ? '#ff6600' : '#001a33',
                                         color: '#fff', border: '1px solid #334155', cursor: 'pointer',
                                         fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s'
                                     }}
@@ -145,7 +145,7 @@ const CustomerRegister = () => {
                                 disabled={loading}
                                 style={{
                                     marginTop: '0.5rem', padding: '0.85rem',
-                                    background: loading ? '#334155' : '#2563eb',
+                                    background: loading ? '#334155' : '#ff6600',
                                     border: 'none', borderRadius: '10px',
                                     color: '#fff', fontWeight: 700, fontSize: '1rem',
                                     cursor: loading ? 'not-allowed' : 'pointer',
@@ -159,7 +159,7 @@ const CustomerRegister = () => {
 
                     <p style={{ color: '#64748b', textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem' }}>
                         Already have an account?{' '}
-                        <Link to="/login" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
+                        <Link to="/login" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
                     </p>
                 </div>
             </div>
