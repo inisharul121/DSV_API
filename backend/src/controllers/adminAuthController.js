@@ -70,3 +70,38 @@ exports.me = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
+// GET /api/admins - List all staff (Admin only)
+exports.getAllAdmins = async (req, res) => {
+    try {
+        const admins = await Admin.findAll({
+            attributes: ['id', 'name', 'email', 'role', 'status', 'createdAt'],
+            order: [['createdAt', 'DESC']]
+        });
+        res.json({ success: true, admins });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// PUT /api/admins/:id/status - Update staff status (Admin only)
+exports.updateAdminStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const { id } = req.params;
+
+        if (!['Active', 'Pending', 'Rejected'].includes(status)) {
+            return res.status(400).json({ success: false, error: 'Invalid status.' });
+        }
+
+        const admin = await Admin.findByPk(id);
+        if (!admin) return res.status(404).json({ success: false, error: 'Admin not found.' });
+
+        admin.status = status;
+        await admin.save();
+
+        res.json({ success: true, message: `Staff status updated to ${status}.` });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};

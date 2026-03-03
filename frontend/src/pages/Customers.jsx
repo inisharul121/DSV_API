@@ -1,17 +1,32 @@
-import React, { useState } from 'react';
-import { Users, Search, Mail, MapPin, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, Search, Mail, MapPin, ExternalLink, Loader2 } from 'lucide-react';
+import dsvApi from '../api/dsvApi';
 
 const Customers = () => {
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const customers = [
-        { id: 101, name: 'Global Tech Solutions', city: 'Zurich, CH', email: 'it@globaltech.com', totalShipments: 45 },
-        { id: 102, name: 'Precision Parts AG', city: 'Baar, CH', email: 'shipping@precision.ch', totalShipments: 128 },
-    ];
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            try {
+                const res = await dsvApi.get('/customers');
+                if (res.data.success) {
+                    setCustomers(res.data.customers);
+                }
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCustomers();
+    }, []);
 
     const filtered = customers.filter(c =>
-        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.email.toLowerCase().includes(searchTerm.toLowerCase())
+        c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.company?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -36,34 +51,41 @@ const Customers = () => {
                     </div>
                 </div>
 
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ textAlign: 'left', borderBottom: '2px solid #f1f5f9' }}>
-                                <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>NAME</th>
-                                <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>LOCATION</th>
-                                <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>CONTACT</th>
-                                <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>SHIPMENTS</th>
-                                <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', textAlign: 'right' }}>ACTIONS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filtered.map((c) => (
-                                <tr key={c.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                    <td style={{ padding: '1rem 0.5rem', fontWeight: 700 }}>{c.name}</td>
-                                    <td style={{ padding: '1rem 0.5rem' }}><MapPin size={12} style={{ marginRight: '0.4rem' }} />{c.city}</td>
-                                    <td style={{ padding: '1rem 0.5rem' }}>{c.email}</td>
-                                    <td style={{ padding: '1rem 0.5rem' }}>{c.totalShipments}</td>
-                                    <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
-                                        <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)' }}>
-                                            <ExternalLink size={16} />
-                                        </button>
-                                    </td>
+                {loading ? (
+                    <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                        <Loader2 size={24} className="loader" style={{ marginBottom: '1rem' }} />
+                        <p>Loading customers...</p>
+                    </div>
+                ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ textAlign: 'left', borderBottom: '2px solid #f1f5f9' }}>
+                                    <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>NAME</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>LOCATION</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>CONTACT</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>SHIPMENTS</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', textAlign: 'right' }}>ACTIONS</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {filtered.map((c) => (
+                                    <tr key={c.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                        <td style={{ padding: '1rem 0.5rem', fontWeight: 700 }}>{c.name}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}><MapPin size={12} style={{ marginRight: '0.4rem' }} />{c.company || 'N/A'}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{c.email}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{new Date(c.createdAt).toLocaleDateString()}</td>
+                                        <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
+                                            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)' }}>
+                                                <ExternalLink size={16} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

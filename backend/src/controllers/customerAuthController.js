@@ -113,3 +113,16 @@ exports.me = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
+// GET /api/customers - List all customers (Admin only)
+exports.getAllCustomers = async (req, res) => {
+    try {
+        const customers = await Customer.findAll({
+            attributes: ['id', 'name', 'email', 'company', 'phone', 'createdAt'],
+            order: [['createdAt', 'DESC']]
+        });
+        res.json({ success: true, customers });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};

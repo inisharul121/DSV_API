@@ -37,6 +37,11 @@ router.post('/bookings/:shipmentId/labels', documentController.getShipmentLabels
 // Admin: All Orders
 router.get('/orders', adminAuth, orderController.getOrders);
 
+// Admin: User Management
+router.get('/admins', adminAuth, adminAuthController.getAllAdmins);
+router.put('/admins/:id/status', adminAuth, adminAuthController.updateAdminStatus);
+router.get('/customers', adminAuth, customerAuthController.getAllCustomers);
+
 // Tracking
 router.get('/tracking/shipments/:shipmentId', trackingController.getShipmentDetails);
 router.get('/tracking/shipments/:shipmentId/events', trackingController.getShipmentEvents);
