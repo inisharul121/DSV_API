@@ -29,7 +29,7 @@ const Sidebar = () => {
         <aside className="sidebar">
             <div className="sidebar-header" style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)' }}>
                 <Link to="/">
-                    <img src="https://limbercargo.com/assets/images/rony_limber_logo.jpg" alt="Limber Cargo" style={{ width: '100%', height: 'auto' }} />
+                    <img src="/images/logo.jpg" alt="Limber Cargo" style={{ width: '100%', height: 'auto' }} />
                 </Link>
             </div>
 

@@ -15,7 +15,7 @@ const Support = () => {
                 borderBottom: '1px solid #f0f0f0'
             }}>
                 <Link to="/">
-                    <img src="https://limbercargo.com/assets/images/rony_limber_logo.jpg" alt="Limber Cargo" style={{ height: '70px' }} />
+                    <img src="/images/logo.jpg" alt="Limber Cargo" style={{ height: '70px' }} />
                 </Link>
 
                 <div style={{ display: 'flex', gap: '2.5rem' }}>
@@ -85,7 +85,7 @@ const Support = () => {
             {/* Breadcrumb / Hero */}
             <section style={{
                 height: '400px',
-                backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("https://limbercargo.com/assets/images/002.jpg")',
+                backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/images/slider1.jpg")',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 display: 'flex',
@@ -129,7 +129,7 @@ const Support = () => {
                 <div style={{ display: 'flex', gap: '5rem', alignItems: 'center' }}>
                     <div style={{ flex: 1 }}>
                         <img
-                            src="https://limbercargo.com/assets/images/support_img.jpg"
+                            src="/images/slide3.jpg"
                             alt="The Complete Solution"
                             style={{ width: '100%', borderRadius: '4px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
                         />
@@ -228,7 +228,7 @@ const Support = () => {
             <footer style={{ background: '#111', color: 'white', padding: '6rem 8% 2rem' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4rem', marginBottom: '5rem' }}>
                     <div>
-                        <img src="https://limbercargo.com/assets/images/rony_limber_logo.jpg" alt="Limber Cargo" style={{ height: '70px', marginBottom: '2rem' }} />
+                        <img src="/images/logo.jpg" alt="Limber Cargo" style={{ height: '70px', marginBottom: '2rem' }} />
                         <p style={{ color: '#999', fontSize: '0.9rem', lineHeight: 1.6 }}>Limber Cargo is a World-Class Global Supplier of Transport and logistics Solutions. Our Head office is in Switzerland and we have international network of partners and agents.</p>
                     </div>
                     <div>
