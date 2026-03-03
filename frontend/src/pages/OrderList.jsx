@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Filter, ExternalLink, RefreshCw, FileText } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
@@ -134,24 +135,20 @@ const OrderList = () => {
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
                                             <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 {order.labelUrl && (
-                                                    <a
-                                                        href={`${API_BASE_URL.replace('/api', '')}${order.labelUrl}`}
-                                                        target="_blank"
-                                                        rel="noreferrer"
+                                                    <Link
+                                                        to={`/labels?id=${order.bookingId}`}
                                                         style={{ color: '#64748b', textDecoration: 'none' }}
-                                                        title="View Label"
+                                                        title="Download Label"
                                                     >
                                                         <FileText size={18} />
-                                                    </a>
+                                                    </Link>
                                                 )}
-                                                <a
-                                                    href={`https://track.dsv.com?bookingId=${order.bookingId}`}
-                                                    target="_blank"
-                                                    rel="noreferrer"
+                                                <Link
+                                                    to={`/shipments?id=${order.bookingId}`}
                                                     style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
                                                 >
                                                     Track <ExternalLink size={14} />
-                                                </a>
+                                                </Link>
                                             </div>
                                         </td>
                                     </tr>

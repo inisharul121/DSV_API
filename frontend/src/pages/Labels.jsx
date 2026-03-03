@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, FileText, Download, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
@@ -7,21 +8,27 @@ const Labels = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const [searchParams] = useSearchParams();
 
-    const handleDownloadLabel = async (e) => {
-        if (e) e.preventDefault();
-        if (!shipmentId) return;
+    // Auto-trigger download if ?id= is in the URL (e.g. from Order List)
+    useEffect(() => {
+        const id = searchParams.get('id');
+        if (id) {
+            setShipmentId(id);
+            // Slight delay to let state settle before triggering download
+            setTimeout(() => handleDownloadLabelById(id), 200);
+        }
+    }, [searchParams]);
 
+    // Core download function that can be called directly with an ID
+    const handleDownloadLabelById = async (id) => {
+        if (!id) return;
         setLoading(true);
         setError(null);
         setSuccess(null);
 
         try {
-            // The API expects a POST or GET based on our controller. 
-            // In our documentController.js, getShipmentLabels is a GET-like POST route on /bookings/:shipmentId/labels
-            // But actually it's a POST in routes/api.js.
-
-            const response = await dsvApi.post(`/bookings/${shipmentId}/labels`, {});
+            const response = await dsvApi.post(`/bookings/${id}/labels`, {});
 
             if (response.data.success) {
                 const labelData = response.data.pdfBase64;
@@ -38,12 +45,12 @@ const Labels = () => {
                     const url = window.URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', `Label_${shipmentId}.pdf`);
+                    link.setAttribute('download', `Label_${id}.pdf`);
                     document.body.appendChild(link);
                     link.click();
                     link.remove();
 
-                    setSuccess(`Label for ${shipmentId} downloaded successfully!`);
+                    setSuccess(`Label for ${id} downloaded successfully!`);
                 } else {
                     setError('No PDF content was found in the label response. Please contact support.');
                 }
@@ -57,6 +64,11 @@ const Labels = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDownloadLabel = async (e) => {
+        if (e) e.preventDefault();
+        await handleDownloadLabelById(shipmentId);
     };
 
     return (
