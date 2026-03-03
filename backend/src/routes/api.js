@@ -6,6 +6,7 @@ const trackingController = require('../controllers/trackingController');
 const documentController = require('../controllers/documentController');
 const quoteController = require('../controllers/quoteController');
 const certificationController = require('../controllers/certificationController');
+const orderController = require('../controllers/orderController');
 const certMiddleware = require('../middleware/certification');
 
 // Quotes

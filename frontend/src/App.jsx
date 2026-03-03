@@ -5,6 +5,7 @@ import Shipments from './pages/Shipments';
 import Dashboard from './pages/Dashboard';
 import Quotes from './pages/Quotes';
 import Order from './components/wizard/Order';
+import OrderList from './pages/OrderList'; // Added import for OrderList
 import Staff from './pages/Staff';
 import Customers from './pages/Customers';
 import Labels from './pages/Labels';
@@ -28,6 +29,7 @@ const App = () => {
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/order" element={<Order />} />
+          <Route path="/order-list" element={<OrderList />} /> {/* Added new route for OrderList */}
           <Route path="/shipments" element={<Shipments />} />
           <Route path="/quotes" element={<Quotes />} />
           <Route path="/staff" element={<Staff />} />

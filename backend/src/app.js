@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const config = require('./config/env');
 const authMiddleware = require('./middleware/auth');
+const sequelize = require('./config/database');
+const Order = require('./models/Order');
 
 const app = express();
 
@@ -32,11 +34,22 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start Server
+// Start Server with Database Sync
 if (require.main === module) {
-    app.listen(config.port, () => {
-        console.log(`Server running on port ${config.port} in ${config.env} mode`);
-    });
+    sequelize.sync({ alter: true })
+        .then(() => {
+            console.log('Database synced successfully');
+            app.listen(config.port, () => {
+                console.log(`Server running on port ${config.port} in ${config.env} mode`);
+            });
+        })
+        .catch((err) => {
+            console.error('Failed to sync database:', err);
+            // Still start the server if DB fails, or handle as needed
+            app.listen(config.port, () => {
+                console.log(`Server running on port ${config.port} in ${config.env} mode (DB Sync Failed)`);
+            });
+        });
 }
 
 module.exports = app;

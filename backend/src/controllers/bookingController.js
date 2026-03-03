@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const config = require('../config/env');
 const labelExtractor = require('../utils/labelExtractor');
+const Order = require('../models/Order');
 // const labelGenerator = require('../utils/labelGenerator'); // TODO: Implement this
 
 // Helper to save label from base64 or buffer
@@ -91,6 +92,28 @@ exports.createSimpleBooking = async (req, res) => {
             } else {
                 console.warn('[BOOKING] labelResponse received but contained no valid labelContent or shippingLabel.');
             }
+        }
+
+        // 3. Save Order to Local Database
+        try {
+            await Order.create({
+                bookingId: bookingId,
+                shipperName: shipmentData.origin_company || shipmentData.pickup?.address?.companyName || "Sender",
+                receiverName: shipmentData.dest_company || shipmentData.delivery?.companyName || "Receiver",
+                originCountry: (shipmentData.origin_country || shipmentData.pickup?.address?.countryCode || "CH").substring(0, 2),
+                destinationCountry: (shipmentData.dest_country || shipmentData.delivery?.countryCode || "DE").substring(0, 2),
+                serviceCode: shipmentData.serviceCode || "DSVAirExpress",
+                totalWeight: parseFloat(shipmentData.weight || 1.0),
+                goodsValue: parseFloat(shipmentData.goodsValue || 0),
+                currency: shipmentData.currencyCode || "CHF",
+                status: 'Created',
+                labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null
+            });
+            console.log(`Order ${bookingId} saved to database`);
+        } catch (dbError) {
+            console.error('Failed to save order to local database:', dbError);
+            // Don't fail the request if just the local save fails, 
+            // the shipment was already created in DSV
         }
 
         res.status(201).json({

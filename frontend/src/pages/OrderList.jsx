@@ -1,0 +1,154 @@
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, ExternalLink, RefreshCw, FileText } from 'lucide-react';
+import axios from 'axios';
+
+const OrderList = () => {
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const fetchOrders = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('/api/orders');
+            if (response.data.success) {
+                setOrders(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
+    const filteredOrders = orders.filter(order =>
+        order.bookingId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.shipperName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.receiverName?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700, margin: 0 }}>Order History</h2>
+                    <p style={{ color: '#64748b', marginTop: '0.5rem' }}>Full list of shipments created through Limber Cargo</p>
+                </div>
+                <button
+                    onClick={fetchOrders}
+                    className="btn-secondary"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                    <RefreshCw size={18} className={loading ? 'spin' : ''} /> Refresh
+                </button>
+            </div>
+
+            <div className="card" style={{ padding: '1.5rem' }}>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+                    <div className="input-group" style={{ flex: 1 }}>
+                        <div style={{ position: 'relative' }}>
+                            <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                            <input
+                                type="text"
+                                className="input-field"
+                                placeholder="Search by Booking ID, Shipper, or Receiver..."
+                                style={{ width: '100%', paddingLeft: '3rem' }}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Filter size={18} /> Filter
+                    </button>
+                </div>
+
+                {loading ? (
+                    <div style={{ display: 'grid', placeItems: 'center', height: '300px', color: '#64748b' }}>
+                        Loading order history...
+                    </div>
+                ) : filteredOrders.length === 0 ? (
+                    <div style={{ display: 'grid', placeItems: 'center', height: '300px', color: '#64748b' }}>
+                        {searchTerm ? 'No orders match your search.' : 'No orders found.'}
+                    </div>
+                ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
+                                    <th style={{ padding: '1rem 0.5rem', fontWeight: 600 }}>Date</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontWeight: 600 }}>Booking ID</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontWeight: 600 }}>Shipper</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontWeight: 600 }}>Receiver</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontWeight: 600 }}>Service</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontWeight: 600 }}>Weight</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontWeight: 600 }}>Status</th>
+                                    <th style={{ padding: '1rem 0.5rem', fontWeight: 600, textAlign: 'right' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredOrders.map((order) => (
+                                    <tr key={order.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                                        <td style={{ padding: '1rem 0.5rem', color: '#64748b' }}>
+                                            {new Date(order.createdAt).toLocaleDateString()}
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <span style={{ fontWeight: 600, color: '#1a1a1a' }}>{order.bookingId}</span>
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{order.shipperName}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{order.receiverName}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{order.serviceCode}</div>
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{order.totalWeight} {order.weightUnit || 'KG'}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <span style={{
+                                                padding: '0.25rem 0.75rem',
+                                                borderRadius: '20px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 600,
+                                                background: order.status === 'Created' ? 'rgba(37, 99, 235, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                                                color: order.status === 'Created' ? '#2563eb' : '#10b981'
+                                            }}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                                {order.labelUrl && (
+                                                    <a
+                                                        href={`${axios.defaults.baseURL || ''}${order.labelUrl}`}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        style={{ color: '#64748b', textDecoration: 'none' }}
+                                                        title="View Label"
+                                                    >
+                                                        <FileText size={18} />
+                                                    </a>
+                                                )}
+                                                <a
+                                                    href={`https://track.dsv.com?bookingId=${order.bookingId}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
+                                                >
+                                                    Track <ExternalLink size={14} />
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default OrderList;
