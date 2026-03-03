@@ -8,8 +8,10 @@ const quoteController = require('../controllers/quoteController');
 const certificationController = require('../controllers/certificationController');
 const orderController = require('../controllers/orderController');
 const customerAuthController = require('../controllers/customerAuthController');
+const adminAuthController = require('../controllers/adminAuthController');
 const customerOrderController = require('../controllers/customerOrderController');
 const customerAuth = require('../middleware/customerAuth');
+const adminAuth = require('../middleware/adminAuth');
 const certMiddleware = require('../middleware/certification');
 
 // Quotes
@@ -33,7 +35,7 @@ router.post('/bookings/:draftId/documents', upload.single('file'), documentContr
 router.post('/bookings/:shipmentId/labels', documentController.getShipmentLabels);
 
 // Admin: All Orders
-router.get('/orders', orderController.getOrders);
+router.get('/orders', adminAuth, orderController.getOrders);
 
 // Tracking
 router.get('/tracking/shipments/:shipmentId', trackingController.getShipmentDetails);
@@ -49,6 +51,11 @@ router.post('/auth/customer/register', customerAuthController.register);
 router.post('/auth/customer/login', customerAuthController.login);
 router.get('/auth/customer/me', customerAuth, customerAuthController.me);
 router.put('/auth/customer/profile', customerAuth, customerAuthController.updateProfile);
+
+// Admin Auth
+router.post('/auth/admin/register', adminAuthController.register);
+router.post('/auth/admin/login', adminAuthController.login);
+router.get('/auth/admin/me', adminAuth, adminAuthController.me);
 
 // Customer Portal: Customer-scoped orders (requires customer JWT)
 router.get('/customer/orders', customerAuth, customerOrderController.getMyOrders);

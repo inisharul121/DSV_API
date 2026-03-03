@@ -88,18 +88,34 @@ const Home = () => {
                     <Link to="/about" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>About</Link>
                     <Link to="/support" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Support</Link>
                     <Link to="/contact" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Contact</Link>
-                    <Link to="/dashboard" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Dashboard</Link>
+                    <Link to="/portal/dashboard" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Portal</Link>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', height: '100%' }}>
-                    {localStorage.getItem('customerToken') ? (
+                    {localStorage.getItem('adminToken') ? (
                         <>
-                            <Link to="/portal/orders" style={{
+                            <Link to="/dashboard" style={{
+                                color: '#fff', textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem',
+                                background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)',
+                                padding: '0.4rem 1rem', borderRadius: '6px'
+                            }}>
+                                🛡️ Admin Dashboard
+                            </Link>
+                            <button onClick={() => { localStorage.removeItem('adminToken'); localStorage.removeItem('adminInfo'); window.location.reload(); }} style={{
+                                background: 'none', border: '1px solid #444', color: '#aaa',
+                                padding: '0.4rem 0.85rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem'
+                            }}>
+                                Sign Out
+                            </button>
+                        </>
+                    ) : localStorage.getItem('customerToken') ? (
+                        <>
+                            <Link to="/portal/dashboard" style={{
                                 color: '#fff', textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem',
                                 background: 'rgba(255,102,0,0.15)', border: '1px solid rgba(255,102,0,0.4)',
                                 padding: '0.4rem 1rem', borderRadius: '6px'
                             }}>
-                                📦 My Shipments
+                                📦 My Portal
                             </Link>
                             <button onClick={() => { localStorage.removeItem('customerToken'); localStorage.removeItem('customerInfo'); window.location.reload(); }} style={{
                                 background: 'none', border: '1px solid #444', color: '#aaa',
@@ -110,10 +126,17 @@ const Home = () => {
                         </>
                     ) : (
                         <>
-                            <Link to="/portal/login" style={{
-                                color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',
-                                border: '1px solid #555', padding: '0.4rem 1.1rem', borderRadius: '6px'
-                            }}>Login</Link>
+                            <div className="login-dropdown" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                <Link to="/portal/login" style={{
+                                    color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',
+                                    border: '1px solid #555', padding: '0.4rem 1.1rem', borderRadius: '6px 0 0 6px'
+                                }}>Login</Link>
+                                <Link to="/admin/login" style={{
+                                    color: '#94a3b8', textDecoration: 'none', fontWeight: 600, fontSize: '0.75rem',
+                                    border: '1px solid #444', borderLeft: 'none', padding: '0.51rem 0.8rem', borderRadius: '0 6px 6px 0',
+                                    background: '#222'
+                                }}>Staff</Link>
+                            </div>
                             <Link to="/portal/register" style={{
                                 background: '#ff6600', color: 'white',
                                 textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',

@@ -8,11 +8,11 @@ const Layout = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Access Control: Customers should not be in the Admin area
+    // Access Control: Only Staff/Admin can access this area
     React.useEffect(() => {
-        const customerToken = localStorage.getItem('customerToken');
-        if (customerToken) {
-            navigate('/portal/dashboard');
+        const adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            navigate('/admin/login');
         }
     }, [navigate]);
 

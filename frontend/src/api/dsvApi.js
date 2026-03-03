@@ -10,9 +10,13 @@ const dsvApi = axios.create({
 // Add a request interceptor
 dsvApi.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('customerToken');
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
+        const adminToken = localStorage.getItem('adminToken');
+        const customerToken = localStorage.getItem('customerToken');
+
+        if (adminToken) {
+            config.headers['Authorization'] = `Bearer ${adminToken}`;
+        } else if (customerToken) {
+            config.headers['Authorization'] = `Bearer ${customerToken}`;
         }
         return config;
     },

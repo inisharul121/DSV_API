@@ -26,8 +26,12 @@ const Header = ({ title, subtitle }) => {
 
                 <div className="user-profile" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <div className="user-info" style={{ textAlign: 'right' }}>
-                        <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Nisharul Islam</div>
-                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Admin Account</div>
+                        <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                            {JSON.parse(localStorage.getItem('adminInfo') || '{}').name || 'Admin User'}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                            {JSON.parse(localStorage.getItem('adminInfo') || '{}').role || 'Administrator'}
+                        </div>
                     </div>
                     <div className="avatar" style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <User size={24} />

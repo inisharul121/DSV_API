@@ -14,6 +14,7 @@ import CustomerRegister from './pages/CustomerRegister';
 import CustomerOrders from './pages/CustomerOrders';
 import CustomerDashboard from './pages/CustomerDashboard';
 import CustomerProfile from './pages/CustomerProfile';
+import AdminLogin from './pages/AdminLogin';
 import CustomerLayout from './components/layout/CustomerLayout';
 import Order from './components/wizard/Order';
 
@@ -42,6 +43,9 @@ const App = () => {
           <Route path="/portal/profile" element={<CustomerProfile />} />
           <Route path="/portal/book" element={<Order />} />
         </Route>
+
+        {/* Employee/Admin Portal */}
+        <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* Private Dashboard Area (Admin - Employee Side) */}
         <Route element={<Layout />}>
