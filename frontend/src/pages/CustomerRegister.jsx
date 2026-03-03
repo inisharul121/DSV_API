@@ -4,8 +4,9 @@ import { Truck, UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const CustomerRegister = () => {
-    const [form, setForm] = useState({ name: '', email: '', password: '', company: '', phone: '' });
+    const [form, setForm] = useState({ name: '', email: '', password: '', company: '', phone: '', role: 'Customer' });
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(false); // New state for admin success message
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -16,11 +17,17 @@ const CustomerRegister = () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await dsvApi.post('/auth/customer/register', form);
+            const endpoint = form.role === 'Admin' ? '/auth/admin/register' : '/auth/customer/register';
+            const res = await dsvApi.post(endpoint, form);
+
             if (res.data.success) {
-                localStorage.setItem('customerToken', res.data.token);
-                localStorage.setItem('customerInfo', JSON.stringify(res.data.customer));
-                navigate('/portal/orders');
+                if (form.role === 'Admin') {
+                    setSuccess(true);
+                } else {
+                    localStorage.setItem('customerToken', res.data.token);
+                    localStorage.setItem('customerInfo', JSON.stringify(res.data.customer));
+                    navigate('/portal/orders');
+                }
             }
         } catch (err) {
             setError(err.response?.data?.error || 'Registration failed. Please try again.');
@@ -66,44 +73,89 @@ const CustomerRegister = () => {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                            <div>
-                                <label style={labelStyle}>Full Name *</label>
-                                <input name="name" type="text" value={form.name} onChange={handleChange} placeholder="John Doe" required style={inputStyle} />
+                    {success ? (
+                        <div style={{ textAlign: 'center', padding: '1rem' }}>
+                            <CheckCircle2 size={48} color="#10b981" style={{ margin: '0 auto 1.5rem' }} />
+                            <h2 style={{ color: '#fff', marginBottom: '1rem' }}>Registration Successful!</h2>
+                            <p style={{ color: '#94a3b8', lineHeight: 1.6, marginBottom: '2rem' }}>
+                                Your staff account has been created and is currently <strong>pending approval</strong>.
+                                You will be able to log in once an administrator activates your account.
+                            </p>
+                            <Link to="/admin/login" style={{
+                                display: 'block', padding: '0.85rem', background: '#2563eb',
+                                borderRadius: '10px', color: '#fff', fontWeight: 700, textDecoration: 'none'
+                            }}>
+                                Go to Sign In
+                            </Link>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {/* Role Selection */}
+                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setForm(f => ({ ...f, role: 'Customer' }))}
+                                    style={{
+                                        flex: 1, padding: '0.6rem', borderRadius: '8px',
+                                        background: form.role === 'Customer' ? '#2563eb' : '#0f172a',
+                                        color: '#fff', border: '1px solid #334155', cursor: 'pointer',
+                                        fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s'
+                                    }}
+                                >
+                                    Individual/Company
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setForm(f => ({ ...f, role: 'Admin' }))}
+                                    style={{
+                                        flex: 1, padding: '0.6rem', borderRadius: '8px',
+                                        background: form.role === 'Admin' ? '#2563eb' : '#0f172a',
+                                        color: '#fff', border: '1px solid #334155', cursor: 'pointer',
+                                        fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s'
+                                    }}
+                                >
+                                    Staff/Employee
+                                </button>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={labelStyle}>Full Name *</label>
+                                    <input name="name" type="text" value={form.name} onChange={handleChange} placeholder="John Doe" required style={inputStyle} />
+                                </div>
+                                <div>
+                                    <label style={labelStyle}>Company</label>
+                                    <input name="company" type="text" value={form.company} onChange={handleChange} placeholder="Acme AG" style={inputStyle} />
+                                </div>
                             </div>
                             <div>
-                                <label style={labelStyle}>Company</label>
-                                <input name="company" type="text" value={form.company} onChange={handleChange} placeholder="Acme AG" style={inputStyle} />
+                                <label style={labelStyle}>Email *</label>
+                                <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@company.com" required style={inputStyle} />
                             </div>
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Email *</label>
-                            <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@company.com" required style={inputStyle} />
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Phone</label>
-                            <input name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+41 79 000 0000" style={inputStyle} />
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Password *</label>
-                            <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min. 8 characters" required minLength={8} style={inputStyle} />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            style={{
-                                marginTop: '0.5rem', padding: '0.85rem',
-                                background: loading ? '#334155' : '#2563eb',
-                                border: 'none', borderRadius: '10px',
-                                color: '#fff', fontWeight: 700, fontSize: '1rem',
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
-                            }}
-                        >
-                            <UserPlus size={18} /> {loading ? 'Creating account...' : 'Create Account'}
-                        </button>
-                    </form>
+                            <div>
+                                <label style={labelStyle}>Phone</label>
+                                <input name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+41 79 000 0000" style={inputStyle} />
+                            </div>
+                            <div>
+                                <label style={labelStyle}>Password *</label>
+                                <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min. 8 characters" required minLength={8} style={inputStyle} />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                style={{
+                                    marginTop: '0.5rem', padding: '0.85rem',
+                                    background: loading ? '#334155' : '#2563eb',
+                                    border: 'none', borderRadius: '10px',
+                                    color: '#fff', fontWeight: 700, fontSize: '1rem',
+                                    cursor: loading ? 'not-allowed' : 'pointer',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
+                                }}
+                            >
+                                <UserPlus size={18} /> {loading ? 'Creating account...' : form.role === 'Admin' ? 'Request Access' : 'Create Account'}
+                            </button>
+                        </form>
+                    )}
 
                     <p style={{ color: '#64748b', textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem' }}>
                         Already have an account?{' '}

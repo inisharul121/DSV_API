@@ -37,6 +37,10 @@ exports.login = async (req, res) => {
             return res.status(401).json({ success: false, error: 'Invalid credentials.' });
         }
 
+        if (admin.status !== 'Active') {
+            return res.status(403).json({ success: false, error: 'Your account is pending approval or has been deactivated.' });
+        }
+
         const valid = await bcrypt.compare(password, admin.passwordHash);
         if (!valid) {
             return res.status(401).json({ success: false, error: 'Invalid credentials.' });

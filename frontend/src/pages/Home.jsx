@@ -28,7 +28,7 @@ const Home = () => {
     };
 
     return (
-        <div className="home-container" style={{ fontWait: 400 }}>
+        <div className="home-container" style={{ fontWeight: 400 }}>
             {/* Top Bar - Refined Layout */}
             <div className="top-header" style={{
                 background: 'white',
@@ -88,7 +88,8 @@ const Home = () => {
                     <Link to="/about" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>About</Link>
                     <Link to="/support" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Support</Link>
                     <Link to="/contact" style={{ color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Contact</Link>
-                    <Link to="/portal/dashboard" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Portal</Link>
+                    {localStorage.getItem('customerToken') && <Link to="/portal/dashboard" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Portal</Link>}
+                    {localStorage.getItem('adminToken') && <Link to="/dashboard" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Admin</Link>}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', height: '100%' }}>

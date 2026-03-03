@@ -24,6 +24,10 @@ const Admin = sequelize.define('Admin', {
     role: {
         type: DataTypes.STRING,
         defaultValue: 'Admin'
+    },
+    status: {
+        type: DataTypes.STRING,
+        defaultValue: 'Pending' // 'Pending', 'Active', 'Rejected'
     }
 }, {
     timestamps: true,

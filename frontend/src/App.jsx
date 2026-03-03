@@ -16,7 +16,6 @@ import CustomerDashboard from './pages/CustomerDashboard';
 import CustomerProfile from './pages/CustomerProfile';
 import AdminLogin from './pages/AdminLogin';
 import CustomerLayout from './components/layout/CustomerLayout';
-import Order from './components/wizard/Order';
 
 import Home from './pages/Home';
 import About from './pages/About';
