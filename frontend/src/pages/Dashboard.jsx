@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Ship, CheckCircle, Clock, AlertTriangle, ArrowRight, ExternalLink } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
@@ -124,18 +125,20 @@ const Dashboard = () => {
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
                                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                                                 {order.labelUrl && (
-                                                    <a href={`${axios.defaults.baseURL || ''}${order.labelUrl}`} target="_blank" rel="noreferrer" className="btn-secondary" style={{ padding: '0.4rem', borderRadius: '8px' }}>
+                                                    <Link
+                                                        to={`/labels?id=${order.bookingId}`}
+                                                        className="btn-secondary"
+                                                        style={{ padding: '0.4rem 0.8rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.85rem' }}
+                                                    >
                                                         Label
-                                                    </a>
+                                                    </Link>
                                                 )}
-                                                <a
-                                                    href={`https://track.dsv.com?bookingId=${order.bookingId}`}
-                                                    target="_blank"
-                                                    rel="noreferrer"
+                                                <Link
+                                                    to={`/shipments?id=${order.bookingId}`}
                                                     style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
                                                 >
                                                     Track <ExternalLink size={14} />
-                                                </a>
+                                                </Link>
                                             </div>
                                         </td>
                                     </tr>

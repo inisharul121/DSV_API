@@ -6,6 +6,7 @@ const config = require('./config/env');
 const authMiddleware = require('./middleware/auth');
 const sequelize = require('./config/database');
 const Order = require('./models/Order');
+const Customer = require('./models/Customer');
 
 const app = express();
 

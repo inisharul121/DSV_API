@@ -4,7 +4,22 @@ const fs = require('fs');
 const config = require('../config/env');
 const labelExtractor = require('../utils/labelExtractor');
 const Order = require('../models/Order');
-// const labelGenerator = require('../utils/labelGenerator'); // TODO: Implement this
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_CUSTOMER_SECRET || 'limber-cargo-customer-secret-2026';
+
+// Helper: extract customer ID from optional Bearer token
+const extractCustomerId = (req) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+        const token = authHeader.slice(7);
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return decoded.id || null;
+    } catch {
+        return null;
+    }
+};
 
 // Helper to save label from base64 or buffer
 const saveLabel = async (labelData, bookingId) => {
@@ -96,6 +111,7 @@ exports.createSimpleBooking = async (req, res) => {
 
         // 3. Save Order to Local Database
         try {
+            const customerId = extractCustomerId(req);
             await Order.create({
                 bookingId: bookingId,
                 shipperName: shipmentData.origin_company || shipmentData.pickup?.address?.companyName || "Sender",
@@ -107,9 +123,10 @@ exports.createSimpleBooking = async (req, res) => {
                 goodsValue: parseFloat(shipmentData.goodsValue || 0),
                 currency: shipmentData.currencyCode || "CHF",
                 status: 'Created',
-                labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null
+                labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
+                customerId: customerId
             });
-            console.log(`Order ${bookingId} saved to database`);
+            console.log(`Order ${bookingId} saved to database${customerId ? ` (customer: ${customerId})` : ''}`);
         } catch (dbError) {
             console.error('Failed to save order to local database:', dbError);
             // Don't fail the request if just the local save fails, 

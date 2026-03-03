@@ -5,10 +5,13 @@ import Shipments from './pages/Shipments';
 import Dashboard from './pages/Dashboard';
 import Quotes from './pages/Quotes';
 import Order from './components/wizard/Order';
-import OrderList from './pages/OrderList'; // Added import for OrderList
+import OrderList from './pages/OrderList';
 import Staff from './pages/Staff';
 import Customers from './pages/Customers';
 import Labels from './pages/Labels';
+import CustomerLogin from './pages/CustomerLogin';
+import CustomerRegister from './pages/CustomerRegister';
+import CustomerOrders from './pages/CustomerOrders';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -19,17 +22,22 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Public Landing Page */}
+        {/* Public Landing Pages */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/support" element={<Support />} />
         <Route path="/contact" element={<Contact />} />
 
-        {/* Private Dashboard Area */}
+        {/* Customer Portal */}
+        <Route path="/portal/login" element={<CustomerLogin />} />
+        <Route path="/portal/register" element={<CustomerRegister />} />
+        <Route path="/portal/orders" element={<CustomerOrders />} />
+
+        {/* Private Dashboard Area (Admin) */}
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/order" element={<Order />} />
-          <Route path="/order-list" element={<OrderList />} /> {/* Added new route for OrderList */}
+          <Route path="/order-list" element={<OrderList />} />
           <Route path="/shipments" element={<Shipments />} />
           <Route path="/quotes" element={<Quotes />} />
           <Route path="/staff" element={<Staff />} />

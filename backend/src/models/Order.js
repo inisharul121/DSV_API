@@ -51,6 +51,14 @@ const Order = sequelize.define('Order', {
     labelUrl: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    customerId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+            model: 'customers',
+            key: 'id'
+        }
     }
 }, {
     timestamps: true,

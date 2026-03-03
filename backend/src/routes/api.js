@@ -7,6 +7,9 @@ const documentController = require('../controllers/documentController');
 const quoteController = require('../controllers/quoteController');
 const certificationController = require('../controllers/certificationController');
 const orderController = require('../controllers/orderController');
+const customerAuthController = require('../controllers/customerAuthController');
+const customerOrderController = require('../controllers/customerOrderController');
+const customerAuth = require('../middleware/customerAuth');
 const certMiddleware = require('../middleware/certification');
 
 // Quotes
@@ -29,8 +32,10 @@ router.post('/bookings/complex', upload.any(), bookingController.createComplexBo
 router.post('/bookings/:draftId/documents', upload.single('file'), documentController.uploadDocument);
 router.post('/bookings/:shipmentId/labels', documentController.getShipmentLabels);
 
-// Tracking
+// Admin: All Orders
 router.get('/orders', orderController.getOrders);
+
+// Tracking
 router.get('/tracking/shipments/:shipmentId', trackingController.getShipmentDetails);
 router.get('/tracking/shipments/:shipmentId/events', trackingController.getShipmentEvents);
 router.get('/tracking/awb/:awbNumber/events', trackingController.getShipmentEventsByAWB);
@@ -38,5 +43,13 @@ router.get('/tracking/carrier/:carrierId/events', trackingController.getShipment
 
 // Legacy/Alternative tracking path
 router.get('/shipments/:shipmentId/tracking', trackingController.trackShipment);
+
+// Customer Auth (no authentication required)
+router.post('/auth/customer/register', customerAuthController.register);
+router.post('/auth/customer/login', customerAuthController.login);
+router.get('/auth/customer/me', customerAuth, customerAuthController.me);
+
+// Customer Portal: Customer-scoped orders (requires customer JWT)
+router.get('/customer/orders', customerAuth, customerOrderController.getMyOrders);
 
 module.exports = router;
