@@ -9,12 +9,11 @@ import OrderList from './pages/OrderList';
 import Staff from './pages/Staff';
 import Customers from './pages/Customers';
 import Labels from './pages/Labels';
-import CustomerLogin from './pages/CustomerLogin';
+import Login from './pages/Login';
 import CustomerRegister from './pages/CustomerRegister';
 import CustomerOrders from './pages/CustomerOrders';
 import CustomerDashboard from './pages/CustomerDashboard';
 import CustomerProfile from './pages/CustomerProfile';
-import AdminLogin from './pages/AdminLogin';
 import CustomerLayout from './components/layout/CustomerLayout';
 
 import Home from './pages/Home';
@@ -32,19 +31,17 @@ const App = () => {
         <Route path="/support" element={<Support />} />
         <Route path="/contact" element={<Contact />} />
 
-        {/* Customer Portal */}
-        <Route path="/portal/login" element={<CustomerLogin />} />
+        {/* Authentication */}
+        <Route path="/login" element={<Login />} />
         <Route path="/portal/register" element={<CustomerRegister />} />
 
+        {/* Customer Portal */}
         <Route element={<CustomerLayout />}>
           <Route path="/portal/dashboard" element={<CustomerDashboard />} />
           <Route path="/portal/orders" element={<CustomerOrders />} />
           <Route path="/portal/profile" element={<CustomerProfile />} />
           <Route path="/portal/book" element={<Order />} />
         </Route>
-
-        {/* Employee/Admin Portal */}
-        <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* Private Dashboard Area (Admin - Employee Side) */}
         <Route element={<Layout />}>

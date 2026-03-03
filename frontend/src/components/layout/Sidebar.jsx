@@ -8,10 +8,13 @@ import {
     CreditCard,
     BarChart3,
     UserCircle,
-    FileText
+    FileText,
+    LogOut
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
+    const navigate = useNavigate();
     const navItems = [
         { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
         { name: 'Order List', path: '/order-list', icon: <FileText size={20} /> },
@@ -48,6 +51,35 @@ const Sidebar = () => {
                     </NavLink>
                 ))}
             </nav>
+
+            <div className="sidebar-footer" style={{ marginTop: 'auto', padding: '1rem', borderTop: '1px solid var(--border)' }}>
+                <button
+                    onClick={() => {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminInfo');
+                        navigate('/login');
+                    }}
+                    className="nav-item"
+                    style={{
+                        width: '100%',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#ef4444',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '8px',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    <LogOut size={20} />
+                    <span>Logout</span>
+                </button>
+            </div>
         </aside>
     );
 };

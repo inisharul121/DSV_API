@@ -81,7 +81,7 @@ const CustomerRegister = () => {
                                 Your staff account has been created and is currently <strong>pending approval</strong>.
                                 You will be able to log in once an administrator activates your account.
                             </p>
-                            <Link to="/admin/login" style={{
+                            <Link to="/login" style={{
                                 display: 'block', padding: '0.85rem', background: '#2563eb',
                                 borderRadius: '10px', color: '#fff', fontWeight: 700, textDecoration: 'none'
                             }}>
@@ -159,7 +159,7 @@ const CustomerRegister = () => {
 
                     <p style={{ color: '#64748b', textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem' }}>
                         Already have an account?{' '}
-                        <Link to="/portal/login" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
+                        <Link to="/login" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
                     </p>
                 </div>
             </div>

@@ -4,6 +4,7 @@ import { Truck, LogIn, AlertCircle } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const CustomerLogin = () => {
+    const [role, setRole] = useState('Customer'); // Default role
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
@@ -15,11 +16,23 @@ const CustomerLogin = () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await dsvApi.post('/auth/customer/login', { email, password });
+            const endpoint = role === 'Admin' ? '/auth/admin/login' : '/auth/customer/login';
+            const res = await dsvApi.post(endpoint, { email, password });
+
             if (res.data.success) {
-                localStorage.setItem('customerToken', res.data.token);
-                localStorage.setItem('customerInfo', JSON.stringify(res.data.customer));
-                navigate('/portal/dashboard');
+                if (role === 'Admin') {
+                    localStorage.setItem('adminToken', res.data.token);
+                    localStorage.setItem('adminInfo', JSON.stringify(res.data.admin));
+                    localStorage.removeItem('customerToken');
+                    localStorage.removeItem('customerInfo');
+                    navigate('/dashboard');
+                } else {
+                    localStorage.setItem('customerToken', res.data.token);
+                    localStorage.setItem('customerInfo', JSON.stringify(res.data.customer));
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminInfo');
+                    navigate('/portal/dashboard');
+                }
             }
         } catch (err) {
             setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
@@ -50,11 +63,38 @@ const CustomerLogin = () => {
                         <Truck size={28} color="#60a5fa" />
                     </div>
                     <h1 style={{ color: '#fff', fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>Limber Cargo</h1>
-                    <p style={{ color: '#94a3b8', marginTop: '0.4rem' }}>Customer Portal</p>
+                    <p style={{ color: '#94a3b8', marginTop: '0.4rem' }}>Secure Access Portal</p>
                 </div>
 
                 <div style={{ background: '#1e293b', borderRadius: '16px', padding: '2rem', border: '1px solid #334155' }}>
-                    <h2 style={{ color: '#f1f5f9', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>Sign In</h2>
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                        <button
+                            onClick={() => setRole('Customer')}
+                            style={{
+                                flex: 1, padding: '0.6rem', borderRadius: '8px',
+                                background: role === 'Customer' ? '#2563eb' : '#0f172a',
+                                color: '#fff', border: '1px solid #334155', cursor: 'pointer',
+                                fontWeight: 600, fontSize: '0.85rem'
+                            }}
+                        >
+                            Client Login
+                        </button>
+                        <button
+                            onClick={() => setRole('Admin')}
+                            style={{
+                                flex: 1, padding: '0.6rem', borderRadius: '8px',
+                                background: role === 'Admin' ? '#2563eb' : '#0f172a',
+                                color: '#fff', border: '1px solid #334155', cursor: 'pointer',
+                                fontWeight: 600, fontSize: '0.85rem'
+                            }}
+                        >
+                            Staff Login
+                        </button>
+                    </div>
+
+                    <h2 style={{ color: '#f1f5f9', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>
+                        {role === 'Admin' ? 'Staff Sign In' : 'Client Sign In'}
+                    </h2>
 
                     {error && (
                         <div style={{

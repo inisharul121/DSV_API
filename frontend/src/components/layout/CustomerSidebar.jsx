@@ -16,7 +16,7 @@ const CustomerSidebar = () => {
     const handleLogout = () => {
         localStorage.removeItem('customerToken');
         localStorage.removeItem('customerInfo');
-        navigate('/portal/login');
+        navigate('/login');
     };
 
     const navItems = [

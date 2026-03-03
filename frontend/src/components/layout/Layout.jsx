@@ -12,7 +12,7 @@ const Layout = () => {
     React.useEffect(() => {
         const adminToken = localStorage.getItem('adminToken');
         if (!adminToken) {
-            navigate('/admin/login');
+            navigate('/login');
         }
     }, [navigate]);
 

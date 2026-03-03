@@ -127,17 +127,10 @@ const Home = () => {
                         </>
                     ) : (
                         <>
-                            <div className="login-dropdown" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                                <Link to="/portal/login" style={{
-                                    color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',
-                                    border: '1px solid #555', padding: '0.4rem 1.1rem', borderRadius: '6px 0 0 6px'
-                                }}>Login</Link>
-                                <Link to="/admin/login" style={{
-                                    color: '#94a3b8', textDecoration: 'none', fontWeight: 600, fontSize: '0.75rem',
-                                    border: '1px solid #444', borderLeft: 'none', padding: '0.51rem 0.8rem', borderRadius: '0 6px 6px 0',
-                                    background: '#222'
-                                }}>Staff</Link>
-                            </div>
+                            <Link to="/login" style={{
+                                color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',
+                                border: '1px solid #555', padding: '0.4rem 1.1rem', borderRadius: '6px'
+                            }}>Login</Link>
                             <Link to="/portal/register" style={{
                                 background: '#ff6600', color: 'white',
                                 textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',

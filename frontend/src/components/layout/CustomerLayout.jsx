@@ -11,7 +11,7 @@ const CustomerLayout = () => {
 
     // Redirect to login if no token
     if (!token) {
-        navigate('/portal/login');
+        navigate('/login');
         return null;
     }
 
