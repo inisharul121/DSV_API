@@ -2,9 +2,19 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { useNavigate } from 'react-router-dom';
 
 const Layout = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+
+    // Access Control: Customers should not be in the Admin area
+    React.useEffect(() => {
+        const customerToken = localStorage.getItem('customerToken');
+        if (customerToken) {
+            navigate('/portal/dashboard');
+        }
+    }, [navigate]);
 
     // Map routes to titles
     const getPageTitle = (pathname) => {

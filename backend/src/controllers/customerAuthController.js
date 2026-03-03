@@ -67,6 +67,40 @@ exports.login = async (req, res) => {
     }
 };
 
+// PUT /api/auth/customer/profile
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, company, phone, password } = req.body;
+        const customer = await Customer.findByPk(req.customerId);
+
+        if (!customer) return res.status(404).json({ success: false, error: 'Customer not found.' });
+
+        if (name) customer.name = name;
+        if (company) customer.company = company;
+        if (phone) customer.phone = phone;
+
+        if (password) {
+            customer.passwordHash = await bcrypt.hash(password, 10);
+        }
+
+        await customer.save();
+
+        res.json({
+            success: true,
+            customer: {
+                id: customer.id,
+                name: customer.name,
+                email: customer.email,
+                company: customer.company,
+                phone: customer.phone
+            }
+        });
+    } catch (error) {
+        console.error('Customer Update Error:', error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
 // GET /api/auth/customer/me  (verify token)
 exports.me = async (req, res) => {
     try {

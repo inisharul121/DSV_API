@@ -12,6 +12,10 @@ import Labels from './pages/Labels';
 import CustomerLogin from './pages/CustomerLogin';
 import CustomerRegister from './pages/CustomerRegister';
 import CustomerOrders from './pages/CustomerOrders';
+import CustomerDashboard from './pages/CustomerDashboard';
+import CustomerProfile from './pages/CustomerProfile';
+import CustomerLayout from './components/layout/CustomerLayout';
+import Order from './components/wizard/Order';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -31,9 +35,15 @@ const App = () => {
         {/* Customer Portal */}
         <Route path="/portal/login" element={<CustomerLogin />} />
         <Route path="/portal/register" element={<CustomerRegister />} />
-        <Route path="/portal/orders" element={<CustomerOrders />} />
 
-        {/* Private Dashboard Area (Admin) */}
+        <Route element={<CustomerLayout />}>
+          <Route path="/portal/dashboard" element={<CustomerDashboard />} />
+          <Route path="/portal/orders" element={<CustomerOrders />} />
+          <Route path="/portal/profile" element={<CustomerProfile />} />
+          <Route path="/portal/book" element={<Order />} />
+        </Route>
+
+        {/* Private Dashboard Area (Admin - Employee Side) */}
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/order" element={<Order />} />

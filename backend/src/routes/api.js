@@ -48,6 +48,7 @@ router.get('/shipments/:shipmentId/tracking', trackingController.trackShipment);
 router.post('/auth/customer/register', customerAuthController.register);
 router.post('/auth/customer/login', customerAuthController.login);
 router.get('/auth/customer/me', customerAuth, customerAuthController.me);
+router.put('/auth/customer/profile', customerAuth, customerAuthController.updateProfile);
 
 // Customer Portal: Customer-scoped orders (requires customer JWT)
 router.get('/customer/orders', customerAuth, customerOrderController.getMyOrders);

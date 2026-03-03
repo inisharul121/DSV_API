@@ -19,7 +19,7 @@ const CustomerLogin = () => {
             if (res.data.success) {
                 localStorage.setItem('customerToken', res.data.token);
                 localStorage.setItem('customerInfo', JSON.stringify(res.data.customer));
-                navigate('/portal/orders');
+                navigate('/portal/dashboard');
             }
         } catch (err) {
             setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
