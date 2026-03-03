@@ -91,19 +91,50 @@ const Home = () => {
                     <Link to="/dashboard" style={{ color: '#ff6600', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Dashboard</Link>
                 </div>
 
-                <Link to="/order" style={{
-                    background: '#ff6600',
-                    color: 'white',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '0 2.5rem',
-                    textDecoration: 'none',
-                    fontWeight: 700,
-                    fontSize: '1rem'
-                }}>
-                    Order Now!
-                </Link>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', height: '100%' }}>
+                    {localStorage.getItem('customerToken') ? (
+                        <>
+                            <Link to="/portal/orders" style={{
+                                color: '#fff', textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem',
+                                background: 'rgba(255,102,0,0.15)', border: '1px solid rgba(255,102,0,0.4)',
+                                padding: '0.4rem 1rem', borderRadius: '6px'
+                            }}>
+                                📦 My Shipments
+                            </Link>
+                            <button onClick={() => { localStorage.removeItem('customerToken'); localStorage.removeItem('customerInfo'); window.location.reload(); }} style={{
+                                background: 'none', border: '1px solid #444', color: '#aaa',
+                                padding: '0.4rem 0.85rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem'
+                            }}>
+                                Sign Out
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/portal/login" style={{
+                                color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',
+                                border: '1px solid #555', padding: '0.4rem 1.1rem', borderRadius: '6px'
+                            }}>Login</Link>
+                            <Link to="/portal/register" style={{
+                                background: '#ff6600', color: 'white',
+                                textDecoration: 'none', fontWeight: 700, fontSize: '0.9rem',
+                                padding: '0.4rem 1.1rem', borderRadius: '6px'
+                            }}>Register</Link>
+                        </>
+                    )}
+                    <Link to="/order" style={{
+                        background: '#ff6600',
+                        color: 'white',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0 2.5rem',
+                        textDecoration: 'none',
+                        fontWeight: 700,
+                        fontSize: '1rem'
+                    }}>
+                        Order Now!
+                    </Link>
+                </div>
             </nav>
 
             {/* Hero Section with Slider */}
