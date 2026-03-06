@@ -37,7 +37,11 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
             origin: 'CH',
             description: 'Shipping Goods',
             currency: 'CHF',
-            value: 60
+            value: 60,
+            hsCode: '',
+            quantity: 1,
+            reasonForExport: 'SALE',
+            incoterms: 'DAP'
         },
         notifications: {
             dep: 'recipient1@receiver.com',
@@ -121,6 +125,10 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                 commodity: form.commodity.description,
                 commodity_currency: form.commodity.currency,
                 goodsValue: form.commodity.value,
+                hsCode: form.commodity.hsCode,
+                quantity: form.commodity.quantity,
+                reasonForExport: form.commodity.reasonForExport,
+                incoterms: form.commodity.incoterms,
 
                 notif_email_1: form.notifications.dep,
                 notif_email_2: form.notifications.exc,
@@ -318,6 +326,43 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                                             <option value="USD">USD</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">HS Code</label>
+                                        <input type="text" className="input-field" placeholder="e.g. 610910" value={form.commodity.hsCode} onChange={(e) => handleFormChange('commodity', 'hsCode', e.target.value)} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">Quantity *</label>
+                                        <input type="number" className="input-field" required value={form.commodity.quantity} onChange={(e) => handleFormChange('commodity', 'quantity', e.target.value)} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Origin of Goods</label>
+                                        <select className="input-field" value={form.commodity.origin} onChange={(e) => handleFormChange('commodity', 'origin', e.target.value)}>
+                                            {countries.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">Reason for Export</label>
+                                        <select className="input-field" value={form.commodity.reasonForExport} onChange={(e) => handleFormChange('commodity', 'reasonForExport', e.target.value)}>
+                                            <option value="SALE">Sale</option>
+                                            <option value="GIFT">Gift</option>
+                                            <option value="SAMPLE">Sample</option>
+                                            <option value="RETURN">Return</option>
+                                            <option value="REPAIR">Repair</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="input-group">
+                                    <label className="input-label">Incoterms</label>
+                                    <select className="input-field" value={form.commodity.incoterms} onChange={(e) => handleFormChange('commodity', 'incoterms', e.target.value)}>
+                                        <option value="DAP">DAP - Delivered at Place</option>
+                                        <option value="DDP">DDP - Delivered Duty Paid</option>
+                                        <option value="FCA">FCA - Free Carrier</option>
+                                        <option value="EXW">EXW - Ex Works</option>
+                                    </select>
                                 </div>
                             </section>
                         </div>

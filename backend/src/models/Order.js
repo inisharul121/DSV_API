@@ -52,6 +52,26 @@ const Order = sequelize.define('Order', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    hsCode: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    quantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1
+    },
+    reasonForExport: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    incoterms: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    originOfGoods: {
+        type: DataTypes.STRING(2),
+        allowNull: true
+    },
     customerId: {
         type: DataTypes.UUID,
         allowNull: true,

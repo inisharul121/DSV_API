@@ -180,12 +180,16 @@ exports.buildBookingPayload = (data) => {
             {
                 originCountryCode: data.commodity_origin || data.origin_country || "CH",
                 goodsDescription: data.commodity || "General Goods",
+                hsCode: data.hsCode || undefined,
+                numberOfItems: parseInt(data.quantity) || 1,
                 goodsValue: {
                     currencyCode: data.commodity_currency || data.currencyCode || "CHF",
                     monetaryValue: parseFloat(data.goodsValue)
                 }
             }
-        ] : undefined
+        ] : undefined,
+        incoterms: data.incoterms || "DAP",
+        reasonForExport: data.reasonForExport || "SALE"
     };
 
     return payload;

@@ -124,6 +124,11 @@ exports.createSimpleBooking = async (req, res) => {
                 currency: shipmentData.currencyCode || "CHF",
                 status: 'Created',
                 labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
+                hsCode: shipmentData.hsCode || null,
+                quantity: parseInt(shipmentData.quantity) || 1,
+                reasonForExport: shipmentData.reasonForExport || null,
+                incoterms: shipmentData.incoterms || null,
+                originOfGoods: shipmentData.commodity_origin || null,
                 customerId: customerId
             });
             console.log(`Order ${bookingId} saved to database${customerId ? ` (customer: ${customerId})` : ''}`);
