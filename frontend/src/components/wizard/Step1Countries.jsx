@@ -16,10 +16,12 @@ const Step1Countries = ({ data, updateData, onNext }) => {
             const response = await dsvApi.post('/quotes', {
                 dsvAccount: 8004990000,
                 pickupCountryCode: direction === 'export' ? 'CH' : data.deliveryCountry,
+                pickupCity: direction === 'export' ? data.sender?.city || 'Baar' : undefined,
+                pickupZipCode: direction === 'export' ? data.sender?.zip || '6340' : undefined,
                 deliveryCountryCode: direction === 'export' ? data.deliveryCountry : 'CH',
                 packageType: "PARCELS",
                 weight: data.weight,
-                // Default small box for initial quote
+                // Default box for initial quote
                 length: data.dimensions?.length || 10,
                 width: data.dimensions?.width || 10,
                 height: data.dimensions?.height || 10

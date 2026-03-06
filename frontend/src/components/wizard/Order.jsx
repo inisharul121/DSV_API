@@ -11,7 +11,7 @@ const Order = () => {
         pickupCountry: 'CH',
         deliveryCountry: '',
         weight: '',
-        dimensions: { length: 75, width: 35, height: 35 },
+        dimensions: { length: 10, width: 10, height: 10 },
         sender: {
             company: 'BCIC Swiss GmbH',
             address: 'Lättichstrasse 6',

@@ -202,8 +202,8 @@ exports.buildQuotePayload = (data) => {
     return {
         dsvAccount: parseInt(data.dsvAccount || config.dsv.account),
         pickupCountryCode: pickupCountry.trim().substring(0, 2).toUpperCase(),
-        pickupCity: data.pickupCity || data.pickup?.address?.city || data.origin_city || "Baar",
-        pickupZipCode: data.pickupZipCode || data.pickup?.address?.zipCode || data.origin_zip || "6340",
+        pickupCity: (data.pickupCity || data.pickup?.address?.city || data.origin_city || "Baar").trim(),
+        pickupZipCode: (data.pickupZipCode || data.pickup?.address?.zipCode || data.origin_zip || "6340").trim(),
         deliveryCountryCode: deliveryCountry.trim().substring(0, 2).toUpperCase(),
         deliveryCity: data.deliveryCity || data.delivery?.city || data.dest_city || undefined,
         deliveryZipCode: data.deliveryZipCode || data.delivery?.address?.zipCode || data.dest_zip || undefined,
