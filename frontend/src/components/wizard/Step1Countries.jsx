@@ -176,7 +176,7 @@ const Step1Countries = ({ data, updateData, onNext }) => {
                                 key={p.label}
                                 className="btn-preset"
                                 onClick={() => updateData({ dimensions: { length: p.l, width: p.w, height: p.h } })}
-                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', background: 'white', border: '1px solid #e2e8f0', borderRadius: '20px', cursor: 'pointer' }}
+                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', background: 'white', border: '1px solid #e2e8f0', borderRadius: '20px', cursor: 'pointer', color: '#475569', fontWeight: 600 }}
                             >
                                 {p.label}
                             </button>
