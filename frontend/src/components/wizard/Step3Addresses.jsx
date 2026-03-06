@@ -60,6 +60,23 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
         }));
     };
 
+    // Synchronize price when service code changes in this form
+    React.useEffect(() => {
+        if (data.availableServices) {
+            const newSvc = data.availableServices.find(s => s.serviceCode === form.service.serviceCode);
+            if (newSvc) {
+                updateData({
+                    serviceCode: newSvc.serviceCode,
+                    pricing: {
+                        totalPrice: newSvc.totalDisplay,
+                        currency: newSvc.currency,
+                        breakdown: newSvc.detailedBreakdown
+                    }
+                });
+            }
+        }
+    }, [form.service.serviceCode]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -262,9 +279,18 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                                     <div className="input-group">
                                         <label className="input-label">Service Code</label>
                                         <select className="input-field" value={form.service.serviceCode} onChange={(e) => handleFormChange('service', 'serviceCode', e.target.value)}>
-                                            <option value="DSVAirExpress">DSV Air Express</option>
-                                            <option value="DSVEconomy">DSV Economy</option>
-                                            <option value="DSVAirExpressImport">DSV Air Express Import</option>
+                                            {data.availableServices?.length > 0 ? (
+                                                data.availableServices.map(svc => (
+                                                    <option key={svc.serviceCode} value={svc.serviceCode}>
+                                                        {svc.serviceCode} - {svc.currency} {svc.totalDisplay}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <>
+                                                    <option value="DSVAirExpress">DSV Air Express</option>
+                                                    <option value="DSVEconomy">DSV Economy</option>
+                                                </>
+                                            )}
                                         </select>
                                     </div>
                                     <div className="input-group">

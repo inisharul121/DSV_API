@@ -36,6 +36,9 @@ const Step1Countries = ({ data, updateData, onNext }) => {
 
             if (response.data.success && response.data.data.services?.length > 0) {
                 setServices(response.data.data.services);
+                // Store services in parent for Step 2 to use if user changes service code
+                updateData({ availableServices: response.data.data.services });
+
                 // If current selected service is not in new results, or none selected, pick the first one
                 const remainsAvailable = response.data.data.services.find(s => s.serviceCode === selectedService);
                 if (!remainsAvailable) {
