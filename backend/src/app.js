@@ -17,10 +17,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files (labels, invoices)
-app.use('/labels', express.static(path.resolve('./public/labels')));
-app.use('/invoices', express.static(path.resolve('./public/invoices')));
+app.use('/api/labels', express.static(path.resolve('./public/labels')));
+app.use('/api/invoices', express.static(path.resolve('./public/invoices')));
 
 // API Routes
+const apiRoutes = require('./routes/api');
 app.use('/api', authMiddleware, apiRoutes);
 
 // Root route for health check
@@ -40,7 +41,7 @@ app.use((err, req, res, next) => {
 
 // Start Server with Database Sync
 if (require.main === module) {
-    sequelize.sync({ alter: true })
+    sequelize.sync({ alter: false })
         .then(() => {
             console.log('Database synced successfully');
             const server = app.listen(config.port, () => {
