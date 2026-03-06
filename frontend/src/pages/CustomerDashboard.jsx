@@ -133,19 +133,35 @@ const CustomerDashboard = () => {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 <Link
                                                     to={`/portal/shipments?id=${order.bookingId}`}
                                                     style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
                                                 >
                                                     Track <ExternalLink size={14} />
                                                 </Link>
-                                                <Link
-                                                    to={`/portal/labels?id=${order.bookingId}`}
-                                                    style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
-                                                >
-                                                    Label <FileText size={14} />
-                                                </Link>
+                                                {order.labelUrl && (
+                                                    <a
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.labelUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
+                                                        title="Download Label"
+                                                    >
+                                                        Label <FileText size={14} />
+                                                    </a>
+                                                )}
+                                                {order.invoiceUrl && (
+                                                    <a
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.invoiceUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
+                                                        title="Download Invoice"
+                                                    >
+                                                        Invoice <FileText size={14} />
+                                                    </a>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

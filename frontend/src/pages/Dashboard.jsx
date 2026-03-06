@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Ship, CheckCircle, Clock, AlertTriangle, ArrowRight, ExternalLink } from 'lucide-react';
+import { Ship, CheckCircle, Clock, AlertTriangle, ArrowRight, ExternalLink, FileText, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const StatCard = ({ icon: Icon, value, label, color, bgColor }) => (
@@ -123,15 +123,33 @@ const Dashboard = () => {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                            <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 {order.labelUrl && (
-                                                    <Link
-                                                        to={`/labels?id=${order.bookingId}`}
+                                                    <a
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.labelUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="btn-secondary"
                                                         style={{ padding: '0.4rem 0.8rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.85rem' }}
+                                                        title="Download Label"
                                                     >
                                                         Label
-                                                    </Link>
+                                                    </a>
+                                                )}
+                                                {order.invoiceUrl && (
+                                                    <a
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.invoiceUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="btn-secondary"
+                                                        style={{
+                                                            padding: '0.4rem 0.8rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.85rem',
+                                                            background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none'
+                                                        }}
+                                                        title="Download Invoice"
+                                                    >
+                                                        Invoice
+                                                    </a>
                                                 )}
                                                 <Link
                                                     to={`/shipments?id=${order.bookingId}`}

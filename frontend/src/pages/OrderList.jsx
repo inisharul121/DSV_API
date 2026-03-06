@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, ExternalLink, RefreshCw, FileText } from 'lucide-react';
+import { Search, Filter, ExternalLink, RefreshCw, FileText, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -133,35 +133,38 @@ const OrderList = () => {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
-                                            <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                            <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 {order.labelUrl && (
                                                     <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${order.labelUrl}`}
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.labelUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        style={{ color: '#64748b', textDecoration: 'none' }}
+                                                        className="btn-secondary"
+                                                        style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#64748b', border: '1px solid #e2e8f0' }}
                                                         title="Download Shipping Label"
                                                     >
-                                                        <FileText size={18} />
+                                                        <FileText size={14} /> Label
                                                     </a>
                                                 )}
                                                 {order.invoiceUrl && (
                                                     <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${order.invoiceUrl}`}
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.invoiceUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        style={{ color: '#2563eb', textDecoration: 'none' }}
+                                                        className="btn-secondary"
+                                                        style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#2563eb', background: 'rgba(37, 99, 235, 0.1)', border: 'none' }}
                                                         title="Download Proforma Invoice"
                                                     >
-                                                        <RefreshCw size={18} style={{ display: 'none' }} />
-                                                        <FileText size={18} />
+                                                        <FileText size={14} /> Invoice
                                                     </a>
                                                 )}
                                                 <Link
                                                     to={`/shipments?id=${order.bookingId}`}
-                                                    style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
+                                                    className="btn-secondary"
+                                                    style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: 'none' }}
+                                                    title="Track Shipment"
                                                 >
-                                                    Track <ExternalLink size={14} />
+                                                    <Truck size={14} /> Track
                                                 </Link>
                                             </div>
                                         </td>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Package, RefreshCw, FileText, ExternalLink } from 'lucide-react';
+import { Search, Package, RefreshCw, FileText, ExternalLink, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const CustomerOrders = () => {
@@ -142,7 +142,7 @@ const CustomerOrders = () => {
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                 {order.labelUrl && (
                                                     <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${order.labelUrl}`}
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.labelUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="btn-secondary"
@@ -153,7 +153,7 @@ const CustomerOrders = () => {
                                                 )}
                                                 {order.invoiceUrl && (
                                                     <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${order.invoiceUrl}`}
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.invoiceUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="btn-secondary"
