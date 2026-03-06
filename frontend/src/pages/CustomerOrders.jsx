@@ -141,13 +141,30 @@ const CustomerOrders = () => {
                                         <td style={{ padding: '1rem 0.75rem' }}>
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                 {order.labelUrl && (
-                                                    <Link
-                                                        to={`/portal/labels?id=${order.bookingId}`}
+                                                    <a
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${order.labelUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="btn-secondary"
                                                         style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                                     >
                                                         <FileText size={13} /> Label
-                                                    </Link>
+                                                    </a>
+                                                )}
+                                                {order.invoiceUrl && (
+                                                    <a
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${order.invoiceUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="btn-secondary"
+                                                        style={{
+                                                            padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem',
+                                                            display: 'flex', alignItems: 'center', gap: '0.3rem',
+                                                            background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none'
+                                                        }}
+                                                    >
+                                                        <FileText size={13} /> Invoice
+                                                    </a>
                                                 )}
                                                 <Link
                                                     to={`/portal/shipments?id=${order.bookingId}`}

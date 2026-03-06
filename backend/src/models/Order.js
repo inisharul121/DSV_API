@@ -52,6 +52,10 @@ const Order = sequelize.define('Order', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    invoiceUrl: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     hsCode: {
         type: DataTypes.STRING,
         allowNull: true

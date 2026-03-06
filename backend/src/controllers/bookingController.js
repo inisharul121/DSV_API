@@ -5,6 +5,7 @@ const config = require('../config/env');
 const labelExtractor = require('../utils/labelExtractor');
 const Order = require('../models/Order');
 const jwt = require('jsonwebtoken');
+const invoiceGenerator = require('../utils/invoiceGenerator');
 
 const JWT_SECRET = process.env.JWT_CUSTOMER_SECRET || 'limber-cargo-customer-secret-2026';
 
@@ -109,6 +110,17 @@ exports.createSimpleBooking = async (req, res) => {
             }
         }
 
+        // 2.5 Generate Proforma Invoice PDF
+        let savedInvoicePath = null;
+        try {
+            console.log(`[BOOKING] Generating proforma invoice for: ${bookingId}`);
+            const invoiceFile = await invoiceGenerator.generateProformaInvoice(shipmentData, bookingId);
+            savedInvoicePath = `/invoices/${invoiceFile}`;
+            console.log(`[BOOKING] Proforma invoice generated: ${savedInvoicePath}`);
+        } catch (invError) {
+            console.error('[BOOKING] Failed to generate proforma invoice:', invError.message);
+        }
+
         // 3. Save Order to Local Database
         try {
             const customerId = extractCustomerId(req);
@@ -124,6 +136,7 @@ exports.createSimpleBooking = async (req, res) => {
                 currency: shipmentData.currencyCode || "CHF",
                 status: 'Created',
                 labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
+                invoiceUrl: savedInvoicePath,
                 hsCode: shipmentData.hsCode || null,
                 quantity: parseInt(shipmentData.quantity) || 1,
                 unitPrice: parseFloat(shipmentData.unitPrice || 0),

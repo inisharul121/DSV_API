@@ -16,8 +16,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files (labels, invoices)
+app.use('/labels', express.static(path.resolve('./public/labels')));
+app.use('/invoices', express.static(path.resolve('./public/invoices')));
+
 // API Routes
-const apiRoutes = require('./routes/api');
 app.use('/api', authMiddleware, apiRoutes);
 
 // Root route for health check

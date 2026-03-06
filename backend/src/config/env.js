@@ -31,6 +31,7 @@ module.exports = {
     },
     paths: {
         labels: path.resolve(process.env.LABEL_STORAGE_PATH || './public/labels'),
+        invoices: path.resolve(process.env.INVOICE_STORAGE_PATH || './public/invoices'),
     },
     upload: {
         maxSize: process.env.MAX_UPLOAD_SIZE || '10mb',

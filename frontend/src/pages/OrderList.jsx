@@ -135,13 +135,27 @@ const OrderList = () => {
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
                                             <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 {order.labelUrl && (
-                                                    <Link
-                                                        to={`/labels?id=${order.bookingId}`}
+                                                    <a
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${order.labelUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         style={{ color: '#64748b', textDecoration: 'none' }}
-                                                        title="Download Label"
+                                                        title="Download Shipping Label"
                                                     >
                                                         <FileText size={18} />
-                                                    </Link>
+                                                    </a>
+                                                )}
+                                                {order.invoiceUrl && (
+                                                    <a
+                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${order.invoiceUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{ color: '#2563eb', textDecoration: 'none' }}
+                                                        title="Download Proforma Invoice"
+                                                    >
+                                                        <RefreshCw size={18} style={{ display: 'none' }} />
+                                                        <FileText size={18} />
+                                                    </a>
                                                 )}
                                                 <Link
                                                     to={`/shipments?id=${order.bookingId}`}
