@@ -186,6 +186,13 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                                     <input type="text" className="input-field" value={form.origin.company} onChange={(e) => handleFormChange('origin', 'company', e.target.value)} />
                                 </div>
                                 <div className="input-group" style={{ marginBottom: '1rem' }}>
+                                    <label className="input-label">Country Code *</label>
+                                    <select className="input-field" disabled value={form.origin.country} style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed' }}>
+                                        <option value="">Select Country</option>
+                                        {countries.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '1rem' }}>
                                     <label className="input-label">Address *</label>
                                     <input type="text" className="input-field" required value={form.origin.address} onChange={(e) => handleFormChange('origin', 'address', e.target.value)} />
                                 </div>

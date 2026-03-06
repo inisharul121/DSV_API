@@ -5,7 +5,7 @@ import Step3Booking from './Step3Addresses'; // Renaming internal reference
 const Order = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
-        direction: 'export',
+        originCountry: 'CH',
         addressType: 'business',
         pickupCountry: 'CH',
         deliveryCountry: '',

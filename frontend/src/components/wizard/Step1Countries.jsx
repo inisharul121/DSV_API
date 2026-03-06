@@ -15,17 +15,16 @@ const Step1Countries = ({ data, updateData, onNext }) => {
     ];
 
     const handlePricing = async () => {
-        if (!data.deliveryCountry || !data.weight) return;
+        if (!data.originCountry || !data.deliveryCountry || !data.weight) return;
 
         setLoading(true);
         try {
-            const direction = data.direction || 'export';
             const response = await dsvApi.post('/quotes', {
                 dsvAccount: 8004990000,
-                pickupCountryCode: direction === 'export' ? 'CH' : data.deliveryCountry,
-                pickupCity: direction === 'export' ? data.sender?.city || 'Baar' : undefined,
-                pickupZipCode: direction === 'export' ? data.sender?.zip || '6340' : undefined,
-                deliveryCountryCode: direction === 'export' ? data.deliveryCountry : 'CH',
+                pickupCountryCode: data.originCountry,
+                pickupCity: data.originCountry === 'CH' ? data.sender?.city || 'Baar' : undefined,
+                pickupZipCode: data.originCountry === 'CH' ? data.sender?.zip || '6340' : undefined,
+                deliveryCountryCode: data.deliveryCountry,
                 packageType: "PARCELS",
                 weight: data.weight,
                 length: data.dimensions?.length || 10,
@@ -69,7 +68,7 @@ const Step1Countries = ({ data, updateData, onNext }) => {
             handlePricing();
         }, 600);
         return () => clearTimeout(timer);
-    }, [data.deliveryCountry, data.weight, data.direction, data.dimensions?.length, data.dimensions?.width, data.dimensions?.height]);
+    }, [data.originCountry, data.deliveryCountry, data.weight, data.dimensions?.length, data.dimensions?.width, data.dimensions?.height]);
 
     const handleSelectService = (svc) => {
         setSelectedService(svc.serviceCode);
@@ -93,19 +92,41 @@ const Step1Countries = ({ data, updateData, onNext }) => {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
             <div className="form-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 <h3 style={{ borderBottom: '2px solid var(--accent)', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
-                    Step 1: Delivery & Box Size
+                    Step 1: Route & Box Size
                 </h3>
+
+                <div className="input-group">
+                    <label className="input-label">Select Origin Country:</label>
+                    <select
+                        className="input-field"
+                        value={data.originCountry || ''}
+                        onChange={(e) => updateData({
+                            originCountry: e.target.value,
+                            sender: { ...data.sender, country: e.target.value }
+                        })}
+                    >
+                        <option value="">Select Country</option>
+                        {countries.map(c => (
+                            <option key={c.code} value={c.code}>{c.name} ({c.code})</option>
+                        ))}
+                    </select>
+                </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                     <div className="input-group">
-                        <label className="input-label">Export/Import:</label>
+                        <label className="input-label">Destination Country:</label>
                         <select
                             className="input-field"
-                            value={data.direction || 'export'}
-                            onChange={(e) => updateData({ direction: e.target.value })}
+                            value={data.deliveryCountry || ''}
+                            onChange={(e) => updateData({
+                                deliveryCountry: e.target.value,
+                                receiver: { ...data.receiver, country: e.target.value }
+                            })}
                         >
-                            <option value="export">Export from Switzerland</option>
-                            <option value="import">Import to Switzerland</option>
+                            <option value="">Select Country</option>
+                            {countries.map(c => (
+                                <option key={c.code} value={c.code}>{c.name} ({c.code})</option>
+                            ))}
                         </select>
                     </div>
 
@@ -120,23 +141,6 @@ const Step1Countries = ({ data, updateData, onNext }) => {
                             onChange={(e) => updateData({ weight: e.target.value })}
                         />
                     </div>
-                </div>
-
-                <div className="input-group">
-                    <label className="input-label">Select Destination Country:</label>
-                    <select
-                        className="input-field"
-                        value={data.deliveryCountry || ''}
-                        onChange={(e) => updateData({
-                            deliveryCountry: e.target.value,
-                            receiver: { ...data.receiver, country: e.target.value }
-                        })}
-                    >
-                        <option value="">Select Country</option>
-                        {countries.map(c => (
-                            <option key={c.code} value={c.code}>{c.name} ({c.code})</option>
-                        ))}
-                    </select>
                 </div>
 
                 <div className="input-group">
