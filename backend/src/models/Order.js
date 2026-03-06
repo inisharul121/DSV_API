@@ -72,6 +72,15 @@ const Order = sequelize.define('Order', {
         type: DataTypes.STRING(2),
         allowNull: true
     },
+    origin_eori: { type: DataTypes.STRING, allowNull: true },
+    dest_eori: { type: DataTypes.STRING, allowNull: true },
+    iossNumber: { type: DataTypes.STRING, allowNull: true },
+    unitPrice: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
+    netWeight: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
+    uom: { type: DataTypes.STRING, allowNull: true },
+    invoice_number: { type: DataTypes.STRING, allowNull: true },
+    invoice_type: { type: DataTypes.STRING, allowNull: true },
+    invoice_signature: { type: DataTypes.STRING, allowNull: true },
     customerId: {
         type: DataTypes.UUID,
         allowNull: true,

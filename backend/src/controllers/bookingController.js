@@ -126,9 +126,18 @@ exports.createSimpleBooking = async (req, res) => {
                 labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
                 hsCode: shipmentData.hsCode || null,
                 quantity: parseInt(shipmentData.quantity) || 1,
+                unitPrice: parseFloat(shipmentData.unitPrice || 0),
+                netWeight: parseFloat(shipmentData.netWeight || 0),
+                uom: shipmentData.uom || 'Pieces',
                 reasonForExport: shipmentData.reasonForExport || null,
                 incoterms: shipmentData.incoterms || null,
                 originOfGoods: shipmentData.commodity_origin || null,
+                origin_eori: shipmentData.origin_eori || null,
+                dest_eori: shipmentData.dest_eori || null,
+                iossNumber: shipmentData.iossNumber || null,
+                invoice_number: shipmentData.invoice_number || null,
+                invoice_type: shipmentData.invoice_type || null,
+                invoice_signature: shipmentData.invoice_signature || null,
                 customerId: customerId
             });
             console.log(`Order ${bookingId} saved to database${customerId ? ` (customer: ${customerId})` : ''}`);

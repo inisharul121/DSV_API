@@ -70,7 +70,8 @@ exports.buildBookingPayload = (data) => {
             countryCode: (data.origin_country || data.pickup?.address?.countryCode || "CH").trim().substring(0, 2).toUpperCase(),
             zipCode: data.origin_zip || data.pickup?.address?.zipCode || "",
             contactName: data.origin_contact || data.pickup?.address?.contactName || "",
-            contactPhoneNumber: formatPhoneNumber(data.origin_phone || data.pickup?.address?.contactPhoneNumber || "")
+            contactPhoneNumber: formatPhoneNumber(data.origin_phone || data.pickup?.address?.contactPhoneNumber || ""),
+            registrationNumbers: data.origin_eori ? [{ type: "EORI", number: data.origin_eori }] : undefined
         },
         receiver: {
             companyName: data.dest_company || data.delivery?.companyName || "Receiver",
@@ -81,7 +82,8 @@ exports.buildBookingPayload = (data) => {
             zipCode: data.dest_zip || data.delivery?.zipCode || "",
             contactName: data.dest_contact || data.delivery?.contactName || "",
             contactPhoneNumber: formatPhoneNumber(data.dest_phone || data.delivery?.contactPhoneNumber || ""),
-            residential: data.delivery?.residential !== undefined ? data.delivery.residential : (data.residential === 'on' || data.residential === true)
+            residential: data.delivery?.residential !== undefined ? data.delivery.residential : (data.residential === 'on' || data.residential === true),
+            registrationNumbers: data.dest_eori ? [{ type: "VAT", number: data.dest_eori }] : undefined
         },
         pickup: (() => {
             const fromDateStr = data.collectDateFrom || data.pickup?.collectDateFrom;
@@ -176,18 +178,32 @@ exports.buildBookingPayload = (data) => {
             }
             return pkgs.length > 0 ? pkgs : [{ length: 1, width: 1, height: 1, grossWeight: 0.1 }]; // Simple fallback
         })(),
-        commodities: (data.goodsValue && parseFloat(data.goodsValue) > 0) ? [
-            {
-                originCountryCode: data.commodity_origin || data.origin_country || "CH",
-                goodsDescription: data.commodity || "General Goods",
-                hsCode: data.hsCode || undefined,
-                numberOfItems: parseInt(data.quantity) || 1,
-                goodsValue: {
-                    currencyCode: data.commodity_currency || data.currencyCode || "CHF",
-                    monetaryValue: parseFloat(data.goodsValue)
+        proformaInvoice: (data.goodsValue && parseFloat(data.goodsValue) > 0) ? {
+            invoiceNumber: data.invoice_number || "INV-" + Date.now(),
+            invoiceType: data.invoice_type || "PROFORMA",
+            invoiceDate: new Date().toISOString().split('T')[0],
+            signer: data.invoice_signature || data.origin_contact || "Sender",
+            commodities: [
+                {
+                    countryOfOrigin: data.commodity_origin || data.origin_country || "CH",
+                    description: data.commodity || "General Goods",
+                    hsCode: data.hsCode || undefined,
+                    quantity: parseInt(data.quantity) || 1,
+                    quantityUnit: (() => {
+                        const uom = data.uom || 'Pieces';
+                        if (uom === 'Pieces') return 'PCE';
+                        if (uom === 'Sets') return 'SET';
+                        if (uom === 'Kilograms') return 'KGM';
+                        if (uom === 'Meters') return 'MTR';
+                        return 'PCE';
+                    })(),
+                    unitPrice: parseFloat(data.unitPrice || data.goodsValue || 0),
+                    netWeight: parseFloat(data.netWeight || data.weight || 0.1),
+                    incoterms: data.incoterms || "DAP",
+                    reasonForExport: data.reasonForExport || "SALE"
                 }
-            }
-        ] : undefined,
+            ]
+        } : undefined,
         incoterms: data.incoterms || "DAP",
         reasonForExport: data.reasonForExport || "SALE"
     };
