@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Step1Delivery from './Step1Countries'; // Renaming internal reference
-import Step2Dimensions from './Step2Dimensions';
 import Step3Booking from './Step3Addresses'; // Renaming internal reference
 
 const Order = () => {
@@ -42,7 +41,7 @@ const Order = () => {
         }
     }, []);
 
-    const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
+    const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 2));
     const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
     const updateFormData = (updates) => {
@@ -50,9 +49,8 @@ const Order = () => {
     };
 
     const steps = [
-        { number: 1, label: 'Delivery Options' },
-        { number: 2, label: 'Box Size' },
-        { number: 3, label: 'Booking' },
+        { number: 1, label: 'Delivery & Box' },
+        { number: 2, label: 'Booking Form' },
     ];
 
     return (
@@ -78,14 +76,6 @@ const Order = () => {
                     />
                 )}
                 {currentStep === 2 && (
-                    <Step2Dimensions
-                        data={formData}
-                        updateData={updateFormData}
-                        onNext={nextStep}
-                        onBack={prevStep}
-                    />
-                )}
-                {currentStep === 3 && (
                     <Step3Booking
                         data={formData}
                         updateData={updateFormData}

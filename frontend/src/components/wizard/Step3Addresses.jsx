@@ -19,8 +19,8 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
         },
         service: {
             packageType: 'PARCELS',
-            serviceCode: 'DSVAirExpress',
-            currency: 'CHF',
+            serviceCode: data.serviceCode || 'DSVAirExpress',
+            currency: data.pricing?.currency || 'CHF',
             insuranceValue: 0
         },
         measurements: {
