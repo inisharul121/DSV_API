@@ -23,14 +23,10 @@ exports.generateProformaInvoice = async (data, bookingId) => {
 
             // --- HEADER ---
             // Branding Section
-            doc.font('Helvetica-Bold').fontSize(18).text('DSV Air & Sea Pvt. Ltd.', 40, 40);
-            doc.font('Helvetica').fontSize(9).text('The Qube, B-201, B-204, M.V. Road', 40, 60);
-            doc.text('Off Intl. Airport App. Road, Marol, Andheri East', 40, 72);
-            doc.text('Mumbai 400 059, India', 40, 84);
-            doc.text('Phone: +91 22 7199 9000    www.in.dsv.com', 40, 96);
-            doc.text('Fax: +91 22 7199 9001      info@in.dsv.com', 40, 108);
-            doc.fontSize(7).text('Business Reg No/CIN: U63011MH2006PTC162700', 40, 122);
-            doc.text('Income Tax No (PAN): AACCD3848A', 40, 130);
+            doc.font('Helvetica-Bold').fontSize(18).text('DSV Global Transport', 40, 40);
+            doc.font('Helvetica').fontSize(9).text('Professional Logistics Solutions', 40, 60);
+            doc.text('Global Network | Air & Sea | Solutions', 40, 72);
+            doc.text('www.dsv.com', 40, 84);
 
             // Logo Branding Placeholder (Top Right)
             doc.fontSize(24).font('Helvetica-Bold').text('DSV', 450, 40, { align: 'right', width: 100 });
@@ -38,11 +34,8 @@ exports.generateProformaInvoice = async (data, bookingId) => {
 
             // --- TITLE BLOCK ---
             doc.rect(40, 150, 515, 25).stroke();
-            doc.font('Helvetica-Bold').fontSize(16).text('PRO FORMA TAX INVOICE IN', 45, 157);
+            doc.font('Helvetica-Bold').fontSize(16).text('PRO FORMA TAX INVOICE', 45, 157);
             doc.fontSize(10).text('Page 1 of 1', 480, 158);
-
-            // Registrations
-            doc.font('Helvetica').fontSize(9).text('Service Tax Registration No: AACCD3848AST001', 40, 180);
 
             // --- SHIPMENT SPECIFICS (GRID) ---
             const gridTop = 195;
@@ -152,9 +145,10 @@ exports.generateProformaInvoice = async (data, bookingId) => {
             doc.moveDown(4);
             const tableTop = 470;
             doc.rect(40, tableTop, 515, 15).fill('#f1f5f9').stroke();
+            const curr = data.currencyCode || 'CHF';
             doc.font('Helvetica-Bold').fontSize(8).fillColor('#000').text('DESCRIPTION', 45, tableTop + 4);
-            doc.text('SERVICE TAX IN INR', 350, tableTop + 4, { width: 100, align: 'right' });
-            doc.text('CHARGES IN INR', 450, tableTop + 4, { width: 100, align: 'right' });
+            doc.text(`TAX IN ${curr}`, 350, tableTop + 4, { width: 100, align: 'right' });
+            doc.text(`CHARGES IN ${curr}`, 450, tableTop + 4, { width: 100, align: 'right' });
 
             // Mocked Itemized Charges
             const goodsValue = parseFloat(data.goodsValue || 0);
@@ -169,7 +163,7 @@ exports.generateProformaInvoice = async (data, bookingId) => {
             doc.font('Helvetica').fontSize(8);
             doc.text(`Freight Charge (Booking ${bookingId})`, 45, chargeY);
             doc.text('Zero Rated', 350, chargeY, { width: 100, align: 'right' });
-            doc.text(freightCharge.toLocaleString('en-IN', { minimumFractionDigits: 2 }), 450, chargeY, { width: 100, align: 'right' });
+            doc.text(freightCharge.toLocaleString('en-US', { minimumFractionDigits: 2 }), 450, chargeY, { width: 100, align: 'right' });
 
             // Totals Box
             const totalBoxTop = 600;
@@ -180,15 +174,15 @@ exports.generateProformaInvoice = async (data, bookingId) => {
 
             doc.font('Helvetica-Bold').fontSize(8);
             doc.text('SUBTOTAL', 345, totalBoxTop + 4, { width: 100, align: 'right' });
-            doc.text('SERVICE TAX 14.00%', 345, totalBoxTop + 19, { width: 100, align: 'right' });
-            doc.text('SBC 0.50%', 345, totalBoxTop + 34, { width: 100, align: 'right' });
-            doc.fontSize(10).text('TOTAL INR', 345, totalBoxTop + 49, { width: 100, align: 'right' });
+            doc.text('VAT / TAX', 345, totalBoxTop + 19, { width: 100, align: 'right' });
+            doc.text('OTHER FEES', 345, totalBoxTop + 34, { width: 100, align: 'right' });
+            doc.fontSize(10).text(`TOTAL ${curr}`, 345, totalBoxTop + 49, { width: 100, align: 'right' });
 
             doc.font('Helvetica').fontSize(8);
-            doc.text(subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 }), 450, totalBoxTop + 4, { width: 100, align: 'right' });
-            doc.text(serviceTax.toLocaleString('en-IN', { minimumFractionDigits: 2 }), 450, totalBoxTop + 19, { width: 100, align: 'right' });
-            doc.text(sbTax.toLocaleString('en-IN', { minimumFractionDigits: 2 }), 450, totalBoxTop + 34, { width: 100, align: 'right' });
-            doc.font('Helvetica-Bold').fontSize(10).text(total.toLocaleString('en-IN', { minimumFractionDigits: 2 }), 450, totalBoxTop + 49, { width: 100, align: 'right' });
+            doc.text(subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 }), 450, totalBoxTop + 4, { width: 100, align: 'right' });
+            doc.text(serviceTax.toLocaleString('en-US', { minimumFractionDigits: 2 }), 450, totalBoxTop + 19, { width: 100, align: 'right' });
+            doc.text(sbTax.toLocaleString('en-US', { minimumFractionDigits: 2 }), 450, totalBoxTop + 34, { width: 100, align: 'right' });
+            doc.font('Helvetica-Bold').fontSize(10).text(total.toLocaleString('en-US', { minimumFractionDigits: 2 }), 450, totalBoxTop + 49, { width: 100, align: 'right' });
 
             // --- BANK TRANSFER FOOTER ---
             const footerTop = 680;
@@ -197,16 +191,16 @@ exports.generateProformaInvoice = async (data, bookingId) => {
 
             doc.font('Helvetica-Bold').fontSize(8).text('Transfer Funds To:', 30, footerTop + 5);
             doc.font('Helvetica').text('Bank:', 30, footerTop + 20);
-            doc.text('HSBC Limited', 80, footerTop + 20);
+            doc.text(data.bankName || 'International Bank', 80, footerTop + 20);
             doc.text('Account:', 30, footerTop + 35);
-            doc.text(data.bankAccount || '030-773626-511', 80, footerTop + 35);
+            doc.text(data.bankAccount || 'CH-XXXX-XXXX-XXXX', 80, footerTop + 35);
             doc.text('SWIFT:', 200, footerTop + 20);
-            doc.text('HSBCINBB', 240, footerTop + 20);
+            doc.text(data.bankSwift || 'BANKXXXX', 240, footerTop + 20);
             doc.font('Helvetica-Bold').text('Pay Ref:', 30, footerTop + 60);
-            doc.text(`${data.customerId || '6402432396'} IN`, 80, footerTop + 60);
+            doc.text(`${bookingId} / ${data.receiverName || 'REF'}`, 80, footerTop + 60);
 
             doc.font('Helvetica-Bold').text('Address:', 320, footerTop + 5);
-            doc.font('Helvetica').fontSize(8).text('DSV Air & Sea Pvt. Ltd. - I721\n8th Fl Off No A/6 & Unit No A2 Saf\nSatellite, Ahmedabad GJ 380051\nIndia', 320, footerTop + 20);
+            doc.font('Helvetica').fontSize(8).text('DSV Global Transport and Logistics\nGlobal Network Offices\nLogistics Hub\nInternational Network', 320, footerTop + 20);
 
             doc.end();
 

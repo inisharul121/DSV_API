@@ -26,8 +26,8 @@ router.post('/certification/run/:testId', certificationController.runTest);
 // Apply certification middleware to all booking-related routes
 router.use('/bookings', certMiddleware);
 
-// Simple booking (JSON only)
-router.post('/bookings/simple', bookingController.createSimpleBooking);
+// Smart/Simple booking (Multipart allowed for optional documents)
+router.post('/bookings/simple', upload.any(), bookingController.createSimpleBooking);
 
 // Complex booking (Multipart)
 router.post('/bookings/complex', upload.any(), bookingController.createComplexBooking);

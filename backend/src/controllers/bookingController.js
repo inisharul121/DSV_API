@@ -1,4 +1,3 @@
-const dsvClient = require('../config/dsv-api');
 const path = require('path');
 const fs = require('fs');
 const config = require('../config/env');
@@ -6,6 +5,9 @@ const labelExtractor = require('../utils/labelExtractor');
 const Order = require('../models/Order');
 const jwt = require('jsonwebtoken');
 const invoiceGenerator = require('../utils/invoiceGenerator');
+const countryHelper = require('../utils/countryHelper');
+const dsvDocumentUploader = require('../utils/dsvDocumentUploader');
+const dsvClient = require('../config/dsv-api');
 
 const JWT_SECRET = process.env.JWT_CUSTOMER_SECRET || 'limber-cargo-customer-secret-2026';
 
@@ -43,8 +45,22 @@ const payloadBuilder = require('../utils/payloadBuilder');
 
 exports.createSimpleBooking = async (req, res) => {
     try {
-        const { shipmentData } = req.body;
-        console.log('[BOOKING] Received Request Body:', JSON.stringify(req.body, null, 2));
+        let shipmentData = req.body.shipmentData;
+
+        // Handle multipart/form-data where shipmentData might be a stringified JSON
+        if (typeof shipmentData === 'string') {
+            try {
+                shipmentData = JSON.parse(shipmentData);
+            } catch (pErr) {
+                console.error('Failed to parse stringified shipmentData:', pErr);
+            }
+        }
+
+        if (!shipmentData) {
+            return res.status(400).json({ success: false, error: 'shipmentData is required' });
+        }
+
+        console.log('[BOOKING] Processing shipment for:', shipmentData.dest_country || shipmentData.delivery?.countryCode);
 
         // Transform frontend data to DSV API format
         const dsvPayload = payloadBuilder.buildBookingPayload(shipmentData);
@@ -63,6 +79,45 @@ exports.createSimpleBooking = async (req, res) => {
         }
 
         console.log(`Draft Shipment Created: ${bookingId}`);
+
+        // --- SMART FLOW LOGIC ---
+        const destCountry = (shipmentData.dest_country || shipmentData.delivery?.countryCode || "DE").trim().toUpperCase();
+        const isComplex = countryHelper.isComplexFlow(destCountry);
+        console.log(`[SMART-FLOW] Dest: ${destCountry}, IsComplex: ${isComplex}`);
+        let savedInvoicePath = null;
+
+        if (isComplex) {
+            console.log(`[BOOKING] Complex Flow detected for ${destCountry}. Generating and uploading mandatory documents...`);
+
+            // 1. Generate Proforma Invoice for DSV
+            const invoiceFileName = await invoiceGenerator.generateProformaInvoice(shipmentData, bookingId);
+            const invoiceFilePath = path.join(config.paths.invoices, invoiceFileName);
+            savedInvoicePath = `/invoices/${invoiceFileName}`;
+
+            // 2. Upload to DSV Draft
+            try {
+                await dsvDocumentUploader.uploadDocumentToDraft(bookingId, invoiceFilePath, 'COMMERCIAL_INVOICE');
+                console.log(`[BOOKING] Commercial Invoice uploaded to DSV draft ${bookingId}`);
+            } catch (uploadError) {
+                console.warn(`[BOOKING] DSV Document Upload failed for ${bookingId}, but continuing...`, uploadError.message);
+            }
+        }
+
+        // 1.5 Handle User Manual Uploads (if any)
+        if (req.files && req.files.length > 0) {
+            console.log(`[BOOKING] Uploading ${req.files.length} user-provided documents for draft ${bookingId}`);
+            for (const file of req.files) {
+                try {
+                    // Temporarily save buffer to disk if multer is memoryStorage
+                    // (Assuming middleware uses diskStorage or we can read from disk)
+                    // If multer is using memoryStorage, we need to handle it in dsvDocumentUploader
+                    await dsvDocumentUploader.uploadDocumentToDraft(bookingId, file.path, 'OTHER');
+                    console.log(`[BOOKING] User document ${file.originalname} uploaded to DSV`);
+                } catch (userUpErr) {
+                    console.error(`[BOOKING] Failed to upload user document ${file.originalname}:`, userUpErr.message);
+                }
+            }
+        }
 
         // 2. Confirm Booking and Get Labels
         // Try fallback paths if one fails
@@ -110,15 +165,16 @@ exports.createSimpleBooking = async (req, res) => {
             }
         }
 
-        // 2.5 Generate Proforma Invoice PDF
-        let savedInvoicePath = null;
-        try {
-            console.log(`[BOOKING] Generating proforma invoice for: ${bookingId}`);
-            const invoiceFile = await invoiceGenerator.generateProformaInvoice(shipmentData, bookingId);
-            savedInvoicePath = `/invoices/${invoiceFile}`;
-            console.log(`[BOOKING] Proforma invoice generated: ${savedInvoicePath}`);
-        } catch (invError) {
-            console.error('[BOOKING] Failed to generate proforma invoice:', invError.message);
+        // 2.5 Generate Proforma Invoice PDF if not already done in Complex Flow logic above
+        if (!savedInvoicePath) {
+            try {
+                console.log(`[BOOKING] Generating proforma invoice for: ${bookingId}`);
+                const invoiceFile = await invoiceGenerator.generateProformaInvoice(shipmentData, bookingId);
+                savedInvoicePath = `/invoices/${invoiceFile}`;
+                console.log(`[BOOKING] Proforma invoice generated: ${savedInvoicePath}`);
+            } catch (invError) {
+                console.error('[BOOKING] Failed to generate proforma invoice:', invError.message);
+            }
         }
 
         // 3. Save Order to Local Database
