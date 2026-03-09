@@ -7,6 +7,7 @@ const documentController = require('../controllers/documentController');
 const quoteController = require('../controllers/quoteController');
 const certificationController = require('../controllers/certificationController');
 const orderController = require('../controllers/orderController');
+const reportController = require('../controllers/reportController');
 const customerAuthController = require('../controllers/customerAuthController');
 const adminAuthController = require('../controllers/adminAuthController');
 const customerOrderController = require('../controllers/customerOrderController');
@@ -38,6 +39,9 @@ router.post('/bookings/:shipmentId/labels', documentController.getShipmentLabels
 // Admin: All Orders
 router.get('/orders', adminAuth, orderController.getOrders);
 router.get('/orders/stats', adminAuth, orderController.getDashboardStats);
+
+// Reports
+router.get('/reports/monthly', adminAuth, reportController.getMonthlyReport);
 
 // Admin: User Management
 router.get('/admins', adminAuth, adminAuthController.getAllAdmins);

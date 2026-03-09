@@ -20,6 +20,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Support from './pages/Support';
 import Contact from './pages/Contact';
+import Reports from './pages/Reports';
 
 const App = () => {
   return (
@@ -56,7 +57,7 @@ const App = () => {
           <Route path="/customers" element={<Customers />} />
           <Route path="/labels" element={<Labels />} />
           <Route path="/payments" element={<div className="card"><h3>Payments</h3><p>Payment transaction history logic goes here.</p></div>} />
-          <Route path="/reports" element={<div className="card"><h3>Reports</h3><p>Analytics and reporting dashboards.</p></div>} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="/profile" element={<div className="card"><h3>User Profile</h3><p>User settings and preferences.</p></div>} />
         </Route>
       </Routes>
