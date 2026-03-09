@@ -1,6 +1,8 @@
 const dsvClient = require('../config/dsv-api');
 const config = require('../config/env');
 const payloadBuilder = require('../utils/payloadBuilder');
+const Quote = require('../models/Quote');
+const { v4: uuidv4 } = require('uuid');
 
 exports.getQuotes = async (req, res) => {
     try {
@@ -57,6 +59,38 @@ exports.getQuotes = async (req, res) => {
                     currency: (svc.rates && svc.rates.currency) || 'CHF'
                 };
             });
+
+            // Persistence: Save the top quote to our database for history
+            try {
+                const bestSvc = quoteResponse.data.services[0];
+                const quoteId = `QT-${Math.floor(1000 + Math.random() * 9000)}`;
+
+                await Quote.create({
+                    quoteId,
+                    pickupCountry: dsvPayload.pickupCountryCode,
+                    pickupCity: dsvPayload.pickupCity,
+                    pickupZipCode: dsvPayload.pickupZipCode,
+                    deliveryCountry: dsvPayload.deliveryCountryCode,
+                    deliveryCity: dsvPayload.deliveryCity,
+                    deliveryZipCode: dsvPayload.deliveryZipCode,
+                    weight: dsvPayload.packages[0].grossWeight,
+                    packageType: dsvPayload.serviceOptions.packageType,
+                    serviceName: bestSvc.serviceDescription,
+                    serviceCode: bestSvc.serviceCode,
+                    totalPrice: bestSvc.totalDisplay,
+                    currency: bestSvc.currency,
+                    etaMin: bestSvc.etaMin,
+                    etaMax: bestSvc.etaMax,
+                    adminId: req.adminId, // From auth middleware
+                    customerId: req.customerId // From auth middleware
+                });
+
+                // Attach the generated ID to the response for the frontend
+                quoteResponse.data.generatedQuoteId = quoteId;
+            } catch (dbError) {
+                console.error('Error saving quote to database:', dbError);
+                // Don't fail the whole request if DB save fails
+            }
         }
 
         res.status(200).json({
@@ -73,5 +107,31 @@ exports.getQuotes = async (req, res) => {
             success: false,
             error: errorData
         });
+    }
+};
+
+exports.getRecentQuotes = async (req, res) => {
+    try {
+        const where = {};
+        if (req.adminId) {
+            // Staff/Admins see all for now or just theirs? 
+            // Usually dashboard history is for the logged in user's actions
+            // where.adminId = req.adminId; 
+        } else if (req.customerId) {
+            where.customerId = req.customerId;
+        }
+
+        const quotes = await Quote.findAll({
+            where,
+            order: [['createdAt', 'DESC']],
+            limit: 50
+        });
+
+        res.json({
+            success: true,
+            data: quotes
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 };

@@ -16,6 +16,7 @@ const certMiddleware = require('../middleware/certification');
 
 // Quotes
 router.post('/quotes', quoteController.getQuotes);
+router.get('/quotes', adminAuth, quoteController.getRecentQuotes); // Default to adminAuth for now
 
 // Certification Testing
 router.get('/certification/tests', certificationController.getTestCases);

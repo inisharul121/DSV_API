@@ -7,6 +7,8 @@ const authMiddleware = require('./middleware/auth');
 const sequelize = require('./config/database');
 const Order = require('./models/Order');
 const Customer = require('./models/Customer');
+const Quote = require('./models/Quote');
+const Admin = require('./models/Admin');
 
 const app = express();
 
@@ -41,7 +43,7 @@ app.use((err, req, res, next) => {
 
 // Start Server with Database Sync
 if (require.main === module) {
-    sequelize.sync({ alter: false })
+    sequelize.sync({ alter: true })
         .then(() => {
             console.log('Database synced successfully');
             const server = app.listen(config.port, () => {

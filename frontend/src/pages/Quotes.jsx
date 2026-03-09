@@ -7,11 +7,22 @@ const Quotes = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [quotes, setQuotes] = useState([
-        { id: 'QT-9901', date: '2026-02-25', country: 'Germany (DE)', weight: '15kg', service: 'Air Express', price: 'CHF 145.20' },
-        { id: 'QT-9884', date: '2026-02-24', country: 'United States (US)', weight: '2.5kg', service: 'Air Express', price: 'CHF 88.50' },
-        { id: 'QT-9872', date: '2026-02-24', country: 'United Kingdom (GB)', weight: '10kg', service: 'Economy', price: 'CHF 112.00' },
-    ]);
+    const [quotes, setQuotes] = useState([]);
+
+    const fetchQuoteHistory = async () => {
+        try {
+            const res = await dsvApi.get('/quotes');
+            if (res.data.success) {
+                setQuotes(res.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching quote history:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchQuoteHistory();
+    }, []);
 
     const [formData, setFormData] = useState({
         pickupCountryCode: 'CH',
@@ -35,6 +46,25 @@ const Quotes = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleReQuote = (quote) => {
+        setFormData({
+            pickupCountryCode: quote.pickupCountry,
+            pickupCity: quote.pickupCity,
+            pickupZipCode: quote.pickupZipCode,
+            deliveryCountryCode: quote.deliveryCountry,
+            deliveryCity: quote.deliveryCity || '',
+            deliveryZipCode: quote.deliveryZipCode || '',
+            packageType: quote.packageType,
+            weight: parseFloat(quote.weight),
+            length: 10,
+            width: 10,
+            height: 10,
+            collectDate: new Date().toISOString().split('T')[0]
+        });
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -43,19 +73,8 @@ const Quotes = () => {
             const response = await dsvApi.post('/quotes', formData);
             if (response.data.success) {
                 setQuoteResults(response.data.data.services);
-                // Add to history
-                if (response.data.data.services && response.data.data.services.length > 0) {
-                    const firstSvc = response.data.data.services[0];
-                    const newQuote = {
-                        id: `QT-${Math.floor(Math.random() * 10000)}`,
-                        date: formData.collectDate,
-                        country: `${formData.deliveryCountryCode}`,
-                        weight: `${formData.weight}kg`,
-                        service: firstSvc.serviceDescription,
-                        price: `${firstSvc.currency} ${firstSvc.totalDisplay}`
-                    };
-                    setQuotes(prev => [newQuote, ...prev]);
-                }
+                // Refresh history to show the new quote
+                fetchQuoteHistory();
             }
         } catch (error) {
             console.error('Error fetching quote:', error);
@@ -65,9 +84,9 @@ const Quotes = () => {
         }
     };
 
-    const filteredQuotes = quotes.filter(q =>
-        q.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        q.country.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredQuotes = (quotes || []).filter(q =>
+        (q.quoteId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (q.deliveryCountry || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -301,18 +320,21 @@ const Quotes = () => {
                             <tbody>
                                 {filteredQuotes.map((q) => (
                                     <tr key={q.id} className="hover-row" style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                        <td style={{ padding: '1rem 0.5rem', fontWeight: 700 }}>{q.id}</td>
-                                        <td style={{ padding: '1rem 0.5rem' }}>{q.date}</td>
+                                        <td style={{ padding: '1rem 0.5rem', fontWeight: 700 }}>{q.quoteId}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{new Date(q.createdAt).toLocaleDateString()}</td>
                                         <td style={{ padding: '1rem 0.5rem' }}>
                                             <span style={{ padding: '0.25rem 0.5rem', background: '#f1f5f9', borderRadius: '4px', fontSize: '0.85rem' }}>
-                                                {q.country}
+                                                {q.deliveryCountry}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '1rem 0.5rem' }}>{q.weight}</td>
-                                        <td style={{ padding: '1rem 0.5rem' }}>{q.service}</td>
-                                        <td style={{ padding: '1rem 0.5rem', color: 'var(--accent)', fontWeight: 700 }}>{q.price}</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{q.weight}kg</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>{q.serviceName}</td>
+                                        <td style={{ padding: '1rem 0.5rem', color: 'var(--accent)', fontWeight: 700 }}>{q.currency} {q.totalPrice}</td>
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
-                                            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '0.25rem', justifyContent: 'end' }}>
+                                            <button
+                                                onClick={() => handleReQuote(q)}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '0.25rem', justifyContent: 'end' }}
+                                            >
                                                 Re-quote <ArrowRight size={14} />
                                             </button>
                                         </td>
