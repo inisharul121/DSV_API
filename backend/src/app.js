@@ -9,6 +9,11 @@ const Order = require('./models/Order');
 const Customer = require('./models/Customer');
 const Quote = require('./models/Quote');
 const Admin = require('./models/Admin');
+const ProformaInvoice = require('./models/ProformaInvoice');
+
+// Establish associations
+Order.hasOne(ProformaInvoice, { foreignKey: 'orderId', as: 'invoice' });
+ProformaInvoice.belongsTo(Order, { foreignKey: 'orderId', as: 'order' });
 
 const app = express();
 

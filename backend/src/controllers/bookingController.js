@@ -3,6 +3,7 @@ const fs = require('fs');
 const config = require('../config/env');
 const labelExtractor = require('../utils/labelExtractor');
 const Order = require('../models/Order');
+const ProformaInvoice = require('../models/ProformaInvoice');
 const jwt = require('jsonwebtoken');
 const invoiceGenerator = require('../utils/invoiceGenerator');
 const countryHelper = require('../utils/countryHelper');
@@ -180,7 +181,7 @@ exports.createSimpleBooking = async (req, res) => {
         // 3. Save Order to Local Database
         try {
             const customerId = extractCustomerId(req);
-            await Order.create({
+            const order = await Order.create({
                 bookingId: bookingId,
                 awb: draftResponse.data.shipmentIdentificationNumber || bookingId,
                 shipperName: shipmentData.origin_company || shipmentData.pickup?.address?.companyName || "Sender",
@@ -208,9 +209,24 @@ exports.createSimpleBooking = async (req, res) => {
                 invoice_number: shipmentData.invoice_number || null,
                 invoice_type: shipmentData.invoice_type || null,
                 invoice_signature: shipmentData.invoice_signature || null,
+                totalShippingPrice: parseFloat(shipmentData.totalShippingPrice || 0),
+                baseShippingPrice: parseFloat(shipmentData.baseShippingPrice || 0),
                 customerId: customerId
             });
-            console.log(`Order ${bookingId} saved to database${customerId ? ` (customer: ${customerId})` : ''}`);
+
+            // Create ProformaInvoice record
+            await ProformaInvoice.create({
+                orderId: order.id,
+                invoiceNumber: shipmentData.invoice_number || `INV-${bookingId}`,
+                totalAmount: parseFloat(shipmentData.totalShippingPrice || 0),
+                baseAmount: parseFloat(shipmentData.baseShippingPrice || 0),
+                taxAmount: 0, // Could be calculated if needed
+                currency: shipmentData.currencyCode || "CHF",
+                invoiceUrl: savedInvoicePath,
+                status: 'Generated'
+            });
+
+            console.log(`Order ${bookingId} and ProformaInvoice saved to database${customerId ? ` (customer: ${customerId})` : ''}`);
         } catch (dbError) {
             console.error('Failed to save order to local database:', dbError);
             // Don't fail the request if just the local save fails, 

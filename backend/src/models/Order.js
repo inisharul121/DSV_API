@@ -96,10 +96,20 @@ const Order = sequelize.define('Order', {
             model: 'customers',
             key: 'id'
         }
+    },
+    totalShippingPrice: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true
+    },
+    baseShippingPrice: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true
     }
 }, {
     timestamps: true,
     tableName: 'orders'
 });
 
+
 module.exports = Order;
+// Associations are handled in app.js to avoid circular dependencies

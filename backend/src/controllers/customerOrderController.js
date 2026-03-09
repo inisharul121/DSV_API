@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const ProformaInvoice = require('../models/ProformaInvoice');
 const invoiceGenerator = require('../utils/invoiceGenerator');
 
 // GET /api/customer/orders — returns only orders belonging to the logged-in customer
@@ -6,6 +7,7 @@ exports.getMyOrders = async (req, res) => {
     try {
         const orders = await Order.findAll({
             where: { customerId: req.customerId },
+            include: [{ model: ProformaInvoice, as: 'invoice' }],
             order: [['createdAt', 'DESC']]
         });
 
@@ -20,7 +22,8 @@ exports.generateMyOrderInvoice = async (req, res) => {
     try {
         const { id } = req.params;
         const order = await Order.findOne({
-            where: { id, customerId: req.customerId }
+            where: { id, customerId: req.customerId },
+            include: [{ model: ProformaInvoice, as: 'invoice' }]
         });
 
         if (!order) {
@@ -42,8 +45,26 @@ exports.generateMyOrderInvoice = async (req, res) => {
                 hawb: order.awb,
                 invoice_date: order.createdAt
             }, order.bookingId);
-            order.invoiceUrl = `/invoices/${fileName}`;
+
+            const invoiceUrl = `/invoices/${fileName}`;
+            order.invoiceUrl = invoiceUrl;
             await order.save();
+
+            // Also update/create ProformaInvoice record
+            if (order.invoice) {
+                order.invoice.invoiceUrl = invoiceUrl;
+                await order.invoice.save();
+            } else {
+                await ProformaInvoice.create({
+                    orderId: order.id,
+                    invoiceNumber: order.invoice_number || `INV-${order.bookingId}`,
+                    totalAmount: order.totalShippingPrice,
+                    baseAmount: order.baseShippingPrice,
+                    currency: order.currency,
+                    invoiceUrl: invoiceUrl,
+                    status: 'Generated'
+                });
+            }
         }
 
         res.json({
@@ -63,7 +84,8 @@ exports.getMyOrderInvoiceHTML = async (req, res) => {
     try {
         const { id } = req.params;
         const order = await Order.findOne({
-            where: { id, customerId: req.customerId }
+            where: { id, customerId: req.customerId },
+            include: [{ model: ProformaInvoice, as: 'invoice' }]
         });
 
         if (!order) {
@@ -77,7 +99,9 @@ exports.getMyOrderInvoiceHTML = async (req, res) => {
             origin_country: order.originCountry,
             dest_country: order.destinationCountry,
             weight: order.totalWeight,
-            currencyCode: order.currency,
+            currencyCode: order.invoice?.currency || order.currency,
+            totalShippingPrice: order.invoice?.totalAmount || order.totalShippingPrice,
+            baseShippingPrice: order.invoice?.baseAmount || order.baseShippingPrice,
             hawb: order.awb,
             invoice_date: order.createdAt
         }, order.bookingId);

@@ -150,19 +150,34 @@ exports.generateProformaInvoice = async (data, bookingId) => {
             doc.text(`TAX IN ${curr}`, 350, tableTop + 4, { width: 100, align: 'right' });
             doc.text(`CHARGES IN ${curr}`, 450, tableTop + 4, { width: 100, align: 'right' });
 
-            // Mocked Itemized Charges
-            const goodsValue = parseFloat(data.goodsValue || 0);
-            const freightCharge = goodsValue * 0.15 || 460169.18;
-            const serviceTax = freightCharge * 0.14 || 64423.68;
-            const sbTax = freightCharge * 0.005 || 2300.85;
-            const subtotal = freightCharge;
-            const total = subtotal + serviceTax + sbTax;
+            // Dynamic Pricing Logic
+            const totalShippingPrice = parseFloat(data.totalShippingPrice || 0);
+            const baseShippingPrice = parseFloat(data.baseShippingPrice || 0);
+
+            let freightCharge, serviceTax, sbTax, subtotal, total;
+
+            if (totalShippingPrice > 0) {
+                // Use the real prices from the database
+                freightCharge = baseShippingPrice;
+                serviceTax = 0; // Defaulting to 0 if not explicitly stored, or calculate as difference
+                sbTax = totalShippingPrice - baseShippingPrice; // Handling fee / Tax
+                subtotal = baseShippingPrice;
+                total = totalShippingPrice;
+            } else {
+                // Fallback to dummy calculations (legacy/mock logic)
+                const goodsValue = parseFloat(data.goodsValue || 0);
+                freightCharge = goodsValue * 0.15 || 460169.18;
+                serviceTax = freightCharge * 0.14 || 64423.68;
+                sbTax = freightCharge * 0.005 || 2300.85;
+                subtotal = freightCharge;
+                total = subtotal + serviceTax + sbTax;
+            }
 
             doc.moveDown();
             const chargeY = doc.y;
             doc.font('Helvetica').fontSize(8);
-            doc.text(`Freight Charge (Booking ${bookingId})`, 45, chargeY);
-            doc.text('Zero Rated', 350, chargeY, { width: 100, align: 'right' });
+            doc.text(totalShippingPrice > 0 ? `Shipping & Handling (Booking ${bookingId})` : `Freight Charge (Booking ${bookingId})`, 45, chargeY);
+            doc.text(totalShippingPrice > 0 ? 'Included' : 'Zero Rated', 350, chargeY, { width: 100, align: 'right' });
             doc.text(freightCharge.toLocaleString('en-US', { minimumFractionDigits: 2 }), 450, chargeY, { width: 100, align: 'right' });
 
             // Totals Box
@@ -222,13 +237,26 @@ exports.generateProformaInvoiceHTML = (data, bookingId) => {
     const dueDate = new Date(invoiceDate.getTime() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
     const curr = data.currencyCode || 'CHF';
 
-    // Calculations
-    const goodsValue = parseFloat(data.goodsValue || 0);
-    const freightCharge = goodsValue * 0.15 || 460.16; // Using a smaller mock if value is low
-    const serviceTax = freightCharge * 0.14 || 64.42;
-    const sbTax = freightCharge * 0.005 || 2.30;
-    const subtotal = freightCharge;
-    const total = subtotal + serviceTax + sbTax;
+    // Dynamic Pricing Logic
+    const totalShippingPrice = parseFloat(data.totalShippingPrice || 0);
+    const baseShippingPrice = parseFloat(data.baseShippingPrice || 0);
+
+    let freightCharge, serviceTax, sbTax, subtotal, total;
+
+    if (totalShippingPrice > 0) {
+        freightCharge = baseShippingPrice;
+        serviceTax = 0;
+        sbTax = totalShippingPrice - baseShippingPrice;
+        subtotal = baseShippingPrice;
+        total = totalShippingPrice;
+    } else {
+        const goodsValue = parseFloat(data.goodsValue || 0);
+        freightCharge = goodsValue * 0.15 || 460.16;
+        serviceTax = freightCharge * 0.14 || 64.42;
+        sbTax = freightCharge * 0.005 || 2.30;
+        subtotal = freightCharge;
+        total = subtotal + serviceTax + sbTax;
+    }
 
     return `
     <!DOCTYPE html>
@@ -302,7 +330,7 @@ exports.generateProformaInvoiceHTML = (data, bookingId) => {
             <table class="charges-table">
                 <thead><tr><th>DESCRIPTION</th><th class="text-right">TAX</th><th class="text-right">CHARGES (${curr})</th></tr></thead>
                 <tbody>
-                    <tr><td>Freight Charges</td><td class="text-right">Zero Rated</td><td class="text-right">${freightCharge.toFixed(2)}</td></tr>
+                    <tr><td>${totalShippingPrice > 0 ? 'Shipping & Handling' : 'Freight Charges'}</td><td class="text-right">${totalShippingPrice > 0 ? 'Included' : 'Zero Rated'}</td><td class="text-right">${freightCharge.toFixed(2)}</td></tr>
                     <tr><td>Service Tax (14%)</td><td class="text-right">${serviceTax.toFixed(2)}</td><td class="text-right">-</td></tr>
                 </tbody>
             </table>

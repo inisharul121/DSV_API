@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Truck, Search, Filter, Download, ExternalLink, Package, Clock, CheckCircle, AlertCircle, RefreshCw, Printer, ShieldCheck } from 'lucide-react';
+import { Truck, Search, Filter, Download, ExternalLink, Package, Clock, CheckCircle, AlertCircle, RefreshCw, Printer, ShieldCheck, Loader2, ChevronRight, FileText } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
 

@@ -1,10 +1,12 @@
 const Order = require('../models/Order');
+const ProformaInvoice = require('../models/ProformaInvoice');
 const invoiceGenerator = require('../utils/invoiceGenerator');
 
 exports.getOrders = async (req, res) => {
     try {
         console.log('[OrderController] Fetching all orders...');
         const orders = await Order.findAll({
+            include: [{ model: ProformaInvoice, as: 'invoice' }],
             order: [['createdAt', 'DESC']]
         });
         console.log(`[OrderController] Found ${orders.length} orders.`);
@@ -94,7 +96,6 @@ exports.generateOrderInvoice = async (req, res) => {
         // Generate invoice if not exists
         if (!order.invoiceUrl) {
             console.log(`[OrderController] Generating missing invoice for order: ${order.bookingId}`);
-            // Prepare data for generator (mapped from Order model to generator expected fields)
             const fileName = await invoiceGenerator.generateProformaInvoice({
                 ...order.toJSON(),
                 origin_company: order.shipperName,
@@ -106,8 +107,27 @@ exports.generateOrderInvoice = async (req, res) => {
                 hawb: order.awb,
                 invoice_date: order.createdAt
             }, order.bookingId);
-            order.invoiceUrl = `/invoices/${fileName}`;
+
+            const invoiceUrl = `/invoices/${fileName}`;
+            order.invoiceUrl = invoiceUrl;
             await order.save();
+
+            // Also ensure ProformaInvoice record exists
+            const invoice = await ProformaInvoice.findOne({ where: { orderId: order.id } });
+            if (invoice) {
+                invoice.invoiceUrl = invoiceUrl;
+                await invoice.save();
+            } else {
+                await ProformaInvoice.create({
+                    orderId: order.id,
+                    invoiceNumber: order.invoice_number || `INV-${order.bookingId}`,
+                    totalAmount: order.totalShippingPrice,
+                    baseAmount: order.baseShippingPrice,
+                    currency: order.currency,
+                    invoiceUrl: invoiceUrl,
+                    status: 'Generated'
+                });
+            }
         }
 
         res.json({
@@ -126,7 +146,10 @@ exports.generateOrderInvoice = async (req, res) => {
 exports.getOrderInvoiceHTML = async (req, res) => {
     try {
         const { id } = req.params;
-        const order = await Order.findByPk(id);
+        const order = await Order.findOne({
+            where: { id },
+            include: [{ model: ProformaInvoice, as: 'invoice' }]
+        });
 
         if (!order) {
             return res.status(404).send('<h1>Order Not Found</h1>');
@@ -139,7 +162,9 @@ exports.getOrderInvoiceHTML = async (req, res) => {
             origin_country: order.originCountry,
             dest_country: order.destinationCountry,
             weight: order.totalWeight,
-            currencyCode: order.currency,
+            currencyCode: order.invoice?.currency || order.currency,
+            totalShippingPrice: order.invoice?.totalAmount || order.totalShippingPrice,
+            baseShippingPrice: order.invoice?.baseAmount || order.baseShippingPrice,
             hawb: order.awb,
             invoice_date: order.createdAt
         }, order.bookingId);

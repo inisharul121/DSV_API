@@ -164,7 +164,11 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                 notif_email_2: form.notifications.exc,
                 notif_lang: form.notifications.lang,
 
-                ref_value: form.reference.value
+                ref_value: form.reference.value,
+
+                // Static/Dynamic Pricing Data
+                totalShippingPrice: data.pricing?.totalPrice || 0,
+                baseShippingPrice: (parseFloat(data.pricing?.totalPrice || 0) - 15).toFixed(2)
             };
 
             const formData = new FormData();
