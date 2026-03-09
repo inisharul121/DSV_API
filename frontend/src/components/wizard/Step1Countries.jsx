@@ -250,12 +250,22 @@ const Step1Countries = ({ data, updateData, onNext }) => {
                                     <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
                                         <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Price Breakdown</div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                            {svc.detailedBreakdown?.map((item, bIdx) => (
-                                                <div key={bIdx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                                                    <span style={{ color: '#64748b' }}>{item.label}</span>
-                                                    <span style={{ fontWeight: 600 }}>{svc.currency} {item.value}</span>
-                                                </div>
-                                            ))}
+                                            {svc.detailedBreakdown?.map((item, bIdx) => {
+                                                const isHandlingFee = item.label === 'Limber Cargo Handling Fee';
+                                                return (
+                                                    <div key={bIdx} style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        fontSize: '0.8rem',
+                                                        fontWeight: isHandlingFee ? 700 : 400,
+                                                        color: isHandlingFee ? 'var(--accent)' : '#64748b',
+                                                        padding: isHandlingFee ? '0.2rem 0' : '0'
+                                                    }}>
+                                                        <span>{item.label}</span>
+                                                        <span style={{ fontWeight: 600 }}>{svc.currency} {item.value}</span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}

@@ -394,12 +394,21 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                     </div>
 
                     <div style={{ marginTop: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', borderTop: '2px solid #f1f5f9', paddingTop: '2rem' }}>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
-                                Final Estimate: {data.pricing?.currency || 'CHF'} {data.pricing?.totalPrice || '---'}
+                        <div style={{ width: '100%', maxWidth: '500px', display: 'flex', flexDirection: 'column', gap: '1rem', background: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', color: '#64748b' }}>
+                                <span>Shipping Base Rate</span>
+                                <span>{data.pricing?.currency || 'CHF'} {(parseFloat(data.pricing?.totalPrice || 0) - 15).toFixed(2)}</span>
                             </div>
-                            <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.25rem', fontWeight: 500 }}>
-                                Includes Limber Cargo Handling Fee
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', color: 'var(--accent)', fontWeight: 700 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <ShieldCheck size={18} /> Limber Cargo Handling Fee
+                                </span>
+                                <span>{data.pricing?.currency || 'CHF'} 15.00</span>
+                            </div>
+                            <div style={{ height: '1px', background: '#e2e8f0', margin: '0.5rem 0' }} />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
+                                <span>Final Estimate</span>
+                                <span>{data.pricing?.currency || 'CHF'} {data.pricing?.totalPrice || '---'}</span>
                             </div>
                         </div>
                         <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '500px' }}>
