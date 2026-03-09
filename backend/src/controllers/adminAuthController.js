@@ -71,6 +71,39 @@ exports.me = async (req, res) => {
     }
 };
 
+// PUT /api/auth/admin/profile
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, email, phone, password } = req.body;
+        const admin = await Admin.findByPk(req.adminId);
+
+        if (!admin) return res.status(404).json({ success: false, error: 'Admin not found.' });
+
+        if (name) admin.name = name;
+        if (email) admin.email = email;
+        if (phone) admin.phone = phone;
+
+        if (password) {
+            admin.passwordHash = await bcrypt.hash(password, 10);
+        }
+
+        await admin.save();
+
+        res.json({
+            success: true,
+            admin: {
+                id: admin.id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role,
+                phone: admin.phone
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
 // GET /api/admins - List all staff (Admin only)
 exports.getAllAdmins = async (req, res) => {
     try {

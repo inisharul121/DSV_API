@@ -72,6 +72,7 @@ router.put('/auth/customer/profile', customerAuth, customerAuthController.update
 router.post('/auth/admin/register', adminAuthController.register);
 router.post('/auth/admin/login', adminAuthController.login);
 router.get('/auth/admin/me', adminAuth, adminAuthController.me);
+router.put('/auth/admin/profile', adminAuth, adminAuthController.updateProfile);
 
 // Customer Portal: Customer-scoped orders (requires customer JWT)
 router.get('/customer/orders', customerAuth, customerOrderController.getMyOrders);
