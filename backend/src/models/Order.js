@@ -12,6 +12,10 @@ const Order = sequelize.define('Order', {
         allowNull: true,
         unique: true
     },
+    awb: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     shipperName: {
         type: DataTypes.STRING,
         allowNull: false

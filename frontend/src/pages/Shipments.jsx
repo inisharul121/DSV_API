@@ -11,11 +11,26 @@ const Shipments = () => {
     const [downloading, setDownloading] = useState(null);
     const [searchParams] = useSearchParams();
 
-    // Mock recent shipments for UI
-    const recentShipments = [
-        { id: 'DSV123456', date: '2026-02-24', dest: 'Berlin, DE', status: 'In Transit', awb: '1234567890' },
-        { id: 'DSV789012', date: '2026-02-22', dest: 'London, GB', status: 'Delivered', awb: '9876543210' },
-    ];
+    const [allShipments, setAllShipments] = useState([]);
+    const [fetching, setFetching] = useState(false);
+
+    const fetchShipments = async () => {
+        setFetching(true);
+        try {
+            const response = await dsvApi.get('/orders');
+            if (response.data.success) {
+                setAllShipments(response.data.data);
+            }
+        } catch (err) {
+            console.error('Error fetching shipments:', err);
+        } finally {
+            setFetching(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchShipments();
+    }, []);
 
     const handleTrack = async (e, id) => {
         const idToTrack = id || trackingId;
@@ -28,11 +43,12 @@ const Shipments = () => {
         setTrackingId(idToTrack);
 
         try {
+            // Priority: if it's a long numeric string, it's likely an AWB or Shipment ID
             let eventsUrl = `/tracking/shipments/${idToTrack}/events`;
-            if (idToTrack.length > 15 && /^\d+$/.test(idToTrack)) {
-                eventsUrl = `/tracking/awb/${idToTrack}/events`;
-            } else if (idToTrack.length === 12 && /^\d+$/.test(idToTrack)) {
-                eventsUrl = `/tracking/carrier/${idToTrack}/events`;
+
+            // Heuristic for tracking endpoint
+            if (idToTrack.startsWith('DSV') || idToTrack.length > 10) {
+                eventsUrl = `/tracking/shipments/${idToTrack}/events`;
             }
 
             const response = await dsvApi.get(eventsUrl);
@@ -43,14 +59,14 @@ const Shipments = () => {
             }
         } catch (err) {
             console.error('Tracking error:', err);
-            setError('Network error: Could not connect to DSV tracking service.');
+            setError('Could not retrieve tracking events. Ensure the ID is valid.');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        const id = searchParams.get('id');
+        const id = searchParams.get('id') || searchParams.get('bookingId');
         if (id) {
             handleTrack(null, id);
         }
@@ -144,25 +160,26 @@ const Shipments = () => {
                         <Clock size={22} color="var(--accent)" /> Recent Bookings
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {recentShipments.map((s) => (
+                        {fetching && <div style={{ textAlign: 'center', padding: '1rem' }}><Loader2 className="spin" /></div>}
+                        {!fetching && allShipments.slice(0, 3).map((s) => (
                             <div key={s.id} style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #e2e8f0' }}>
                                 <div>
-                                    <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{s.id}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.dest} • {s.date}</div>
+                                    <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{s.bookingId}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.destinationCountry} • {new Date(s.createdAt).toLocaleDateString()}</div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     <button
                                         className="btn-primary"
                                         style={{ padding: '0.4rem', borderRadius: '8px', background: '#e2e8f0', color: '#475569' }}
-                                        onClick={() => handleDownloadLabel(s.id)}
+                                        onClick={() => handleDownloadLabel(s.bookingId)}
                                         title="Download Label"
                                     >
-                                        {downloading === s.id ? <Loader2 size={16} className="spin" /> : <Download size={16} />}
+                                        {downloading === s.bookingId ? <Loader2 size={16} className="spin" /> : <Download size={16} />}
                                     </button>
                                     <button
                                         className="btn-primary"
                                         style={{ padding: '0.4rem', borderRadius: '8px' }}
-                                        onClick={() => handleTrack(null, s.id)}
+                                        onClick={() => handleTrack(null, s.bookingId)}
                                         title="Track Shipment"
                                     >
                                         <ChevronRight size={16} />
@@ -170,6 +187,9 @@ const Shipments = () => {
                                 </div>
                             </div>
                         ))}
+                        {!fetching && allShipments.length === 0 && (
+                            <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>No recent bookings found.</div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -191,25 +211,32 @@ const Shipments = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {recentShipments.map((s) => (
+                            {allShipments.map((s) => (
                                 <tr key={s.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                    <td style={{ padding: '1rem 0.5rem', fontWeight: 700 }}>{s.id}</td>
-                                    <td style={{ padding: '1rem 0.5rem' }}>{s.dest}</td>
+                                    <td style={{ padding: '1rem 0.5rem', fontWeight: 700 }}>{s.bookingId}</td>
+                                    <td style={{ padding: '1rem 0.5rem' }}>{s.destinationCountry}</td>
                                     <td style={{ padding: '1rem 0.5rem' }}>
-                                        <span style={{ padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', background: s.status === 'Delivered' ? '#dcfce7' : '#dbeafe', color: s.status === 'Delivered' ? '#166534' : '#1e40af' }}>
+                                        <span style={{
+                                            padding: '0.2rem 0.6rem',
+                                            borderRadius: '12px',
+                                            fontSize: '0.75rem',
+                                            background: s.status === 'Delivered' ? '#dcfce7' : (s.status === 'Exception' ? '#fee2e2' : '#dbeafe'),
+                                            color: s.status === 'Delivered' ? '#166534' : (s.status === 'Exception' ? '#991b1b' : '#1e40af')
+                                        }}>
                                             {s.status}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '1rem 0.5rem', fontFamily: 'monospace' }}>{s.awb}</td>
+                                    <td style={{ padding: '1rem 0.5rem', fontFamily: 'monospace' }}>{s.awb || s.bookingId}</td>
                                     <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
                                         <button
-                                            onClick={() => handleDownloadLabel(s.id)}
+                                            onClick={() => handleDownloadLabel(s.bookingId)}
+                                            disabled={downloading === s.bookingId}
                                             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', marginRight: '1rem' }}
                                         >
-                                            Label
+                                            {downloading === s.bookingId ? '...' : 'Label'}
                                         </button>
                                         <button
-                                            onClick={() => handleTrack(null, s.id)}
+                                            onClick={() => handleTrack(null, s.bookingId)}
                                             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)' }}
                                         >
                                             Track
@@ -217,6 +244,11 @@ const Shipments = () => {
                                     </td>
                                 </tr>
                             ))}
+                            {!fetching && allShipments.length === 0 && (
+                                <tr>
+                                    <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No shipments found.</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

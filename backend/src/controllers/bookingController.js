@@ -126,6 +126,7 @@ exports.createSimpleBooking = async (req, res) => {
             const customerId = extractCustomerId(req);
             await Order.create({
                 bookingId: bookingId,
+                awb: draftResponse.data.shipmentIdentificationNumber || bookingId,
                 shipperName: shipmentData.origin_company || shipmentData.pickup?.address?.companyName || "Sender",
                 receiverName: shipmentData.dest_company || shipmentData.delivery?.companyName || "Receiver",
                 originCountry: (shipmentData.origin_country || shipmentData.pickup?.address?.countryCode || "CH").substring(0, 2),
