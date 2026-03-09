@@ -45,3 +45,38 @@ exports.getOrderDetails = async (req, res) => {
         });
     }
 };
+
+exports.getDashboardStats = async (req, res) => {
+    try {
+        console.log('[OrderController] Fetching dashboard stats...');
+        const totalShipments = await Order.count();
+        const delivered = await Order.count({ where: { status: 'Delivered' } });
+        // In processing includes 'Created', 'In Transit', 'Pending'
+        const inProcessing = await Order.count({
+            where: {
+                status: ['Created', 'In Transit', 'Pending', 'Booked']
+            }
+        });
+        const exceptions = await Order.count({
+            where: {
+                status: ['Exception', 'Failed', 'Cancelled']
+            }
+        });
+
+        res.json({
+            success: true,
+            data: {
+                totalShipments,
+                delivered,
+                inProcessing,
+                exceptions
+            }
+        });
+    } catch (error) {
+        console.error('Dashboard Stats Error:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+};

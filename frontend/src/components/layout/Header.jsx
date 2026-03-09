@@ -1,7 +1,18 @@
 import React from 'react';
 import { Search, Bell, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Header = ({ title, subtitle }) => {
+    const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = React.useState('');
+
+    const handleSearch = (e) => {
+        if (e.key === 'Enter' && searchTerm.trim()) {
+            navigate(`/shipments?id=${searchTerm.trim()}`);
+            setSearchTerm('');
+        }
+    };
+
     return (
         <header className="top-bar">
             <div className="page-title">
@@ -17,6 +28,9 @@ const Header = ({ title, subtitle }) => {
                         placeholder="Search shipments..."
                         className="input-field"
                         style={{ paddingLeft: '2.5rem', width: '300px' }}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={handleSearch}
                     />
                 </div>
 

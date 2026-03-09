@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Truck, LogIn, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Truck, LogIn, AlertCircle, Clock } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const CustomerLogin = () => {
@@ -10,6 +10,14 @@ const CustomerLogin = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        if (params.get('error') === 'session_expired') {
+            setError('Your session has expired. Please log in again.');
+        }
+    }, [location]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

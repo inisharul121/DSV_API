@@ -8,11 +8,23 @@ const Layout = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const [adminInfo, setAdminInfo] = React.useState({ name: 'Admin', role: 'Administrator' });
+
     // Access Control: Only Staff/Admin can access this area
     React.useEffect(() => {
         const adminToken = localStorage.getItem('adminToken');
         if (!adminToken) {
             navigate('/login');
+            return;
+        }
+
+        const storedInfo = localStorage.getItem('adminInfo');
+        if (storedInfo) {
+            try {
+                setAdminInfo(JSON.parse(storedInfo));
+            } catch (e) {
+                console.error('Error parsing adminInfo:', e);
+            }
         }
     }, [navigate]);
 
@@ -33,7 +45,7 @@ const Layout = () => {
 
     const getPageSubtitle = (pathname) => {
         switch (pathname) {
-            case '/dashboard': return 'Welcome back, Islam! Here is what is happening today.';
+            case '/dashboard': return `Welcome back, ${adminInfo.name}! Here is what is happening today.`;
             case '/order': return 'Follow the steps below to book a new order.';
             default: return 'Manage your DSV XPress operations.';
         }

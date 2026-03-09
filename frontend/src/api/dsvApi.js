@@ -25,4 +25,26 @@ dsvApi.interceptors.request.use(
     }
 );
 
+// Add a response interceptor
+dsvApi.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // Unauthorized - Clear all tokens and redirect to login
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminInfo');
+            localStorage.removeItem('customerToken');
+            localStorage.removeItem('customerInfo');
+
+            // Avoid infinite redirect loop if already on login page
+            if (!window.location.pathname.includes('/login')) {
+                window.location.href = '/login?error=session_expired';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default dsvApi;
