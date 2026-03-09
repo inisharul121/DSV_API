@@ -43,6 +43,9 @@ router.get('/orders/stats', adminAuth, orderController.getDashboardStats);
 router.get('/admins', adminAuth, adminAuthController.getAllAdmins);
 router.put('/admins/:id/status', adminAuth, adminAuthController.updateAdminStatus);
 router.get('/customers', adminAuth, customerAuthController.getAllCustomers);
+router.put('/customers/:id', adminAuth, customerAuthController.updateCustomerAdmin);
+router.delete('/customers/:id', adminAuth, customerAuthController.deleteCustomer);
+router.get('/customers/:id/summary', adminAuth, customerAuthController.getCustomerSummary);
 
 // Tracking
 router.get('/tracking/shipments/:shipmentId', trackingController.getShipmentDetails);

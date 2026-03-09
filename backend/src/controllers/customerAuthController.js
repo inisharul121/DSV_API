@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Customer = require('../models/Customer');
+const Order = require('../models/Order');
+const { Sequelize } = require('sequelize');
 
 const JWT_SECRET = process.env.JWT_CUSTOMER_SECRET || 'limber-cargo-customer-secret-2026';
 const JWT_EXPIRES = '7d';
@@ -122,6 +124,76 @@ exports.getAllCustomers = async (req, res) => {
             order: [['createdAt', 'DESC']]
         });
         res.json({ success: true, customers });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// PUT /api/customers/:id - Admin Update Customer
+exports.updateCustomerAdmin = async (req, res) => {
+    try {
+        const { name, company, phone, email } = req.body;
+        const customer = await Customer.findByPk(req.params.id);
+
+        if (!customer) return res.status(404).json({ success: false, error: 'Customer not found.' });
+
+        if (name) customer.name = name;
+        if (company) customer.company = company;
+        if (phone) customer.phone = phone;
+        if (email) customer.email = email;
+
+        await customer.save();
+
+        res.json({ success: true, customer });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// DELETE /api/customers/:id - Admin Delete Customer
+exports.deleteCustomer = async (req, res) => {
+    try {
+        const customer = await Customer.findByPk(req.params.id);
+        if (!customer) return res.status(404).json({ success: false, error: 'Customer not found.' });
+
+        await customer.destroy();
+        res.json({ success: true, message: 'Customer deleted successfully.' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// GET /api/customers/:id/summary - Admin Get Customer Summary
+exports.getCustomerSummary = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const customer = await Customer.findByPk(id, {
+            attributes: ['id', 'name', 'email', 'company', 'createdAt']
+        });
+
+        if (!customer) return res.status(404).json({ success: false, error: 'Customer not found.' });
+
+        const totalOrders = await Order.count({ where: { customerId: id } });
+        const totalSpent = await Order.sum('goodsValue', { where: { customerId: id } }) || 0;
+        const totalWeight = await Order.sum('totalWeight', { where: { customerId: id } }) || 0;
+
+        const lastOrder = await Order.findOne({
+            where: { customerId: id },
+            order: [['createdAt', 'DESC']]
+        });
+
+        res.json({
+            success: true,
+            summary: {
+                customer,
+                stats: {
+                    totalOrders,
+                    totalSpent,
+                    totalWeight,
+                    lastOrderDate: lastOrder ? lastOrder.createdAt : null
+                }
+            }
+        });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }

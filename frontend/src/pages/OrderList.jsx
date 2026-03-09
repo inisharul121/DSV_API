@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Filter, ExternalLink, RefreshCw, FileText, Truck } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Search, Filter, ExternalLink, RefreshCw, FileText, Truck, X } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -10,6 +10,9 @@ const OrderList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const customerFilterId = searchParams.get('customerId');
 
     const fetchOrders = async () => {
         setLoading(true);
@@ -33,11 +36,16 @@ const OrderList = () => {
         fetchOrders();
     }, []);
 
-    const filteredOrders = orders.filter(order =>
-        order.bookingId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.shipperName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.receiverName?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredOrders = orders.filter(order => {
+        const matchesSearch = !searchTerm ||
+            order.bookingId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.shipperName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.receiverName?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesCustomer = !customerFilterId || order.customerId === customerFilterId;
+
+        return matchesSearch && matchesCustomer;
+    });
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -56,6 +64,18 @@ const OrderList = () => {
             </div>
 
             <div className="card" style={{ padding: '1.5rem' }}>
+                {customerFilterId && (
+                    <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(37, 99, 235, 0.05)', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid rgba(37, 99, 235, 0.1)' }}>
+                        <Filter size={14} color="var(--accent)" />
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Filtered by Customer</span>
+                        <button
+                            onClick={() => setSearchParams({})}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: 'auto', color: '#64748b', display: 'flex', alignItems: 'center' }}
+                        >
+                            <X size={14} /> Clear
+                        </button>
+                    </div>
+                )}
                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
                     <div className="input-group" style={{ flex: 1 }}>
                         <div style={{ position: 'relative' }}>

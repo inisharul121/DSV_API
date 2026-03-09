@@ -1,7 +1,8 @@
 :root {
     --primary: #003366;
     --secondary: #004080;
-    --accent: #ff6600; /* Original Limber Cargo Orange */
+    --accent: #ff6600;
+    /* Original Limber Cargo Orange */
     --background: #ffffff;
     --card-bg: #ffffff;
     --text-primary: #333333;
@@ -9,8 +10,8 @@
     --success: #28a745;
     --error: #dc3545;
     --radius: 8px;
-    --shadow: 0 2px 10px rgba(0,0,0,0.1);
-    --shadow-hover: 0 5px 20px rgba(0,0,0,0.15);
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 5px 20px rgba(0, 0, 0, 0.15);
 }
 
 * {
@@ -56,7 +57,8 @@ body {
     transition: color 0.2s;
 }
 
-.nav a:hover, .nav a.active {
+.nav a:hover,
+.nav a.active {
     color: var(--secondary);
 }
 
@@ -81,7 +83,7 @@ body {
     padding: 2rem;
     box-shadow: var(--shadow);
     transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .card:hover {
@@ -201,9 +203,20 @@ body {
     font-weight: 600;
 }
 
-.badge-success { background: #dcfce7; color: #166534; }
-.badge-warning { background: #fef9c3; color: #854d0e; }
-.badge-error { background: #fee2e2; color: #991b1b; }
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.badge-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
 
 /* Timeline */
 .timeline {
@@ -244,8 +257,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Toast Notification */
@@ -269,8 +287,13 @@ body {
     transform: translateY(0);
 }
 
-.toast.success { border-left: 4px solid var(--success); }
-.toast.error { border-left: 4px solid var(--error); }
+.toast.success {
+    border-left: 4px solid var(--success);
+}
+
+.toast.error {
+    border-left: 4px solid var(--error);
+}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -278,13 +301,16 @@ body {
         flex-direction: column;
         gap: 1rem;
     }
+
     .nav a {
         margin: 0 1rem;
     }
+
     .hero h1 {
         font-size: 2rem;
     }
 }
+
 :root {
     --primary: #003366;
     --primary-light: #004080;
