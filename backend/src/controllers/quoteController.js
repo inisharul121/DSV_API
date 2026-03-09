@@ -16,10 +16,12 @@ exports.getQuotes = async (req, res) => {
 
         const quoteResponse = await dsvClient.post(quoteUrl, dsvPayload);
 
-        // Enhance each service with a detailed price breakdown
+        // Enhance each service with a detailed price breakdown and add Limber Cargo Handling Fee
         if (quoteResponse.data.services) {
+            const handlingFee = config.dsv.handlingFee || 15.00;
+
             quoteResponse.data.services = quoteResponse.data.services.map(svc => {
-                const total = parseFloat(svc.totalPrice || (svc.rates && svc.rates.total) || 0);
+                let total = parseFloat(svc.totalPrice || (svc.rates && svc.rates.total) || 0);
 
                 // If DSV provides a breakdown, use it, otherwise simulate a detailed one
                 const realBreakdown = svc.rates && svc.rates.priceBreakdown ? svc.rates.priceBreakdown : [];
@@ -27,11 +29,11 @@ exports.getQuotes = async (req, res) => {
 
                 // Combine real data into a standard format for the frontend
                 const detailedBreakdown = [
-                    ...realBreakdown.map(b => ({ label: b.description || 'Freight', value: b.monetaryValue })),
-                    ...realSurcharges.map(s => ({ label: s.description || 'Surcharge', value: s.monetaryValue }))
+                    ...realBreakdown.map(b => ({ label: b.description || 'Freight', value: parseFloat(b.monetaryValue).toFixed(2) })),
+                    ...realSurcharges.map(s => ({ label: s.description || 'Surcharge', value: parseFloat(s.monetaryValue).toFixed(2) }))
                 ];
 
-                // Fallback simulation if no breakdown items are found
+                // Fallback simulation if no breakdown items are found (excluding handling fee for calculation)
                 if (detailedBreakdown.length === 0) {
                     const commission = 10.00;
                     const fuelSurcharge = (total * 0.15);
@@ -44,10 +46,14 @@ exports.getQuotes = async (req, res) => {
                     );
                 }
 
+                // Add Limber Cargo Handling Fee to the breakdown and total
+                detailedBreakdown.push({ label: 'Limber Cargo Handling Fee', value: handlingFee.toFixed(2) });
+                const finalTotal = total + handlingFee;
+
                 return {
                     ...svc,
                     detailedBreakdown,
-                    totalDisplay: total.toFixed(2),
+                    totalDisplay: finalTotal.toFixed(2),
                     currency: (svc.rates && svc.rates.currency) || 'CHF'
                 };
             });

@@ -24,6 +24,7 @@ module.exports = {
             tracking: process.env.DSV_TRACKING_API || "https://api-test.dsv.com/xpress/tracking",
             quote: process.env.DSV_QUOTE_API || "https://api.dsv.com/xp/comparator/v2/compare",
         },
+        handlingFee: parseFloat(process.env.CUSTOMER_HANDLING_FEE || "15.00"),
     },
     certification: {
         enabled: process.env.CERTIFICATION_MODE === 'true' || false,

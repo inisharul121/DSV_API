@@ -394,8 +394,13 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                     </div>
 
                     <div style={{ marginTop: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', borderTop: '2px solid #f1f5f9', paddingTop: '2rem' }}>
-                        <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
-                            Final Estimate: {data.pricing?.currency || 'CHF'} {data.pricing?.totalPrice || '---'}
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
+                                Final Estimate: {data.pricing?.currency || 'CHF'} {data.pricing?.totalPrice || '---'}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.25rem', fontWeight: 500 }}>
+                                Includes Limber Cargo Handling Fee
+                            </div>
                         </div>
                         <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '500px' }}>
                             <button type="button" className="btn-primary" style={{ background: 'var(--text-muted)', flex: 1 }} onClick={onBack}>
