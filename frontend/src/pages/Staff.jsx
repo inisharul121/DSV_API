@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, Search, Shield, Mail, Phone, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { UserPlus, Search, Shield, Mail, Phone, CheckCircle2, XCircle, Loader2, Edit, Trash2, X, User } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const Staff = () => {
@@ -8,11 +8,19 @@ const Staff = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [updating, setUpdating] = useState(null);
 
+    // Modal States
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
+    const [selectedStaff, setSelectedStaff] = useState(null);
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Employee', phone: '' });
+    const [saving, setSaving] = useState(false);
+
     useEffect(() => {
         fetchStaff();
     }, []);
 
     const fetchStaff = async () => {
+        setLoading(true);
         try {
             const res = await dsvApi.get('/admins');
             if (res.data.success) {
@@ -36,6 +44,59 @@ const Staff = () => {
             alert(error.response?.data?.error || 'Failed to update status');
         } finally {
             setUpdating(null);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this staff member?')) return;
+        try {
+            const res = await dsvApi.delete(`/admins/${id}`);
+            if (res.data.success) {
+                setStaff(prev => prev.filter(s => s.id !== id));
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || 'Failed to delete staff');
+        }
+    };
+
+    const handleOpenModal = (mode, data = null) => {
+        setModalMode(mode);
+        setSelectedStaff(data);
+        if (mode === 'edit' && data) {
+            setFormData({
+                name: data.name || '',
+                email: data.email || '',
+                password: '',
+                role: data.role || 'Employee',
+                phone: data.phone || ''
+            });
+        } else {
+            setFormData({ name: '', email: '', password: '', role: 'Employee', phone: '' });
+        }
+        setIsModalOpen(true);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        try {
+            if (modalMode === 'add') {
+                const res = await dsvApi.post('/auth/admin/register', formData);
+                if (res.data.success) {
+                    setIsModalOpen(false);
+                    fetchStaff();
+                }
+            } else {
+                const res = await dsvApi.put(`/admins/${selectedStaff.id}`, formData);
+                if (res.data.success) {
+                    setIsModalOpen(false);
+                    fetchStaff();
+                }
+            }
+        } catch (error) {
+            alert(error.response?.data?.error || 'Failed to save staff information');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -64,6 +125,13 @@ const Staff = () => {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
+                        <button
+                            className="btn-primary"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem' }}
+                            onClick={() => handleOpenModal('add')}
+                        >
+                            <UserPlus size={18} /> Add Staff
+                        </button>
                     </div>
                 </div>
 
@@ -87,11 +155,27 @@ const Staff = () => {
                             <tbody>
                                 {filteredStaff.map((s) => (
                                     <tr key={s.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                        <td style={{ padding: '1rem 0.5rem', fontWeight: 700 }}>{s.name}</td>
-                                        <td style={{ padding: '1rem 0.5rem' }}>{s.role}</td>
+                                        <td style={{ padding: '1rem 0.5rem', fontWeight: 700 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <div style={{ width: '32px', height: '32px', background: '#f1f5f9', borderRadius: '50%', display: 'grid', placeItems: 'center' }}>
+                                                    <User size={16} color="#64748b" />
+                                                </div>
+                                                {s.name}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <span style={{
+                                                fontSize: '0.8rem', fontWeight: 600, padding: '0.2rem 0.5rem',
+                                                background: s.role === 'Admin' ? 'rgba(37, 99, 235, 0.1)' : '#f1f5f9',
+                                                color: s.role === 'Admin' ? '#2563eb' : '#64748b',
+                                                borderRadius: '6px'
+                                            }}>
+                                                {s.role}
+                                            </span>
+                                        </td>
                                         <td style={{ padding: '1rem 0.5rem' }}>
                                             <div style={{ fontSize: '0.85rem' }}><Mail size={12} style={{ verticalAlign: 'middle', marginRight: '0.4rem' }} />{s.email}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}><Phone size={12} style={{ verticalAlign: 'middle', marginRight: '0.4rem' }} />{s.phone}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}><Phone size={12} style={{ verticalAlign: 'middle', marginRight: '0.4rem' }} />{s.phone || 'N/A'}</div>
                                         </td>
                                         <td style={{ padding: '1rem 0.5rem' }}>
                                             <span style={{
@@ -104,49 +188,140 @@ const Staff = () => {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
-                                            {s.status === 'Pending' && (
-                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                    <button
-                                                        disabled={updating === s.id}
-                                                        onClick={() => handleUpdateStatus(s.id, 'Active')}
-                                                        style={{
-                                                            background: '#10b981', color: 'white', border: 'none',
-                                                            borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer',
-                                                            display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem'
-                                                        }}
-                                                    >
-                                                        <CheckCircle2 size={14} /> Approve
-                                                    </button>
-                                                    <button
-                                                        disabled={updating === s.id}
-                                                        onClick={() => handleUpdateStatus(s.id, 'Rejected')}
-                                                        style={{
-                                                            background: '#ef4444', color: 'white', border: 'none',
-                                                            borderRadius: '6px', padding: '0.4rem 0.8rem', cursor: 'pointer',
-                                                            display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem'
-                                                        }}
-                                                    >
-                                                        <XCircle size={14} /> Reject
-                                                    </button>
-                                                </div>
-                                            )}
-                                            {s.status === 'Active' && s.email !== 'admin@gmail.com' && (
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                                {s.status === 'Pending' && (
+                                                    <>
+                                                        <button
+                                                            disabled={updating === s.id}
+                                                            onClick={() => handleUpdateStatus(s.id, 'Active')}
+                                                            title="Approve"
+                                                            style={{
+                                                                background: '#10b981', color: 'white', border: 'none',
+                                                                borderRadius: '6px', padding: '0.4rem', cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            <CheckCircle2 size={16} />
+                                                        </button>
+                                                        <button
+                                                            disabled={updating === s.id}
+                                                            onClick={() => handleUpdateStatus(s.id, 'Rejected')}
+                                                            title="Reject"
+                                                            style={{
+                                                                background: '#ef4444', color: 'white', border: 'none',
+                                                                borderRadius: '6px', padding: '0.4rem', cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            <XCircle size={16} />
+                                                        </button>
+                                                    </>
+                                                )}
+
                                                 <button
-                                                    disabled={updating === s.id}
-                                                    onClick={() => handleUpdateStatus(s.id, 'Rejected')}
-                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', fontSize: '0.85rem' }}
+                                                    onClick={() => handleOpenModal('edit', s)}
+                                                    title="Edit Staff"
+                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                                                 >
-                                                    Deactivate
+                                                    <Edit size={16} />
                                                 </button>
-                                            )}
+
+                                                {s.email !== 'admin@gmail.com' && (
+                                                    <button
+                                                        onClick={() => handleDelete(s.id)}
+                                                        title="Delete Staff"
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
+                                {filteredStaff.length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                            No staff members found.
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
                 )}
             </div>
+
+            {/* Add/Edit Modal */}
+            {isModalOpen && (
+                <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'grid', placeItems: 'center', zIndex: 1000 }}>
+                    <div className="card" style={{ width: '450px', padding: '2rem', position: 'relative' }}>
+                        <button onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                            <X size={20} />
+                        </button>
+                        <h3 style={{ marginBottom: '1.5rem' }}>{modalMode === 'add' ? 'Add New Staff' : 'Edit Staff Details'}</h3>
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className="form-group">
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Full Name</label>
+                                <input
+                                    className="input-field"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    required
+                                    placeholder="Enter full name"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Email Address</label>
+                                <input
+                                    className="input-field"
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    required
+                                    placeholder="email@example.com"
+                                />
+                            </div>
+                            {modalMode === 'add' && (
+                                <div className="form-group">
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Initial Password</label>
+                                    <input
+                                        className="input-field"
+                                        type="password"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        required
+                                        placeholder="Set a password"
+                                    />
+                                </div>
+                            )}
+                            <div className="form-group">
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Phone Number</label>
+                                <input
+                                    className="input-field"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    placeholder="+41 XXXXXXXX"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Role</label>
+                                <select
+                                    className="input-field"
+                                    value={formData.role}
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                    style={{ width: '100%', appearance: 'auto' }}
+                                >
+                                    <option value="Admin">Admin</option>
+                                    <option value="Employee">Employee</option>
+                                    <option value="Support">Support</option>
+                                </select>
+                            </div>
+                            <button className="btn-primary" type="submit" disabled={saving} style={{ marginTop: '1rem' }}>
+                                {saving ? 'Saving...' : (modalMode === 'add' ? 'Create Staff Member' : 'Save Changes')}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

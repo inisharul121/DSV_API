@@ -25,6 +25,10 @@ const Admin = sequelize.define('Admin', {
         type: DataTypes.STRING,
         defaultValue: 'Admin'
     },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     status: {
         type: DataTypes.STRING,
         defaultValue: 'Pending' // 'Pending', 'Active', 'Rejected'

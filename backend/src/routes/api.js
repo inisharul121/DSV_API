@@ -45,6 +45,8 @@ router.get('/reports/monthly', adminAuth, reportController.getMonthlyReport);
 
 // Admin: User Management
 router.get('/admins', adminAuth, adminAuthController.getAllAdmins);
+router.put('/admins/:id', adminAuth, adminAuthController.updateAdmin);
+router.delete('/admins/:id', adminAuth, adminAuthController.deleteAdmin);
 router.put('/admins/:id/status', adminAuth, adminAuthController.updateAdminStatus);
 router.get('/customers', adminAuth, customerAuthController.getAllCustomers);
 router.put('/customers/:id', adminAuth, customerAuthController.updateCustomerAdmin);

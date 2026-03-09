@@ -5,10 +5,10 @@ const Admin = require('../models/Admin');
 const JWT_SECRET = process.env.JWT_ADMIN_SECRET || 'limber-cargo-admin-secret-2026';
 const JWT_EXPIRES = '24h';
 
-// POST /api/auth/admin/register (Internal/Initial setup)
+// POST /api/auth/admin/register
 exports.register = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, role, phone } = req.body;
 
         const existing = await Admin.findOne({ where: { email } });
         if (existing) {
@@ -16,11 +16,11 @@ exports.register = async (req, res) => {
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
-        const admin = await Admin.create({ name, email, passwordHash, role });
+        const admin = await Admin.create({ name, email, passwordHash, role, phone });
 
         res.status(201).json({
             success: true,
-            admin: { id: admin.id, name: admin.name, email: admin.email, role: admin.role }
+            admin: { id: admin.id, name: admin.name, email: admin.email, role: admin.role, phone: admin.phone }
         });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
 exports.me = async (req, res) => {
     try {
         const admin = await Admin.findByPk(req.adminId, {
-            attributes: ['id', 'name', 'email', 'role']
+            attributes: ['id', 'name', 'email', 'role', 'phone']
         });
         if (!admin) return res.status(404).json({ success: false, error: 'Admin not found.' });
         res.json({ success: true, admin });
@@ -75,10 +75,48 @@ exports.me = async (req, res) => {
 exports.getAllAdmins = async (req, res) => {
     try {
         const admins = await Admin.findAll({
-            attributes: ['id', 'name', 'email', 'role', 'status', 'createdAt'],
+            attributes: ['id', 'name', 'email', 'role', 'status', 'phone', 'createdAt'],
             order: [['createdAt', 'DESC']]
         });
         res.json({ success: true, admins });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// PUT /api/admins/:id - Update staff details (Admin only)
+exports.updateAdmin = async (req, res) => {
+    try {
+        const { name, role, phone, email } = req.body;
+        const admin = await Admin.findByPk(req.params.id);
+
+        if (!admin) return res.status(404).json({ success: false, error: 'Admin not found.' });
+
+        if (name) admin.name = name;
+        if (role) admin.role = role;
+        if (phone) admin.phone = phone;
+        if (email) admin.email = email;
+
+        await admin.save();
+        res.json({ success: true, admin });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+// DELETE /api/admins/:id - Delete staff (Admin only)
+exports.deleteAdmin = async (req, res) => {
+    try {
+        const admin = await Admin.findByPk(req.params.id);
+        if (!admin) return res.status(404).json({ success: false, error: 'Admin not found.' });
+
+        // Prevent deleting the main admin
+        if (admin.email === 'admin@gmail.com') {
+            return res.status(403).json({ success: false, error: 'Super Admin cannot be deleted.' });
+        }
+
+        await admin.destroy();
+        res.json({ success: true, message: 'Admin deleted successfully.' });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
