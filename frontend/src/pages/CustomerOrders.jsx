@@ -33,6 +33,22 @@ const CustomerOrders = () => {
         }
     };
 
+    const handleGenerateInvoice = async (orderId) => {
+        try {
+            const response = await dsvApi.get(`/customer/orders/${orderId}/invoice`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.success) {
+                const invoiceUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${response.data.invoiceUrl}`;
+                window.open(invoiceUrl, '_blank');
+                fetchOrders();
+            }
+        } catch (error) {
+            console.error('Error generating invoice:', error);
+            alert('Failed to generate invoice. Please try again.');
+        }
+    };
+
     useEffect(() => {
         if (!token) { navigate('/portal/login'); return; }
         fetchOrders();
@@ -151,21 +167,17 @@ const CustomerOrders = () => {
                                                         <FileText size={13} /> Label
                                                     </a>
                                                 )}
-                                                {order.invoiceUrl && (
-                                                    <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.invoiceUrl}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="btn-secondary"
-                                                        style={{
-                                                            padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem',
-                                                            display: 'flex', alignItems: 'center', gap: '0.3rem',
-                                                            background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none'
-                                                        }}
-                                                    >
-                                                        <FileText size={13} /> Invoice
-                                                    </a>
-                                                )}
+                                                <button
+                                                    onClick={() => handleGenerateInvoice(order.id)}
+                                                    className="btn-secondary"
+                                                    style={{
+                                                        padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem',
+                                                        display: 'flex', alignItems: 'center', gap: '0.3rem',
+                                                        background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none', cursor: 'pointer', fontWeight: 600
+                                                    }}
+                                                >
+                                                    <FileText size={13} /> Invoice
+                                                </button>
                                                 <Link
                                                     to={`/portal/shipments?id=${order.bookingId}`}
                                                     style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#2563eb', textDecoration: 'none', fontWeight: 600, fontSize: '0.8rem' }}

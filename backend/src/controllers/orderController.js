@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const invoiceGenerator = require('../utils/invoiceGenerator');
 
 exports.getOrders = async (req, res) => {
     try {
@@ -74,6 +75,47 @@ exports.getDashboardStats = async (req, res) => {
         });
     } catch (error) {
         console.error('Dashboard Stats Error:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
+
+exports.generateOrderInvoice = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await Order.findByPk(id);
+
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Order not found' });
+        }
+
+        // Generate invoice if not exists
+        if (!order.invoiceUrl) {
+            console.log(`[OrderController] Generating missing invoice for order: ${order.bookingId}`);
+            // Prepare data for generator (mapped from Order model to generator expected fields)
+            const fileName = await invoiceGenerator.generateProformaInvoice({
+                ...order.toJSON(),
+                origin_company: order.shipperName,
+                dest_company: order.receiverName,
+                origin_country: order.originCountry,
+                dest_country: order.destinationCountry,
+                weight: order.totalWeight,
+                currencyCode: order.currency,
+                hawb: order.awb,
+                invoice_date: order.createdAt
+            }, order.bookingId);
+            order.invoiceUrl = `/invoices/${fileName}`;
+            await order.save();
+        }
+
+        res.json({
+            success: true,
+            invoiceUrl: order.invoiceUrl
+        });
+    } catch (error) {
+        console.error('Invoice Generation Error:', error.message);
         res.status(500).json({
             success: false,
             error: error.message

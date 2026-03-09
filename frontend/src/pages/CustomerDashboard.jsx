@@ -22,33 +22,50 @@ const CustomerDashboard = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem('customerToken');
 
+    const fetchOrders = async () => {
+        try {
+            const response = await dsvApi.get('/customer/orders', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.success) {
+                setOrders(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            if (error.response?.status === 401) {
+                localStorage.removeItem('customerToken');
+                localStorage.removeItem('customerInfo');
+                navigate('/portal/login');
+            } else {
+                setError('Failed to fetch orders');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGenerateInvoice = async (orderId) => {
+        try {
+            const response = await dsvApi.get(`/customer/orders/${orderId}/invoice`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.data.success) {
+                const invoiceUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${response.data.invoiceUrl}`;
+                window.open(invoiceUrl, '_blank');
+                // Refresh orders to update the local invoiceUrl if it was just generated
+                fetchOrders();
+            }
+        } catch (error) {
+            console.error('Error generating invoice:', error);
+            alert('Failed to generate invoice. Please try again.');
+        }
+    };
+
     useEffect(() => {
         if (!token) {
             navigate('/portal/login');
             return;
         }
-
-        const fetchOrders = async () => {
-            try {
-                const response = await dsvApi.get('/customer/orders', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (response.data.success) {
-                    setOrders(response.data.data);
-                }
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-                if (error.response?.status === 401) {
-                    localStorage.removeItem('customerToken');
-                    localStorage.removeItem('customerInfo');
-                    navigate('/portal/login');
-                } else {
-                    setError('Failed to fetch orders');
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
 
         fetchOrders();
     }, [token, navigate]);
@@ -136,32 +153,32 @@ const CustomerDashboard = () => {
                                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 <Link
                                                     to={`/portal/shipments?id=${order.bookingId}`}
-                                                    style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
+                                                    className="btn-secondary"
+                                                    style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', border: 'none', fontWeight: 600 }}
+                                                    title="Track Shipment"
                                                 >
-                                                    Track <ExternalLink size={14} />
+                                                    <Truck size={14} /> Track
                                                 </Link>
                                                 {order.labelUrl && (
                                                     <a
                                                         href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.labelUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
+                                                        className="btn-secondary"
+                                                        style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#64748b', border: '1px solid #e2e8f0', fontWeight: 600 }}
                                                         title="Download Label"
                                                     >
-                                                        Label <FileText size={14} />
+                                                        <FileText size={14} /> Label
                                                     </a>
                                                 )}
-                                                {order.invoiceUrl && (
-                                                    <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.invoiceUrl}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        style={{ color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none', fontWeight: 500 }}
-                                                        title="Download Invoice"
-                                                    >
-                                                        Invoice <FileText size={14} />
-                                                    </a>
-                                                )}
+                                                <button
+                                                    onClick={() => handleGenerateInvoice(order.id)}
+                                                    className="btn-secondary"
+                                                    style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#2563eb', background: 'rgba(37, 99, 235, 0.1)', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+                                                    title="Generate/Download Invoice"
+                                                >
+                                                    <FileText size={14} /> Invoice
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
