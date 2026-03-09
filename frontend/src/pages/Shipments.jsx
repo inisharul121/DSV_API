@@ -17,7 +17,11 @@ const Shipments = () => {
     const fetchShipments = async () => {
         setFetching(true);
         try {
-            const response = await dsvApi.get('/orders');
+            // Determine if we should fetch admin orders or customer orders
+            const isCustomer = !!localStorage.getItem('customerToken');
+            const endpoint = isCustomer ? '/customer/orders' : '/orders';
+
+            const response = await dsvApi.get(endpoint);
             if (response.data.success) {
                 setAllShipments(response.data.data);
             }
