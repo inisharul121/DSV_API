@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Truck, Loader2, Calendar, MapPin, Clock, Download, FileText, ChevronRight } from 'lucide-react';
+import { Truck, Search, Filter, Download, ExternalLink, Package, Clock, CheckCircle, AlertCircle, RefreshCw, Printer, ShieldCheck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
+import { toast } from 'react-hot-toast';
 
 const Shipments = () => {
     const [trackingId, setTrackingId] = useState('');
@@ -80,34 +81,32 @@ const Shipments = () => {
         setDownloading(shipmentId);
         try {
             const response = await dsvApi.post(`/bookings/${shipmentId}/labels`, {});
-            if (response.data.success) {
-                const labelData = response.data.pdfBase64;
+            if (response.data.success && response.data.pdfContent) {
+                const labelData = response.data.pdfContent;
 
-                if (labelData) {
-                    const byteCharacters = atob(labelData);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    const byteArray = new Uint8Array(byteNumbers);
-                    const blob = new Blob([byteArray], { type: 'application/pdf' });
-
-                    const url = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute('download', `Label_${shipmentId}.pdf`);
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                } else {
-                    alert('No PDF content found in the label response.');
+                const byteCharacters = atob(labelData);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
                 }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `Label_${shipmentId}.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            } else if (!response.data.pdfContent) {
+                toast.error('No PDF content found in the label response.');
             } else {
-                alert('No labels found for this shipment.');
+                toast.error('No labels found for this shipment.');
             }
         } catch (err) {
-            console.error('Download error:', err);
-            alert('Could not download label. Ensure the Shipment ID is valid and has been confirmed.');
+            console.error('Label download error:', err);
+            toast.error('Could not download label. Ensure the Shipment ID is valid and confirmed.');
         } finally {
             setDownloading(null);
         }

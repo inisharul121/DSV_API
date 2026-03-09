@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Package, Truck, FileText, CheckCircle, Clock, ArrowRight, ExternalLink } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
+import { toast } from 'react-hot-toast';
 
 const StatCard = ({ icon: Icon, value, label, color, bgColor }) => (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem' }}>
@@ -57,7 +58,7 @@ const CustomerDashboard = () => {
             }
         } catch (error) {
             console.error('Error generating invoice:', error);
-            alert('Failed to generate invoice. Please try again.');
+            toast.error('Failed to generate invoice. Please try again.');
         }
     };
 

@@ -15,6 +15,7 @@ import CustomerOrders from './pages/CustomerOrders';
 import CustomerDashboard from './pages/CustomerDashboard';
 import CustomerProfile from './pages/CustomerProfile';
 import CustomerLayout from './components/layout/CustomerLayout';
+import { Toaster } from 'react-hot-toast';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -26,6 +27,7 @@ import Profile from './pages/Profile';
 const App = () => {
   return (
     <Router>
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         {/* Public Landing Pages */}
         <Route path="/" element={<Home />} />

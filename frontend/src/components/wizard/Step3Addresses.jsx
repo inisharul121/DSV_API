@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Send, Building2, MapPin, Phone, Mail, User, ShieldCheck } from 'lucide-react';
 import { countries } from '../../utils/countries';
 import dsvApi from '../../api/dsvApi';
+import { toast } from 'react-hot-toast';
 
 const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
     const [submitting, setSubmitting] = useState(false);
@@ -158,14 +159,14 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
 
             const response = await dsvApi.post('/bookings/simple', { shipmentData: payload });
             if (response.data.success) {
-                alert('Booking created successfully! Shipment ID: ' + (response.data.shipmentId || response.data.bookingId));
+                toast.success('Booking created successfully!');
                 onComplete();
             } else {
-                alert('Booking failed: ' + (response.data.error || 'Unknown error'));
+                toast.error('Booking failed: ' + (response.data.error || 'Unknown error'));
             }
         } catch (err) {
             console.error('Booking error:', err);
-            alert('Booking failed. Please check the console for details.');
+            toast.error('Booking failed. Please check the console for details.');
         } finally {
             setSubmitting(false);
         }

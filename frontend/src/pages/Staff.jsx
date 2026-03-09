@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, Search, Shield, Mail, Phone, CheckCircle2, XCircle, Loader2, Edit, Trash2, X, User } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
+import { toast } from 'react-hot-toast';
 
 const Staff = () => {
     const [staff, setStaff] = useState([]);
@@ -38,10 +39,11 @@ const Staff = () => {
         try {
             const res = await dsvApi.put(`/admins/${id}/status`, { status });
             if (res.data.success) {
+                toast.success(`Staff status updated to ${status}`);
                 fetchStaff();
             }
         } catch (error) {
-            alert(error.response?.data?.error || 'Failed to update status');
+            toast.error(error.response?.data?.error || 'Failed to update status');
         } finally {
             setUpdating(null);
         }
@@ -52,10 +54,11 @@ const Staff = () => {
         try {
             const res = await dsvApi.delete(`/admins/${id}`);
             if (res.data.success) {
+                toast.success('Staff member deleted');
                 setStaff(prev => prev.filter(s => s.id !== id));
             }
         } catch (error) {
-            alert(error.response?.data?.error || 'Failed to delete staff');
+            toast.error(error.response?.data?.error || 'Failed to delete staff');
         }
     };
 
@@ -83,18 +86,20 @@ const Staff = () => {
             if (modalMode === 'add') {
                 const res = await dsvApi.post('/auth/admin/register', formData);
                 if (res.data.success) {
+                    toast.success('Staff member created successfully');
                     setIsModalOpen(false);
                     fetchStaff();
                 }
             } else {
                 const res = await dsvApi.put(`/admins/${selectedStaff.id}`, formData);
                 if (res.data.success) {
+                    toast.success('Staff details updated');
                     setIsModalOpen(false);
                     fetchStaff();
                 }
             }
         } catch (error) {
-            alert(error.response?.data?.error || 'Failed to save staff information');
+            toast.error(error.response?.data?.error || 'Failed to save staff information');
         } finally {
             setSaving(false);
         }

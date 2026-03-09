@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Lock, Save, Loader2, ShieldCheck, UserCircle } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
+import { toast } from 'react-hot-toast';
 
 const Profile = () => {
     const [profile, setProfile] = useState({ name: '', email: '', phone: '', role: '' });
@@ -40,12 +41,12 @@ const Profile = () => {
                 const updatedInfo = { ...JSON.parse(localStorage.getItem('adminInfo') || '{}'), ...res.data.admin };
                 localStorage.setItem('adminInfo', JSON.stringify(updatedInfo));
 
-                alert('Profile updated successfully!');
-                // Reload page to update global state/header
-                window.location.reload();
+                toast.success('Profile updated successfully!');
+                // Reload page after a short delay to allow toast to be seen
+                setTimeout(() => window.location.reload(), 1500);
             }
         } catch (error) {
-            alert(error.response?.data?.error || 'Failed to update profile');
+            toast.error(error.response?.data?.error || 'Failed to update profile');
         } finally {
             setSaving(false);
         }
@@ -54,7 +55,7 @@ const Profile = () => {
     const handlePasswordSubmit = async (e) => {
         e.preventDefault();
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            return alert('Passwords do not match');
+            return toast.error('Passwords do not match');
         }
         setSecuritySaving(true);
         try {
@@ -62,11 +63,11 @@ const Profile = () => {
                 password: passwordData.newPassword
             });
             if (res.data.success) {
-                alert('Password changed successfully!');
+                toast.success('Password changed successfully!');
                 setPasswordData({ newPassword: '', confirmPassword: '' });
             }
         } catch (error) {
-            alert(error.response?.data?.error || 'Failed to update password');
+            toast.error(error.response?.data?.error || 'Failed to update password');
         } finally {
             setSecuritySaving(false);
         }

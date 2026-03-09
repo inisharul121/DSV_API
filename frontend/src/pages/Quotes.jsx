@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Calculator, Filter, Download, Plus, MapPin, Package, Calendar, ArrowRight, Loader, ChevronDown, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { countries } from '../utils/countries';
+import { toast } from 'react-hot-toast';
 
 const Quotes = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -78,7 +79,7 @@ const Quotes = () => {
             }
         } catch (error) {
             console.error('Error fetching quote:', error);
-            alert('Failed to fetch quote. Please check your inputs.');
+            toast.error('Failed to fetch quote. Please check your inputs.');
         } finally {
             setLoading(false);
         }

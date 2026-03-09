@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Package, RefreshCw, FileText, ExternalLink, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
+import { toast } from 'react-hot-toast';
 
 const CustomerOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -45,7 +46,7 @@ const CustomerOrders = () => {
             }
         } catch (error) {
             console.error('Error generating invoice:', error);
-            alert('Failed to generate invoice. Please try again.');
+            toast.error('Failed to generate invoice. Please try again.');
         }
     };
 

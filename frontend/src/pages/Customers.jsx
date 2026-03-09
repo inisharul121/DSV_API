@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Search, Mail, MapPin, ExternalLink, Loader2, Edit, Trash2, Eye, X, Phone, Calendar, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import dsvApi from '../api/dsvApi';
+import { toast } from 'react-hot-toast';
 
 const Customers = () => {
     const navigate = useNavigate();
@@ -41,10 +42,11 @@ const Customers = () => {
         try {
             const res = await dsvApi.delete(`/customers/${id}`);
             if (res.data.success) {
+                toast.success('Customer deleted successfully');
                 setCustomers(prev => prev.filter(c => c.id !== id));
             }
         } catch (error) {
-            alert('Error deleting customer: ' + (error.response?.data?.error || error.message));
+            toast.error('Error deleting customer: ' + (error.response?.data?.error || error.message));
         }
     };
 
@@ -65,11 +67,12 @@ const Customers = () => {
         try {
             const res = await dsvApi.put(`/customers/${selectedCustomer.id}`, editData);
             if (res.data.success) {
+                toast.success('Customer updated successfully');
                 setCustomers(prev => prev.map(c => c.id === selectedCustomer.id ? { ...c, ...editData } : c));
                 setIsEditModalOpen(false);
             }
         } catch (error) {
-            alert('Error updating customer: ' + (error.response?.data?.error || error.message));
+            toast.error('Error updating customer: ' + (error.response?.data?.error || error.message));
         } finally {
             setSaving(false);
         }

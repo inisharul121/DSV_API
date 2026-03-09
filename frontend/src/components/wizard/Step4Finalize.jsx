@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, Download, Printer, Truck, ArrowLeft, Loader2, ExternalLink, FileUp, X } from 'lucide-react';
 import dsvApi from '../../api/dsvApi';
+import { toast } from 'react-hot-toast';
 
 const Step4Finalize = ({ data, onBack }) => {
     const [loading, setLoading] = useState(false);
@@ -66,12 +67,13 @@ const Step4Finalize = ({ data, onBack }) => {
             if (response.data.success) {
                 setSuccess(true);
                 setBookingResult(response.data);
+                toast.success('Booking created successfully!');
             } else {
-                alert('Booking failed: ' + (response.data.error?.message || response.data.error));
+                toast.error('Booking failed: ' + (response.data.error?.message || response.data.error));
             }
         } catch (err) {
             console.error('Booking error:', err);
-            alert('Network error during booking');
+            toast.error('Network error during booking');
         } finally {
             setLoading(false);
         }

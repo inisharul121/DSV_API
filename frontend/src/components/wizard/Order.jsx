@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Step1Delivery from './Step1Countries'; // Renaming internal reference
-import Step3Booking from './Step3Addresses'; // Renaming internal reference
+import Step1Delivery from './Step1Countries';
+import Step3Booking from './Step3Addresses';
+import Step4Finalize from './Step4Finalize';
+import { toast } from 'react-hot-toast';
 
 const Order = () => {
     const [currentStep, setCurrentStep] = useState(1);
@@ -80,7 +82,7 @@ const Order = () => {
                         data={formData}
                         updateData={updateFormData}
                         onBack={prevStep}
-                        onComplete={() => alert('Booking Submitted!')}
+                        onComplete={() => toast.success('Booking Submitted!')}
                     />
                 )}
             </div>
