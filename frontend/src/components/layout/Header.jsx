@@ -1,16 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Bell, User, LogOut, UserCircle, ChevronDown } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 const Header = ({ title, subtitle }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchTerm, setSearchTerm] = useState('');
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef(null);
 
+    // Detect if we are in admin or customer portal
+    const isAdmin = !location.pathname.startsWith('/portal');
     const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
-    const name = adminInfo.name || 'Admin User';
-    const role = adminInfo.role || 'Administrator';
+    const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}');
+
+    // Use appropriate info based on current path or available data
+    const activeInfo = isAdmin ? adminInfo : (customerInfo.id ? customerInfo : adminInfo);
+    const name = activeInfo.name || 'User';
+    const role = isAdmin ? (activeInfo.role || 'Administrator') : (activeInfo.company || 'Client');
+    const profilePath = isAdmin ? '/profile' : '/portal/profile';
+    const loginPath = isAdmin ? '/login' : '/login'; // Both go to common login now
 
     // Get initials for avatar
     const initials = name
@@ -32,14 +41,20 @@ const Header = ({ title, subtitle }) => {
 
     const handleSearch = (e) => {
         if (e.key === 'Enter' && searchTerm.trim()) {
-            navigate(`/shipments?id=${searchTerm.trim()}`);
+            const searchPath = isAdmin ? '/shipments' : '/portal/shipments';
+            navigate(`${searchPath}?id=${searchTerm.trim()}`);
             setSearchTerm('');
         }
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminInfo');
+        if (isAdmin) {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminInfo');
+        } else {
+            localStorage.removeItem('customerToken');
+            localStorage.removeItem('customerInfo');
+        }
         navigate('/login');
     };
 
@@ -101,7 +116,7 @@ const Header = ({ title, subtitle }) => {
                         }}>
                             {initials}
                         </div>
-                        <div className="user-info" style={{ textAlign: 'left', display: 'none', '@media (minWidth: 768px)': { display: 'block' } }}>
+                        <div className="user-info" style={{ textAlign: 'left' }}>
                             <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                                 {name} <ChevronDown size={14} style={{ transform: isProfileOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                             </div>
@@ -120,7 +135,7 @@ const Header = ({ title, subtitle }) => {
                             boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
                             animation: 'fadeIn 0.2s ease-out'
                         }}>
-                            <Link to="/profile" onClick={() => setIsProfileOpen(false)} style={{
+                            <Link to={profilePath} onClick={() => setIsProfileOpen(false)} style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.75rem',
