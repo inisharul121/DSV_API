@@ -45,7 +45,13 @@ const CustomerDashboard = () => {
         }
     };
 
-    const handleGenerateInvoice = async (orderId) => {
+    const handleGenerateHTML = (orderId) => {
+        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+        const previewUrl = `${backendUrl}/customer/orders/${orderId}/invoice-html?token=${token}`;
+        window.open(previewUrl, '_blank');
+    };
+
+    const handleGeneratePDF = async (orderId) => {
         try {
             const response = await dsvApi.get(`/customer/orders/${orderId}/invoice`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -53,12 +59,11 @@ const CustomerDashboard = () => {
             if (response.data.success) {
                 const invoiceUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${response.data.invoiceUrl}`;
                 window.open(invoiceUrl, '_blank');
-                // Refresh orders to update the local invoiceUrl if it was just generated
                 fetchOrders();
             }
         } catch (error) {
-            console.error('Error generating invoice:', error);
-            toast.error('Failed to generate invoice. Please try again.');
+            console.error('Error generating PDF:', error);
+            toast.error('Failed to generate PDF invoice.');
         }
     };
 
@@ -173,12 +178,20 @@ const CustomerDashboard = () => {
                                                     </a>
                                                 )}
                                                 <button
-                                                    onClick={() => handleGenerateInvoice(order.id)}
+                                                    onClick={() => handleGenerateHTML(order.id)}
                                                     className="btn-secondary"
-                                                    style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#2563eb', background: 'rgba(37, 99, 235, 0.1)', border: 'none', fontWeight: 600, cursor: 'pointer' }}
-                                                    title="Generate/Download Invoice"
+                                                    style={{ padding: '0.35rem 0.5rem', borderRadius: '8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#e65100', background: 'rgba(230, 81, 0, 0.1)', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+                                                    title="Preview HTML Invoice"
                                                 >
-                                                    <FileText size={14} /> Invoice
+                                                    <FileText size={12} /> HTML
+                                                </button>
+                                                <button
+                                                    onClick={() => handleGeneratePDF(order.id)}
+                                                    className="btn-secondary"
+                                                    style={{ padding: '0.35rem 0.5rem', borderRadius: '8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#2563eb', background: 'rgba(37, 99, 235, 0.1)', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+                                                    title="Download PDF Invoice"
+                                                >
+                                                    <FileText size={12} /> PDF
                                                 </button>
                                             </div>
                                         </td>

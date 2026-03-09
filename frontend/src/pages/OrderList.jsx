@@ -166,18 +166,26 @@ const OrderList = () => {
                                                         <FileText size={14} /> Label
                                                     </a>
                                                 )}
-                                                {order.invoiceUrl && (
-                                                    <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.invoiceUrl}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="btn-secondary"
-                                                        style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#2563eb', background: 'rgba(37, 99, 235, 0.1)', border: 'none' }}
-                                                        title="Download Proforma Invoice"
-                                                    >
-                                                        <FileText size={14} /> Invoice
-                                                    </a>
-                                                )}
+                                                <a
+                                                    href={`${API_BASE_URL}/orders/${order.id}/invoice-html?token=${localStorage.getItem('adminToken')}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="btn-secondary"
+                                                    style={{ padding: '0.35rem 0.5rem', borderRadius: '8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#e65100', background: 'rgba(230, 81, 0, 0.1)', border: 'none', fontWeight: 600 }}
+                                                    title="Preview HTML Invoice"
+                                                >
+                                                    <FileText size={12} /> HTML
+                                                </a>
+                                                <a
+                                                    href={`${API_BASE_URL}/orders/${order.id}/invoice?token=${localStorage.getItem('adminToken')}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="btn-secondary"
+                                                    style={{ padding: '0.35rem 0.5rem', borderRadius: '8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '0.2rem', color: '#2563eb', background: 'rgba(37, 99, 235, 0.1)', border: 'none', fontWeight: 600 }}
+                                                    title="Download PDF Invoice"
+                                                >
+                                                    <FileText size={12} /> PDF
+                                                </a>
                                                 <Link
                                                     to={`/shipments?id=${order.bookingId}`}
                                                     className="btn-secondary"

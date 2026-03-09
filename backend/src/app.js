@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files (labels, invoices)
 app.use('/api/labels', express.static(path.resolve('./public/labels')));
 app.use('/api/invoices', express.static(path.resolve('./public/invoices')));
+app.use('/api/templates', express.static(path.resolve('./public/templates'))); // For design previews
 
 // API Routes
 const apiRoutes = require('./routes/api');

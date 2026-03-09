@@ -4,7 +4,12 @@ const JWT_SECRET = process.env.JWT_CUSTOMER_SECRET || 'limber-cargo-customer-sec
 
 module.exports = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    let token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+    // Support token in query for direct window.open links (e.g. invoice preview)
+    if (!token && req.query.token) {
+        token = req.query.token;
+    }
 
     if (!token) {
         return res.status(401).json({ success: false, error: 'Authentication required. Please log in.' });

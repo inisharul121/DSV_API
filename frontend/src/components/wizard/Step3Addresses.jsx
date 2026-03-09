@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Send, Building2, MapPin, Phone, Mail, User, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Send, Building2, MapPin, Phone, Mail, User, ShieldCheck, FileUp, Plus, X } from 'lucide-react';
 import { countries } from '../../utils/countries';
 import dsvApi from '../../api/dsvApi';
 import { toast } from 'react-hot-toast';
 
 const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
     const [submitting, setSubmitting] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        setSelectedFiles(prev => [...prev, ...files]);
+    };
+
+    const removeFile = (index) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    };
 
     // Internal state for the complex form
     const [form, setForm] = useState({
@@ -157,7 +167,16 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                 ref_value: form.reference.value
             };
 
-            const response = await dsvApi.post('/bookings/simple', { shipmentData: payload });
+            const formData = new FormData();
+            formData.append('shipmentData', JSON.stringify(payload));
+            selectedFiles.forEach(file => {
+                formData.append('documents', file);
+            });
+
+            const response = await dsvApi.post('/bookings/simple', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
             if (response.data.success) {
                 toast.success('Booking created successfully!');
                 onComplete();
@@ -390,6 +409,35 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                                         <option value="EXW">EXW - Ex Works</option>
                                     </select>
                                 </div>
+                            </section>
+
+                            <section style={{ marginTop: '2rem', padding: '1.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1e293b', marginBottom: '1rem', fontSize: '1rem' }}>
+                                    <FileUp size={20} color="var(--primary)" /> International Documents (Optional)
+                                </h4>
+                                <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem' }}>
+                                    We will automatically generate your Pro Forma Invoice. You can upload additional documents (Packing List, customs forms) below.
+                                </p>
+
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
+                                    {selectedFiles.map((f, i) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'white', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.85rem' }}>
+                                            <span style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeFile(i)}
+                                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex' }}
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <label style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem', background: 'white', border: '1px solid var(--primary)', borderRadius: '8px', color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
+                                    <Plus size={18} /> Add Document
+                                    <input type="file" multiple onChange={handleFileChange} style={{ display: 'none' }} />
+                                </label>
                             </section>
                         </div>
                     </div>

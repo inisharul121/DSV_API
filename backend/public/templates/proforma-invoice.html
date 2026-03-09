@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proforma Tax Invoice Preview</title>
+    <style>
+        :root {
+            --primary: #002e6e;
+            --accent: #e65100;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+            line-height: 1.5;
+            margin: 0;
+            padding: 40px;
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+        }
+
+        .invoice-container {
+            width: 800px;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        /* Watermark-like Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .brand-info h1 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+
+        .brand-info p {
+            margin: 4px 0;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .logo-box {
+            text-align: right;
+        }
+
+        .logo-box .dsv-logo {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .logo-box p {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* Title Block */
+        .title-block {
+            border: 1px solid var(--text);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+        }
+
+        .title-block h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .title-block .page-num {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Address Grid */
+        .address-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            margin-bottom: 30px;
+        }
+
+        .address-box {
+            border: 1px solid var(--border);
+            padding: 15px;
+        }
+
+        .address-box:nth-child(2) {
+            border-left: none;
+        }
+
+        .label {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .address-box p {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            margin-top: -30px;
+            margin-left: auto;
+            width: 300px;
+            display: grid;
+            grid-template-columns: 120px 180px;
+            border-top: 1px solid var(--border);
+        }
+
+        .info-cell {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-top: none;
+            font-size: 11px;
+        }
+
+        .info-cell.label-cell {
+            text-align: right;
+            font-weight: 700;
+            background: var(--bg-light);
+            color: var(--muted);
+        }
+
+        .info-cell.value-cell {
+            font-weight: 600;
+        }
+
+        /* Shipment Details Table */
+        .details-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--border);
+        }
+
+        .details-table td {
+            border: 1px solid var(--border);
+            padding: 10px 15px;
+            vertical-align: top;
+        }
+
+        .details-table .sub-label {
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .details-table .sub-value {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Charges Table */
+        .charges-section {
+            margin-top: 40px;
+        }
+
+        .charges-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .charges-table th {
+            background: var(--bg-light);
+            text-align: left;
+            padding: 10px 15px;
+            font-size: 11px;
+            font-weight: 800;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .charges-table td {
+            padding: 12px 15px;
+            font-size: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* Totals */
+        .totals-container {
+            margin-top: 30px;
+            margin-left: auto;
+            width: 300px;
+            border: 1px solid var(--border);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .total-row:last-child {
+            border-bottom: none;
+            background: var(--bg-light);
+            padding: 12px 15px;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .total-row .val {
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        .footer-box {
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .footer-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .bank-details {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 5px;
+            font-size: 11px;
+        }
+
+        .bank-details dt {
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .bank-details dd {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .invoice-container {
+                box-shadow: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <header>
+            <div class="brand-info">
+                <h1>DSV Global Transport</h1>
+                <p>Professional Logistics Solutions</p>
+                <p>Global Network | Air & Sea | Solutions</p>
+                <p>www.dsv.com</p>
+            </div>
+            <div class="logo-box">
+                <div class="dsv-logo">DSV</div>
+                <p>Global Transport and Logistics</p>
+            </div>
+        </header>
+
+        <div class="title-block">
+            <h2>PRO FORMA TAX INVOICE</h2>
+            <div class="page-num">Page 1 of 1</div>
+        </div>
+
+        <div class="address-grid">
+            <div class="address-box">
+                <span class="label">CONSIGNOR</span>
+                <p>BCIC SWISS GmbH</p>
+                <p style="font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 5px;">
+                    Lättichstrasse 6, 6340 Baar, Switzerland<br>
+                    EORI: CHE-123.456.789
+                </p>
+            </div>
+            <div class="address-box">
+                <span class="label">CONSIGNEE</span>
+                <p>METRO CITY TILES PVT LTD.</p>
+                <p style="font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 5px;">
+                    123 Metro Plaza, Dhaka, Bangladesh<br>
+                    Contact: +880 1234 567 890
+                </p>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-cell label-cell">INVOICE DATE</div>
+            <div class="info-cell value-cell">09 Mar 26</div>
+            <div class="info-cell label-cell">CUSTOMER ID</div>
+            <div class="info-cell value-cell">CUST-88219</div>
+            <div class="info-cell label-cell">SHIPMENT</div>
+            <div class="info-cell value-cell">DSV-1029384</div>
+            <div class="info-cell label-cell">DUE DATE</div>
+            <div class="info-cell value-cell">23 Mar 26</div>
+            <div class="info-cell label-cell">TERMS</div>
+            <div class="info-cell value-cell">DAP - Delivered at Place</div>
+        </div>
+
+        <div class="details-section">
+            <div class="section-title">Shipment Details</div>
+            <table class="details-table">
+                <tr>
+                    <td colspan="4">
+                        <span class="sub-label">GOODS DESCRIPTION</span>
+                        <span class="sub-value">SPARE PARTS FOR CERAMIC INDUSTRY (HS CODE: 8474.90)</span>
+                    </td>
+                    <td colspan="2">
+                        <span class="sub-label">SHIPMENT ID</span>
+                        <span class="sub-value">DSV-1029384</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="sub-label">WEIGHT</span>
+                        <span class="sub-value">250.00 KG</span>
+                    </td>
+                    <td colspan="2">
+                        <span class="sub-label">VOLUME</span>
+                        <span class="sub-value">1.45 M3</span>
+                    </td>
+                    <td>
+                        <span class="sub-label">CHARGEABLE</span>
+                        <span class="sub-value">250.00 KG</span>
+                    </td>
+                    <td>
+                        <span class="sub-label">PACKAGES</span>
+                        <span class="sub-value">3 PCS</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <span class="sub-label">FLIGHT / DATE & REFERENCE</span>
+                        <span class="sub-value">QR640 / 09 Mar 26 / 1029384</span>
+                    </td>
+                    <td colspan="1">
+                        <span class="sub-label">MAWB</span>
+                        <span class="sub-value">157-12345678</span>
+                    </td>
+                    <td colspan="2">
+                        <span class="sub-label">HAWB</span>
+                        <span class="sub-value">DSV882211</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="sub-label">ORIGIN</span>
+                        <span class="sub-value">ZURICH, CH</span>
+                    </td>
+                    <td>
+                        <span class="sub-label">ETD</span>
+                        <span class="sub-value">09 Mar 26</span>
+                    </td>
+                    <td colspan="2">
+                        <span class="sub-label">DESTINATION</span>
+                        <span class="sub-value">DHAKA, BD</span>
+                    </td>
+                    <td>
+                        <span class="sub-label">ETA</span>
+                        <span class="sub-value">12 Mar 26</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="charges-section">
+            <table class="charges-table">
+                <thead>
+                    <tr>
+                        <th width="50%">DESCRIPTION</th>
+                        <th class="text-right">TAX IN CHF</th>
+                        <th class="text-right">CHARGES IN CHF</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Air Freight Charges (ZRH to DAC)</td>
+                        <td class="text-right">Zero Rated</td>
+                        <td class="text-right">1,250.00</td>
+                    </tr>
+                    <tr>
+                        <td>Fuel Surcharge</td>
+                        <td class="text-right">Zero Rated</td>
+                        <td class="text-right">185.50</td>
+                    </tr>
+                    <tr>
+                        <td>Security Handling</td>
+                        <td class="text-right">2.15</td>
+                        <td class="text-right">45.00</td>
+                    </tr>
+                    <tr>
+                        <td>Limber Handling Fee</td>
+                        <td class="text-right">1.20</td>
+                        <td class="text-right">15.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totals-container">
+            <div class="total-row">
+                <span>SUBTOTAL</span>
+                <span class="val">1,495.50</span>
+            </div>
+            <div class="total-row">
+                <span>VAT / TAX</span>
+                <span class="val">3.35</span>
+            </div>
+            <div class="total-row">
+                <span>OTHER FEES</span>
+                <span class="val">0.00</span>
+            </div>
+            <div class="total-row">
+                <span>TOTAL CHF</span>
+                <span class="val">1,498.85</span>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-box">
+                <h4>Transfer Funds To:</h4>
+                <dl class="bank-details">
+                    <dt>Bank:</dt>
+                    <dd>UBS Switzerland AG</dd>
+                    <dt>Account:</dt>
+                    <dd>CH93 0023 4567 8901 2345 6</dd>
+                    <dt>SWIFT:</dt>
+                    <dd>UBSWCHZH123</dd>
+                    <dt>Pay Ref:</dt>
+                    <dd>DSV-1029384 / METRO</dd>
+                </dl>
+            </div>
+            <div class="footer-box">
+                <h4>Registered Address:</h4>
+                <p style="font-size: 10px; color: var(--muted); margin: 0;">
+                    DSV Global Transport and Logistics<br>
+                    8058 Zurich-Airport<br>
+                    Switzerland<br>
+                    UID: CHE-105.938.456
+                </p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

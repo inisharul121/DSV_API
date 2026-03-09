@@ -40,6 +40,7 @@ router.post('/bookings/:shipmentId/labels', documentController.getShipmentLabels
 router.get('/orders', adminAuth, orderController.getOrders);
 router.get('/orders/stats', adminAuth, orderController.getDashboardStats);
 router.get('/orders/:id/invoice', adminAuth, orderController.generateOrderInvoice);
+router.get('/orders/:id/invoice-html', adminAuth, orderController.getOrderInvoiceHTML);
 
 // Reports
 router.get('/reports/monthly', adminAuth, reportController.getMonthlyReport);
@@ -78,5 +79,6 @@ router.put('/auth/admin/profile', adminAuth, adminAuthController.updateProfile);
 // Customer Portal: Customer-scoped orders (requires customer JWT)
 router.get('/customer/orders', customerAuth, customerOrderController.getMyOrders);
 router.get('/customer/orders/:id/invoice', customerAuth, customerOrderController.generateMyOrderInvoice);
+router.get('/customer/orders/:id/invoice-html', customerAuth, customerOrderController.getMyOrderInvoiceHTML);
 
 module.exports = router;

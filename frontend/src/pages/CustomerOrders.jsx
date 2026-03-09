@@ -34,7 +34,13 @@ const CustomerOrders = () => {
         }
     };
 
-    const handleGenerateInvoice = async (orderId) => {
+    const handleGenerateHTML = (orderId) => {
+        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+        const previewUrl = `${backendUrl}/customer/orders/${orderId}/invoice-html?token=${token}`;
+        window.open(previewUrl, '_blank');
+    };
+
+    const handleGeneratePDF = async (orderId) => {
         try {
             const response = await dsvApi.get(`/customer/orders/${orderId}/invoice`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -45,8 +51,8 @@ const CustomerOrders = () => {
                 fetchOrders();
             }
         } catch (error) {
-            console.error('Error generating invoice:', error);
-            toast.error('Failed to generate invoice. Please try again.');
+            console.error('Error generating PDF:', error);
+            toast.error('Failed to generate PDF invoice.');
         }
     };
 
@@ -169,15 +175,28 @@ const CustomerOrders = () => {
                                                     </a>
                                                 )}
                                                 <button
-                                                    onClick={() => handleGenerateInvoice(order.id)}
+                                                    onClick={() => handleGenerateHTML(order.id)}
                                                     className="btn-secondary"
                                                     style={{
-                                                        padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem',
+                                                        padding: '0.35rem 0.7rem', borderRadius: '8px', fontSize: '0.75rem',
+                                                        display: 'flex', alignItems: 'center', gap: '0.3rem',
+                                                        background: 'rgba(230, 81, 0, 0.1)', color: '#e65100', border: 'none', cursor: 'pointer', fontWeight: 600
+                                                    }}
+                                                    title="Preview HTML Invoice"
+                                                >
+                                                    <FileText size={12} /> HTML
+                                                </button>
+                                                <button
+                                                    onClick={() => handleGeneratePDF(order.id)}
+                                                    className="btn-secondary"
+                                                    style={{
+                                                        padding: '0.35rem 0.7rem', borderRadius: '8px', fontSize: '0.75rem',
                                                         display: 'flex', alignItems: 'center', gap: '0.3rem',
                                                         background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none', cursor: 'pointer', fontWeight: 600
                                                     }}
+                                                    title="Download PDF Invoice"
                                                 >
-                                                    <FileText size={13} /> Invoice
+                                                    <FileText size={12} /> PDF
                                                 </button>
                                                 <Link
                                                     to={`/portal/shipments?id=${order.bookingId}`}

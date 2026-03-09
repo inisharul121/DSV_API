@@ -58,3 +58,34 @@ exports.generateMyOrderInvoice = async (req, res) => {
         });
     }
 };
+
+exports.getMyOrderInvoiceHTML = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await Order.findOne({
+            where: { id, customerId: req.customerId }
+        });
+
+        if (!order) {
+            return res.status(404).send('<h1>Order Not Found</h1>');
+        }
+
+        const html = invoiceGenerator.generateProformaInvoiceHTML({
+            ...order.toJSON(),
+            origin_company: order.shipperName,
+            dest_company: order.receiverName,
+            origin_country: order.originCountry,
+            dest_country: order.destinationCountry,
+            weight: order.totalWeight,
+            currencyCode: order.currency,
+            hawb: order.awb,
+            invoice_date: order.createdAt
+        }, order.bookingId);
+
+        res.setHeader('Content-Type', 'text/html');
+        res.send(html);
+    } catch (error) {
+        console.error('Customer HTML Invoice Error:', error.message);
+        res.status(500).send(`<h1>Error generating invoice preview</h1><p>${error.message}</p>`);
+    }
+};

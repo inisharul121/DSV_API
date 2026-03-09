@@ -212,3 +212,109 @@ exports.generateProformaInvoice = async (data, bookingId) => {
         }
     });
 };
+
+/**
+ * Generates the HTML string for the Proforma Invoice.
+ */
+exports.generateProformaInvoiceHTML = (data, bookingId) => {
+    const invoiceDate = data.invoice_date ? new Date(data.invoice_date) : new Date();
+    const formattedInvoiceDate = invoiceDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
+    const dueDate = new Date(invoiceDate.getTime() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
+    const curr = data.currencyCode || 'CHF';
+
+    // Calculations
+    const goodsValue = parseFloat(data.goodsValue || 0);
+    const freightCharge = goodsValue * 0.15 || 460.16; // Using a smaller mock if value is low
+    const serviceTax = freightCharge * 0.14 || 64.42;
+    const sbTax = freightCharge * 0.005 || 2.30;
+    const subtotal = freightCharge;
+    const total = subtotal + serviceTax + sbTax;
+
+    return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            :root { --primary: #002e6e; --accent: #e65100; --text: #1e293b; --muted: #64748b; --border: #e2e8f0; --bg-light: #f8fafc; }
+            body { font-family: 'Inter', system-ui, sans-serif; color: var(--text); padding: 40px; background: #f1f5f9; display: flex; justify-content: center; }
+            .invoice-container { width: 800px; background: white; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; }
+            header { display: flex; justify-content: space-between; margin-bottom: 40px; }
+            .brand-info h1 { color: var(--primary); margin: 0; font-size: 24px; font-weight: 800; }
+            .brand-info p { margin: 4px 0; font-size: 12px; color: var(--muted); }
+            .logo-box { text-align: right; }
+            .logo-box .dsv-logo { font-size: 32px; font-weight: 900; color: var(--primary); }
+            .title-block { border: 1px solid var(--text); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+            .title-block h2 { margin: 0; font-size: 20px; text-transform: uppercase; }
+            .address-grid { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 30px; }
+            .address-box { border: 1px solid var(--border); padding: 15px; }
+            .label { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
+            .address-box p { margin: 0; font-size: 13px; font-weight: 600; }
+            .info-grid { margin-top: -30px; margin-left: auto; width: 300px; display: grid; grid-template-columns: 120px 180px; }
+            .info-cell { padding: 6px 12px; border: 1px solid var(--border); font-size: 11px; }
+            .info-cell.label-cell { text-align: right; font-weight: 700; background: var(--bg-light); color: var(--muted); }
+            .info-cell.value-cell { font-weight: 600; }
+            .details-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); margin-top: 20px; }
+            .details-table td { border: 1px solid var(--border); padding: 10px; }
+            .sub-label { font-size: 9px; font-weight: 800; color: var(--muted); text-transform: uppercase; display: block; }
+            .sub-value { font-size: 12px; font-weight: 600; }
+            .charges-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+            .charges-table th { background: var(--bg-light); text-align: left; padding: 10px; font-size: 11px; border-bottom: 1px solid var(--border); }
+            .charges-table td { padding: 10px; font-size: 12px; border-bottom: 1px solid #f1f5f9; }
+            .text-right { text-align: right; }
+            .totals-container { margin-top: 30px; margin-left: auto; width: 300px; border: 1px solid var(--border); }
+            .total-row { display: flex; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; }
+            .total-row:last-child { background: var(--bg-light); font-size: 14px; color: var(--primary); }
+            footer { margin-top: 50px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
+            .footer-box { border: 1px solid var(--border); padding: 15px; font-size: 11px; }
+            .footer-box h4 { margin: 0 0 10px 0; color: var(--primary); }
+        </style>
+    </head>
+    <body>
+        <div class="invoice-container">
+            <header>
+                <div class="brand-info">
+                    <h1>DSV Global Transport</h1>
+                    <p>Professional Logistics Solutions</p>
+                </div>
+                <div class="logo-box"><div class="dsv-logo">DSV</div></div>
+            </header>
+            <div class="title-block"><h2>PRO FORMA TAX INVOICE</h2></div>
+            <div class="address-grid">
+                <div class="address-box"><span class="label">CONSIGNOR</span><p>${data.origin_company || 'BCIC SWISS GmbH'}</p></div>
+                <div class="address-box"><span class="label">CONSIGNEE</span><p>${data.dest_company || 'METRO CITY TILES PVT LTD.'}</p></div>
+            </div>
+            <div class="info-grid">
+                <div class="info-cell label-cell">INVOICE DATE</div><div class="info-cell value-cell">${formattedInvoiceDate}</div>
+                <div class="info-cell label-cell">SHIPMENT</div><div class="info-cell value-cell">${bookingId}</div>
+                <div class="info-cell label-cell">TERMS</div><div class="info-cell value-cell">${data.incoterms || 'DAP'}</div>
+            </div>
+            <table class="details-table">
+                <tr>
+                    <td colspan="4"><span class="sub-label">GOODS DESCRIPTION</span><span class="sub-value">${data.commodity || 'GENERAL CARGO'}</span></td>
+                    <td colspan="2"><span class="sub-label">WEIGHT</span><span class="sub-value">${data.weight || '0.00'} KG</span></td>
+                </tr>
+                <tr>
+                    <td colspan="3"><span class="sub-label">PACKAGES</span><span class="sub-value">${data.quantity || '1'} PCS</span></td>
+                    <td colspan="3"><span class="sub-label">HAWB</span><span class="sub-value">${data.hawb || 'TBS'}</span></td>
+                </tr>
+            </table>
+            <table class="charges-table">
+                <thead><tr><th>DESCRIPTION</th><th class="text-right">TAX</th><th class="text-right">CHARGES (${curr})</th></tr></thead>
+                <tbody>
+                    <tr><td>Freight Charges</td><td class="text-right">Zero Rated</td><td class="text-right">${freightCharge.toFixed(2)}</td></tr>
+                    <tr><td>Service Tax (14%)</td><td class="text-right">${serviceTax.toFixed(2)}</td><td class="text-right">-</td></tr>
+                </tbody>
+            </table>
+            <div class="totals-container">
+                <div class="total-row"><span>SUBTOTAL</span><span>${subtotal.toFixed(2)}</span></div>
+                <div class="total-row"><span>TOTAL ${curr}</span><span>${total.toFixed(2)}</span></div>
+            </div>
+            <footer>
+                <div class="footer-box"><h4>Bank Details</h4><p>Bank: ${data.bankName || 'UBS Switzerland'}<br>Account: ${data.bankAccount || 'CH-XXXX'}</p></div>
+                <div class="footer-box"><h4>Address</h4><p>DSV Global Transport<br>Zurich-Airport, CH</p></div>
+            </footer>
+        </div>
+    </body>
+    </html>`;
+};
