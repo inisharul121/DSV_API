@@ -93,47 +93,26 @@ exports.generateOrderInvoice = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Order not found' });
         }
 
-        // Generate invoice if not exists
-        if (!order.invoiceUrl) {
-            console.log(`[OrderController] Generating missing invoice for order: ${order.bookingId}`);
-            const fileName = await invoiceGenerator.generateProformaInvoice({
-                ...order.toJSON(),
-                origin_company: order.shipperName,
-                dest_company: order.receiverName,
-                origin_country: order.originCountry,
-                dest_country: order.destinationCountry,
-                weight: order.totalWeight,
-                currencyCode: order.currency,
-                hawb: order.awb,
-                invoice_date: order.createdAt
-            }, order.bookingId);
+        console.log(`[OrderController] Streaming invoice for order: ${order.bookingId}`);
 
-            const invoiceUrl = `/invoices/${fileName}`;
-            order.invoiceUrl = invoiceUrl;
-            await order.save();
+        const doc = invoiceGenerator.generateProformaInvoice({
+            ...order.toJSON(),
+            origin_company: order.shipperName,
+            dest_company: order.receiverName,
+            origin_country: order.originCountry,
+            dest_country: order.destinationCountry,
+            weight: order.totalWeight,
+            currencyCode: order.currency,
+            hawb: order.awb,
+            invoice_date: order.createdAt
+        }, order.bookingId);
 
-            // Also ensure ProformaInvoice record exists
-            const invoice = await ProformaInvoice.findOne({ where: { orderId: order.id } });
-            if (invoice) {
-                invoice.invoiceUrl = invoiceUrl;
-                await invoice.save();
-            } else {
-                await ProformaInvoice.create({
-                    orderId: order.id,
-                    invoiceNumber: order.invoice_number || `INV-${order.bookingId}`,
-                    totalAmount: order.totalShippingPrice,
-                    baseAmount: order.baseShippingPrice,
-                    currency: order.currency,
-                    invoiceUrl: invoiceUrl,
-                    status: 'Generated'
-                });
-            }
-        }
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename=proforma-${order.bookingId}.pdf`);
 
-        res.json({
-            success: true,
-            invoiceUrl: order.invoiceUrl
-        });
+        doc.pipe(res);
+        doc.end();
+
     } catch (error) {
         console.error('Invoice Generation Error:', error.message);
         res.status(500).json({
