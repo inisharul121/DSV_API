@@ -4,17 +4,13 @@
  */
 
 const getApiBaseUrl = () => {
-    // If a VITE_API_URL is explicitly provided in .env, use it.
-    if (import.meta.env.VITE_API_URL) {
-        return import.meta.env.VITE_API_URL;
-    }
-
-    // In local development, default to the local backend port.
-    if (import.meta.env.DEV) {
+    // Check if on localhost/127.0.0.1 for local dev
+    if (typeof window !== 'undefined' &&
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
         return 'http://localhost:3001/api';
     }
 
-    // In production, use a relative path to the API.
+    // Default to relative path for any other hostname (production)
     return '/api';
 };
 
