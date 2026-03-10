@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Truck, UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Truck, UserPlus, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const CustomerRegister = () => {
@@ -8,6 +8,7 @@ const CustomerRegister = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false); // New state for admin success message
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
@@ -42,6 +43,7 @@ const CustomerRegister = () => {
         borderRadius: '10px', color: '#f1f5f9', fontSize: '1rem',
         boxSizing: 'border-box', outline: 'none'
     };
+    const passwordInputStyle = { ...inputStyle, paddingRight: '2.5rem' };
     const labelStyle = { color: '#94a3b8', fontSize: '0.85rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem' };
 
     return (
@@ -138,7 +140,19 @@ const CustomerRegister = () => {
                             </div>
                             <div>
                                 <label style={labelStyle}>Password *</label>
-                                <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min. 8 characters" required minLength={8} style={inputStyle} />
+                                <div style={{ position: 'relative' }}>
+                                    <input name="password" type={showPassword ? "text" : "password"} value={form.password} onChange={handleChange} placeholder="Min. 8 characters" required minLength={8} style={passwordInputStyle} />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{
+                                            position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)',
+                                            background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'
+                                        }}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
                             </div>
                             <button
                                 type="submit"

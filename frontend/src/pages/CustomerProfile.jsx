@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Building, Phone, Key, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import { User, Mail, Building, Phone, Key, Save, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const CustomerProfile = () => {
@@ -11,6 +11,8 @@ const CustomerProfile = () => {
     });
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
@@ -149,26 +151,52 @@ const CustomerProfile = () => {
                         <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Key size={16} /> New Password
                         </label>
-                        <input
-                            type="password"
-                            className="input-field"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            placeholder="Leave blank to keep current"
-                        />
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type={showNewPassword ? "text" : "password"}
+                                className="input-field"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                placeholder="Leave blank to keep current"
+                                style={{ width: '100%', paddingRight: '2.5rem' }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                style={{
+                                    position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+                                    background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'
+                                }}
+                            >
+                                {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="input-group">
                         <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Key size={16} /> Confirm New Password
                         </label>
-                        <input
-                            type="password"
-                            className="input-field"
-                            value={confirmPassword}
-                            onChange={e => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm new password"
-                        />
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                className="input-field"
+                                value={confirmPassword}
+                                onChange={e => setConfirmPassword(e.target.value)}
+                                placeholder="Confirm new password"
+                                style={{ width: '100%', paddingRight: '2.5rem' }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                style={{
+                                    position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+                                    background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'
+                                }}
+                            >
+                                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                        </div>
                     </div>
 
                     <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>

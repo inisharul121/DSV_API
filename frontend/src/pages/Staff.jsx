@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, Search, Shield, Mail, Phone, CheckCircle2, XCircle, Loader2, Edit, Trash2, X, User } from 'lucide-react';
+import { UserPlus, Search, Shield, Mail, Phone, CheckCircle2, XCircle, Loader2, Edit, Trash2, X, User, Eye, EyeOff } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
 
@@ -15,6 +15,7 @@ const Staff = () => {
     const [selectedStaff, setSelectedStaff] = useState(null);
     const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Employee', phone: '' });
     const [saving, setSaving] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         fetchStaff();
@@ -288,14 +289,27 @@ const Staff = () => {
                             {modalMode === 'add' && (
                                 <div className="form-group">
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Initial Password</label>
-                                    <input
-                                        className="input-field"
-                                        type="password"
-                                        value={formData.password}
-                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        required
-                                        placeholder="Set a password"
-                                    />
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            className="input-field"
+                                            type={showPassword ? "text" : "password"}
+                                            value={formData.password}
+                                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                            required
+                                            placeholder="Set a password"
+                                            style={{ width: '100%', paddingRight: '2.5rem' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            style={{
+                                                position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+                                                background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'
+                                            }}
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                             <div className="form-group">

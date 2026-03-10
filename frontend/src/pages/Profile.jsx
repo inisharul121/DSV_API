@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, Lock, Save, Loader2, ShieldCheck, UserCircle } from 'lucide-react';
+import { User, Mail, Phone, Lock, Save, Loader2, ShieldCheck, UserCircle, Eye, EyeOff } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
 
 const Profile = () => {
     const [profile, setProfile] = useState({ name: '', email: '', phone: '', role: '' });
     const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [securitySaving, setSecuritySaving] = useState(false);
@@ -162,25 +164,51 @@ const Profile = () => {
                         <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             <div className="form-group">
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>New Password</label>
-                                <input
-                                    className="input-field"
-                                    type="password"
-                                    required
-                                    placeholder="••••••••"
-                                    value={passwordData.newPassword}
-                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                />
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        className="input-field"
+                                        type={showNewPassword ? "text" : "password"}
+                                        required
+                                        placeholder="••••••••"
+                                        value={passwordData.newPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                        style={{ width: '100%', paddingRight: '2.5rem' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        style={{
+                                            position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+                                            background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'
+                                        }}
+                                    >
+                                        {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
                             </div>
                             <div className="form-group">
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Confirm Password</label>
-                                <input
-                                    className="input-field"
-                                    type="password"
-                                    required
-                                    placeholder="••••••••"
-                                    value={passwordData.confirmPassword}
-                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                />
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        className="input-field"
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        required
+                                        placeholder="••••••••"
+                                        value={passwordData.confirmPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                        style={{ width: '100%', paddingRight: '2.5rem' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        style={{
+                                            position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
+                                            background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'
+                                        }}
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
                             </div>
                             <button className="btn-secondary" type="submit" disabled={securitySaving} style={{ marginTop: '0.5rem' }}>
                                 {securitySaving ? 'Updating...' : 'Update Password'}

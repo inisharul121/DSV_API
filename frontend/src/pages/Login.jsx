@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Truck, LogIn, AlertCircle, Clock } from 'lucide-react';
+import { Truck, LogIn, AlertCircle, Clock, Eye, EyeOff } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 
 const CustomerLogin = () => {
@@ -9,6 +9,7 @@ const CustomerLogin = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -133,19 +134,31 @@ const CustomerLogin = () => {
                         </div>
                         <div>
                             <label style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 500, display: 'block', marginBottom: '0.4rem' }}>Password</label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={e => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                required
-                                style={{
-                                    width: '100%', padding: '0.75rem 1rem',
-                                    background: '#0f172a', border: '1px solid #334155',
-                                    borderRadius: '10px', color: '#f1f5f9', fontSize: '1rem',
-                                    boxSizing: 'border-box', outline: 'none'
-                                }}
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    style={{
+                                        width: '100%', padding: '0.75rem 2.5rem 0.75rem 1rem',
+                                        background: '#0f172a', border: '1px solid #334155',
+                                        borderRadius: '10px', color: '#f1f5f9', fontSize: '1rem',
+                                        boxSizing: 'border-box', outline: 'none'
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{
+                                        position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)',
+                                        background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'
+                                    }}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </div>
                         <button
                             type="submit"
