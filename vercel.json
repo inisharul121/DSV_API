@@ -19,12 +19,8 @@
             "destination": "backend/src/app.js"
         },
         {
-            "source": "/(.*\\.[a-z0-9]+)$",
-            "destination": "/$1"
-        },
-        {
             "source": "/(.*)",
-            "destination": "/index.html"
+            "destination": "frontend/$1"
         }
     ]
 }
