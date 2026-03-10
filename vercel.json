@@ -19,11 +19,12 @@
             "destination": "backend/src/app.js"
         },
         {
-            "handle": "filesystem"
+            "source": "/(.*\\.[a-z0-9]+)$",
+            "destination": "/frontend/$1"
         },
         {
             "source": "/(.*)",
-            "destination": "/index.html"
+            "destination": "/frontend/index.html"
         }
     ]
 }
