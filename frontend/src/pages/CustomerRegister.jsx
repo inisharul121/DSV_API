@@ -48,7 +48,7 @@ const CustomerRegister = () => {
 
     return (
         <div style={{
-            minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'linear-gradient(135deg, #001f3f 0%, #003366 100%)', padding: '2rem'
         }}>
             <div style={{ width: '100%', maxWidth: '460px' }}>

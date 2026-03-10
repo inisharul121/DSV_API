@@ -342,9 +342,12 @@ body {
     font-family: 'Inter', -apple-system, sans-serif;
     background-color: var(--bg-main);
     color: var(--text-main);
-    display: flex;
     min-height: 100vh;
     overflow-x: hidden;
+}
+
+#root {
+    width: 100%;
 }
 
 /* Glassmorphism */
