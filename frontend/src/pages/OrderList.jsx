@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Filter, ExternalLink, RefreshCw, FileText, Truck, X } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+import API_BASE_URL from '../utils/urlConfig';
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
@@ -156,7 +155,7 @@ const OrderList = () => {
                                             <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 {order.labelUrl && (
                                                     <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.labelUrl}`}
+                                                        href={`${API_BASE_URL}${order.labelUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="btn-secondary"

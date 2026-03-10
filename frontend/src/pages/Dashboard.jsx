@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Ship, CheckCircle, Clock, AlertTriangle, ArrowRight, ExternalLink, Search, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
+import API_BASE_URL from '../utils/urlConfig';
 
 const StatCard = ({ icon: Icon, value, label, color, bgColor }) => (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem' }}>
@@ -169,7 +170,7 @@ const Dashboard = () => {
                                             <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                                                 {order.labelUrl && (
                                                     <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.labelUrl}`}
+                                                        href={`${API_BASE_URL}${order.labelUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="btn-secondary"

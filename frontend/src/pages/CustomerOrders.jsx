@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, Package, RefreshCw, FileText, ExternalLink, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
+import API_BASE_URL from '../utils/urlConfig';
 
 const CustomerOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -35,8 +36,7 @@ const CustomerOrders = () => {
     };
 
     const handleGenerateHTML = (orderId) => {
-        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-        const previewUrl = `${backendUrl}/customer/orders/${orderId}/invoice-html?token=${token}`;
+        const previewUrl = `${API_BASE_URL}/customer/orders/${orderId}/invoice-html?token=${token}`;
         window.open(previewUrl, '_blank');
     };
 
@@ -46,7 +46,7 @@ const CustomerOrders = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.data.success) {
-                const invoiceUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${response.data.invoiceUrl}`;
+                const invoiceUrl = `${API_BASE_URL}${response.data.invoiceUrl}`;
                 window.open(invoiceUrl, '_blank');
                 fetchOrders();
             }
@@ -165,7 +165,7 @@ const CustomerOrders = () => {
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                 {order.labelUrl && (
                                                     <a
-                                                        href={`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${order.labelUrl}`}
+                                                        href={`${API_BASE_URL}${order.labelUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="btn-secondary"
