@@ -19,8 +19,11 @@
             "destination": "backend/src/app.js"
         },
         {
-            "source": "/((?!api/).*)",
-            "destination": "frontend/index.html"
+            "handle": "filesystem"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ]
 }
