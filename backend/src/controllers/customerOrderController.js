@@ -30,25 +30,25 @@ exports.generateMyOrderInvoice = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Order not found' });
         }
 
-        console.log(`[CustomerOrderController] Streaming invoice for order: ${order.bookingId}`);
+        console.log(`[CustomerOrderController] Generating PDF Buffer for order: ${order.bookingId}`);
 
-        const doc = invoiceGenerator.generateProformaInvoice({
-            ...order.toJSON(),
-            origin_company: order.shipperName,
-            dest_company: order.receiverName,
-            origin_country: order.originCountry,
-            dest_country: order.destinationCountry,
-            weight: order.totalWeight,
-            currencyCode: order.currency,
-            hawb: order.awb,
-            invoice_date: order.createdAt
-        }, order.bookingId);
+        try {
+            const buffer = await invoiceGenerator.generateProformaInvoiceBuffer({
+                ...order.toJSON(),
+                origin_company: order.shipperName,
+                dest_company: order.receiverName,
+                weight: order.totalWeight,
+                currencyCode: order.currency,
+                invoice_date: order.createdAt
+            }, order.bookingId);
 
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename=proforma-${order.bookingId}.pdf`);
-
-        doc.pipe(res);
-        doc.end();
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `inline; filename=invoice.pdf`);
+            res.send(buffer);
+        } catch (genError) {
+            console.error('Customer PDF Generation Error:', genError);
+            res.status(500).send(`<h1>PDF Generation Failed</h1><p>${genError.message}</p>`);
+        }
 
     } catch (error) {
         console.error('Customer Invoice Generation Error:', error.message);
