@@ -81,4 +81,8 @@ router.get('/customer/orders', customerAuth, customerOrderController.getMyOrders
 router.get('/customer/orders/:id/invoice', customerAuth, customerOrderController.generateMyOrderInvoice);
 router.get('/customer/orders/:id/invoice-html', customerAuth, customerOrderController.getMyOrderInvoiceHTML);
 
+// Customer Portal: Customer-scoped quotes
+router.post('/customer/quotes', customerAuth, quoteController.getQuotes);
+router.get('/customer/quotes', customerAuth, quoteController.getRecentQuotes);
+
 module.exports = router;

@@ -6,7 +6,8 @@ import {
     FileText,
     LogOut,
     LayoutDashboard,
-    User
+    User,
+    Calculator
 } from 'lucide-react';
 
 const CustomerSidebar = () => {
@@ -22,6 +23,7 @@ const CustomerSidebar = () => {
     const navItems = [
         { name: 'Dashboard', path: '/portal/dashboard', icon: <LayoutDashboard size={20} /> },
         { name: 'My Orders', path: '/portal/orders', icon: <Package size={20} /> },
+        { name: 'Quotes', path: '/portal/quotes', icon: <Calculator size={20} /> },
         { name: 'Add Order', path: '/portal/book', icon: <Package size={20} /> },
         { name: 'My Profile', path: '/portal/profile', icon: <User size={20} /> },
         { name: 'Track Shipment', path: '/portal/shipments', icon: <Truck size={20} /> },

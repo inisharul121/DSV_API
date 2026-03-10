@@ -15,6 +15,7 @@ import CustomerOrders from './pages/CustomerOrders';
 import CustomerDashboard from './pages/CustomerDashboard';
 import CustomerProfile from './pages/CustomerProfile';
 import CustomerLayout from './components/layout/CustomerLayout';
+import CustomerQuotes from './pages/CustomerQuotes';
 import { Toaster } from 'react-hot-toast';
 
 import Home from './pages/Home';
@@ -43,6 +44,7 @@ const App = () => {
         <Route element={<CustomerLayout />}>
           <Route path="/portal/dashboard" element={<CustomerDashboard />} />
           <Route path="/portal/orders" element={<CustomerOrders />} />
+          <Route path="/portal/quotes" element={<CustomerQuotes />} />
           <Route path="/portal/profile" element={<CustomerProfile />} />
           <Route path="/portal/book" element={<Order />} />
           <Route path="/portal/shipments" element={<Shipments />} />
