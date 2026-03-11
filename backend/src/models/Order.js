@@ -116,7 +116,12 @@ const Order = sequelize.define('Order', {
     destZip: { type: DataTypes.STRING, allowNull: true },
     destPhone: { type: DataTypes.STRING, allowNull: true },
     destEmail: { type: DataTypes.STRING, allowNull: true },
-    destContact: { type: DataTypes.STRING, allowNull: true }
+    destContact: { type: DataTypes.STRING, allowNull: true },
+    items: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        comment: 'Stores array of multi-item commodities'
+    }
 }, {
     timestamps: true,
     tableName: 'orders'

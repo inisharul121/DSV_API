@@ -190,16 +190,20 @@ exports.createSimpleBooking = async (req, res) => {
                 destinationCountry: (shipmentData.dest_country || shipmentData.delivery?.countryCode || "DE").substring(0, 2),
                 serviceCode: shipmentData.serviceCode || "DSVAirExpress",
                 totalWeight: parseFloat(shipmentData.weight || 1.0),
-                goodsValue: parseFloat(shipmentData.goodsValue || 0),
+                goodsValue: shipmentData.items?.length > 0 
+                    ? shipmentData.items.reduce((sum, item) => sum + parseFloat(item.value || (item.unitPrice * item.quantity) || 0), 0)
+                    : parseFloat(shipmentData.goodsValue || 0),
                 currency: shipmentData.currencyCode || "CHF",
                 status: 'Created',
                 labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
                 invoiceUrl: savedInvoicePath,
-                hsCode: shipmentData.hsCode || null,
-                quantity: parseInt(shipmentData.quantity) || 1,
-                unitPrice: parseFloat(shipmentData.unitPrice || 0),
+                hsCode: shipmentData.items?.[0]?.hsCode || shipmentData.hsCode || null,
+                quantity: shipmentData.items?.length > 0
+                    ? shipmentData.items.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0)
+                    : (parseInt(shipmentData.quantity) || 1),
+                unitPrice: shipmentData.items?.[0]?.unitPrice || parseFloat(shipmentData.unitPrice || 0),
                 netWeight: parseFloat(shipmentData.netWeight || 0),
-                uom: shipmentData.uom || 'Pieces',
+                uom: shipmentData.items?.[0]?.uom || shipmentData.uom || 'Pieces',
                 reasonForExport: shipmentData.reasonForExport || null,
                 incoterms: shipmentData.incoterms || null,
                 originOfGoods: shipmentData.commodity_origin || null,
@@ -223,7 +227,8 @@ exports.createSimpleBooking = async (req, res) => {
                 destZip: shipmentData.dest_zip || shipmentData.delivery?.zipCode || "",
                 destPhone: shipmentData.dest_phone || shipmentData.delivery?.contactPhoneNumber || "",
                 destEmail: shipmentData.dest_email || shipmentData.receiver?.email || "",
-                destContact: shipmentData.dest_contact || shipmentData.delivery?.contactName || ""
+                destContact: shipmentData.dest_contact || shipmentData.delivery?.contactName || "",
+                items: shipmentData.items || null
             });
 
             // Create ProformaInvoice record

@@ -60,7 +60,7 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
             height2: '',
             weight2: ''
         },
-        commodity: {
+        items: [{
             origin: 'CH',
             description: 'Shipping Goods',
             currency: 'CHF',
@@ -72,7 +72,7 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
             uom: 'Pieces',
             reasonForExport: 'SALE',
             incoterms: 'DAP'
-        },
+        }],
         notifications: {
             dep: 'recipient1@receiver.com',
             exc: 'recipient1@receiver.com',
@@ -92,6 +92,36 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                 [field]: value
             }
         }));
+    };
+
+    const handleItemChange = (index, field, value) => {
+        const newItems = [...form.items];
+        newItems[index] = { ...newItems[index], [field]: value };
+        setForm(prev => ({ ...prev, items: newItems }));
+    };
+
+    const addItem = () => {
+        setForm(prev => ({
+            ...prev,
+            items: [...prev.items, { 
+                ...prev.items[0], 
+                description: '', 
+                hsCode: '', 
+                quantity: 1, 
+                value: 60,
+                unitPrice: 60,
+                netWeight: 1
+            }]
+        }));
+    };
+
+    const removeItem = (index) => {
+        if (form.items.length > 1) {
+            setForm(prev => ({
+                ...prev,
+                items: prev.items.filter((_, i) => i !== index)
+            }));
+        }
     };
 
     // Synchronize price when service code changes in this form
@@ -115,6 +145,10 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
         e.preventDefault();
         setSubmitting(true);
         try {
+            // Aggregated values for the API
+            const totalGoodsValue = form.items.reduce((sum, item) => sum + parseFloat(item.value || (item.unitPrice * item.quantity) || 0), 0);
+            const totalQuantity = form.items.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0);
+
             // Mapping for the API
             const payload = {
                 collectDateFrom: form.collectDateFrom,
@@ -158,17 +192,18 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                 height: form.measurements.height,
                 weight: form.measurements.weight,
 
-                commodity_origin: form.commodity.origin,
-                commodity: form.commodity.description,
-                commodity_currency: form.commodity.currency,
-                goodsValue: form.commodity.value,
-                hsCode: form.commodity.hsCode,
-                quantity: form.commodity.quantity,
-                unitPrice: form.commodity.unitPrice,
-                netWeight: form.commodity.netWeight,
-                uom: form.commodity.uom,
-                reasonForExport: form.commodity.reasonForExport,
-                incoterms: form.commodity.incoterms,
+                items: form.items,
+                commodity_origin: form.items[0].origin,
+                commodity: form.items[0].description,
+                commodity_currency: form.items[0].currency,
+                goodsValue: totalGoodsValue,
+                hsCode: form.items[0].hsCode,
+                quantity: totalQuantity,
+                unitPrice: form.items[0].unitPrice,
+                netWeight: form.items[0].netWeight,
+                uom: form.items[0].uom,
+                reasonForExport: form.items[0].reasonForExport,
+                incoterms: form.items[0].incoterms,
 
                 notif_email_1: form.notifications.dep,
                 notif_email_2: form.notifications.exc,
@@ -370,58 +405,110 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
                                     <label className="input-label">Signer / Responsible Person</label>
                                     <input type="text" className="input-field" placeholder="Full Name" value={form.invoice.signature} onChange={(e) => handleFormChange('invoice', 'signature', e.target.value)} />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                                    <div className="input-group">
-                                        <label className="input-label">Good Description *</label>
-                                        <input type="text" className="input-field" required value={form.commodity.description} onChange={(e) => handleFormChange('commodity', 'description', e.target.value)} />
+                                {form.items.map((item, index) => (
+                                    <div key={index} style={{ marginBottom: '1.5rem', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '8px', position: 'relative', background: 'white' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                            <h5 style={{ margin: 0, color: '#0f172a', fontSize: '0.9rem', fontWeight: 700 }}>Product Item #{index + 1}</h5>
+                                            {form.items.length > 1 && (
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => removeItem(index)} 
+                                                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', fontWeight: 600 }}
+                                                >
+                                                    <X size={14} /> Remove
+                                                </button>
+                                            )}
+                                        </div>
+                                        
+                                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div className="input-group">
+                                                <label className="input-label">Good Description *</label>
+                                                <input type="text" className="input-field" required value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">HS Code</label>
+                                                <input type="text" className="input-field" placeholder="6-10 digits" value={item.hsCode} onChange={(e) => handleItemChange(index, 'hsCode', e.target.value)} />
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div className="input-group">
+                                                <label className="input-label">Quantity</label>
+                                                <input type="number" className="input-field" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} />
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">Unit Price ({item.currency})</label>
+                                                <input type="number" className="input-field" min="0" value={item.unitPrice} onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)} />
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">UOM</label>
+                                                <select className="input-field" value={item.uom} onChange={(e) => handleItemChange(index, 'uom', e.target.value)}>
+                                                    <option value="Pieces">Pieces</option>
+                                                    <option value="Sets">Sets</option>
+                                                    <option value="Meters">Meters</option>
+                                                    <option value="Kilograms">Kilograms</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem' }}>
+                                            <div className="input-group">
+                                                <label className="input-label">Net Weight (kg)</label>
+                                                <input type="number" className="input-field" step="0.1" value={item.netWeight} onChange={(e) => handleItemChange(index, 'netWeight', e.target.value)} />
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">Country of Origin</label>
+                                                <input type="text" className="input-field" maxLength="2" value={item.origin} onChange={(e) => handleItemChange(index, 'origin', e.target.value.toUpperCase())} />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="input-group">
-                                        <label className="input-label">HS Code</label>
-                                        <input type="text" className="input-field" placeholder="6-10 digits" value={form.commodity.hsCode} onChange={(e) => handleFormChange('commodity', 'hsCode', e.target.value)} />
-                                    </div>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                                    <div className="input-group">
-                                        <label className="input-label">Quantity</label>
-                                        <input type="number" className="input-field" value={form.commodity.quantity} onChange={(e) => handleFormChange('commodity', 'quantity', e.target.value)} />
-                                    </div>
-                                    <div className="input-group">
-                                        <label className="input-label">Unit Price</label>
-                                        <input type="number" className="input-field" value={form.commodity.unitPrice} onChange={(e) => handleFormChange('commodity', 'unitPrice', e.target.value)} />
-                                    </div>
-                                    <div className="input-group">
-                                        <label className="input-label">UOM</label>
-                                        <select className="input-field" value={form.commodity.uom} onChange={(e) => handleFormChange('commodity', 'uom', e.target.value)}>
-                                            <option value="Pieces">Pieces</option>
-                                            <option value="Sets">Sets</option>
-                                            <option value="Meters">Meters</option>
-                                            <option value="Kilograms">Kilograms</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                ))}
+
+                                <button 
+                                    type="button" 
+                                    onClick={addItem} 
+                                    style={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        gap: '0.5rem', 
+                                        padding: '0.75rem 1rem', 
+                                        background: '#f1f5f9', 
+                                        border: '1px solid #cbd5e1', 
+                                        borderRadius: '8px', 
+                                        cursor: 'pointer', 
+                                        fontSize: '0.9rem', 
+                                        fontWeight: 600, 
+                                        color: '#334155', 
+                                        marginBottom: '2rem',
+                                        width: '100%',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.background = '#e2e8f0'}
+                                    onMouseOut={(e) => e.target.style.background = '#f1f5f9'}
+                                >
+                                    <Plus size={18} /> Add Another Product
+                                </button>
+
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                                     <div className="input-group">
-                                        <label className="input-label">Net Weight (kg)</label>
-                                        <input type="number" className="input-field" value={form.commodity.netWeight} onChange={(e) => handleFormChange('commodity', 'netWeight', e.target.value)} />
-                                    </div>
-                                    <div className="input-group">
                                         <label className="input-label">Reason for Export</label>
-                                        <select className="input-field" value={form.commodity.reasonForExport} onChange={(e) => handleFormChange('commodity', 'reasonForExport', e.target.value)}>
+                                        <select className="input-field" value={form.items[0].reasonForExport} onChange={(e) => handleItemChange(0, 'reasonForExport', e.target.value)}>
                                             <option value="SALE">Sale</option>
                                             <option value="GIFT">Gift</option>
                                             <option value="SAMPLE">Sample</option>
                                             <option value="RETURN">Return</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div className="input-group">
-                                    <label className="input-label">Incoterms</label>
-                                    <select className="input-field" value={form.commodity.incoterms} onChange={(e) => handleFormChange('commodity', 'incoterms', e.target.value)}>
-                                        <option value="DAP">DAP - Delivered at Place</option>
-                                        <option value="DDP">DDP - Delivered Duty Paid</option>
-                                        <option value="FCA">FCA - Free Carrier</option>
-                                        <option value="EXW">EXW - Ex Works</option>
-                                    </select>
+                                    <div className="input-group">
+                                        <label className="input-label">Incoterms</label>
+                                        <select className="input-field" value={form.items[0].incoterms} onChange={(e) => handleItemChange(0, 'incoterms', e.target.value)}>
+                                            <option value="DAP">DAP - Delivered at Place</option>
+                                            <option value="DDP">DDP - Delivered Duty Paid</option>
+                                            <option value="FCA">FCA - Free Carrier</option>
+                                            <option value="EXW">EXW - Ex Works</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </section>
 

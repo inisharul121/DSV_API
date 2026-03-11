@@ -156,6 +156,40 @@ exports.generateProformaInvoiceHTML = (data, bookingId) => {
         totalShippingPrice: totalShipping,
     };
 
+    // ── Generate Dynamic Item Rows ──────────────────────────────────────────
+    let itemRows = '';
+    const items = data.items || [
+        {
+            description: data.commodity || 'Shipping Goods',
+            hsCode:      data.hsCode    || data.hs_code || 'N/A',
+            origin:      data.originOfGoods || data.commodity_origin || (data.origin_country || data.originCountry || 'CH'),
+            quantity:    data.quantity   || 1,
+            uom:         data.uom        || 'PCS',
+            unitPrice:   data.unitPrice  || data.goodsValue || 0,
+            value:       data.goodsValue || data.unitPrice || 0,
+            netWeight:   data.netWeight  || data.weight    || 0
+        }
+    ];
+
+    items.forEach(item => {
+        const itemVal = parseFloat(item.value || (item.unitPrice * item.quantity) || 0).toFixed(2);
+        const itemUnitPrice = parseFloat(item.unitPrice || (item.value / item.quantity) || 0).toFixed(2);
+        
+        itemRows += `
+            <tr>
+                <td>${item.description || 'N/A'}</td>
+                <td>${item.hsCode || 'N/A'}</td>
+                <td>${item.origin || data.origin_country || 'CH'}</td>
+                <td>${item.quantity || 1}</td>
+                <td>${item.uom || 'PCS'}</td>
+                <td>${curr} ${itemUnitPrice}</td>
+                <td>${item.netWeight || 0} kg</td>
+                <td>${curr} ${itemVal}</td>
+            </tr>
+        `;
+    });
+    replacements.itemRows = itemRows;
+
     // ── Replace all {{key}} placeholders ────────────────────────────────────
     for (const [key, value] of Object.entries(replacements)) {
         // Replace both {{key}} template markers

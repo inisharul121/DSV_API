@@ -179,7 +179,7 @@ exports.buildBookingPayload = (data) => {
             }
             return pkgs.length > 0 ? pkgs : [{ length: 1, width: 1, height: 1, grossWeight: 0.1 }]; // Simple fallback
         })(),
-        proformaInvoice: (data.goodsValue && parseFloat(data.goodsValue) > 0) ? {
+        proformaInvoice: (data.items?.length > 0 || (data.goodsValue && parseFloat(data.goodsValue) > 0)) ? {
             proformaInvoiceHeader: {
                 invoiceNumber: data.invoice_number || "INV-" + Date.now(),
                 invoiceType: data.invoice_type || "PROFORMA",
@@ -197,7 +197,22 @@ exports.buildBookingPayload = (data) => {
                     return "SOLD";
                 })()
             },
-            proformaInvoiceLines: [
+            proformaInvoiceLines: (data.items?.length > 0) ? data.items.map(item => ({
+                countryOfOrigin: item.origin || data.commodity_origin || data.origin_country || "CH",
+                descriptionOfGoods: item.description || "General Goods",
+                hsCode: item.hsCode || undefined,
+                quantity: parseInt(item.quantity) || 1,
+                uom: (() => {
+                    const uom = item.uom || 'Pieces';
+                    if (uom === 'Pieces') return 'Pieces';
+                    if (uom === 'Sets') return 'Sets';
+                    if (uom === 'Kilograms') return 'Kilograms';
+                    if (uom === 'Meters') return 'Meters';
+                    return 'Pieces';
+                })(),
+                unitPrice: parseFloat(item.unitPrice || (item.value / item.quantity) || 0),
+                netWeight: parseFloat(item.netWeight || 0.1)
+            })) : [
                 {
                     countryOfOrigin: data.commodity_origin || data.origin_country || "CH",
                     descriptionOfGoods: data.commodity || "General Goods",
@@ -216,7 +231,15 @@ exports.buildBookingPayload = (data) => {
                 }
             ]
         } : undefined,
-        commodities: [
+        commodities: (data.items?.length > 0) ? data.items.map(item => ({
+            originCountryCode: item.origin || data.commodity_origin || data.origin_country || "CH",
+            goodsDescription: item.description || "General Goods",
+            hsCode: item.hsCode || undefined,
+            goodsValue: {
+                currencyCode: data.commodity_currency || data.currencyCode || "CHF",
+                monetaryValue: parseFloat(item.value || (item.unitPrice * item.quantity) || 0)
+            }
+        })) : [
             {
                 originCountryCode: data.commodity_origin || data.origin_country || "CH",
                 goodsDescription: data.commodity || "General Goods",
