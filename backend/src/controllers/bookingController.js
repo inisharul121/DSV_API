@@ -238,6 +238,7 @@ exports.createSimpleBooking = async (req, res) => {
             bookingId,
             shipmentId: bookingId,
             labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
+            invoiceUrl: savedInvoicePath,
             labelWarning: !savedLabelPath ? "Booking created but no labels could be retrieved (this is normal if you don't have a label subscription)." : null,
             trackingUrl: `https://track.dsv.com?bookingId=${bookingId}`
         });

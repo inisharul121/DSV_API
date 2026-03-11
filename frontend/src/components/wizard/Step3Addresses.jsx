@@ -183,7 +183,7 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
 
             if (response.data.success) {
                 toast.success('Booking created successfully!');
-                onComplete();
+                onComplete(response.data);
             } else {
                 toast.error('Booking failed: ' + (response.data.error || 'Unknown error'));
             }
