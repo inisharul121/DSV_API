@@ -61,35 +61,37 @@ exports.getQuotes = async (req, res) => {
             });
 
             // Persistence: Save the top quote to our database for history
-            try {
-                const bestSvc = quoteResponse.data.services[0];
-                const quoteId = `QT-${Math.floor(1000 + Math.random() * 9000)}`;
+            if (quoteResponse.data.services.length > 0) {
+                try {
+                    const bestSvc = quoteResponse.data.services[0];
+                    const quoteId = `QT-${Math.floor(1000 + Math.random() * 9000)}`;
 
-                await Quote.create({
-                    quoteId,
-                    pickupCountry: dsvPayload.pickupCountryCode,
-                    pickupCity: dsvPayload.pickupCity,
-                    pickupZipCode: dsvPayload.pickupZipCode,
-                    deliveryCountry: dsvPayload.deliveryCountryCode,
-                    deliveryCity: dsvPayload.deliveryCity,
-                    deliveryZipCode: dsvPayload.deliveryZipCode,
-                    weight: dsvPayload.packages[0].grossWeight,
-                    packageType: dsvPayload.serviceOptions.packageType,
-                    serviceName: bestSvc.serviceDescription,
-                    serviceCode: bestSvc.serviceCode,
-                    totalPrice: bestSvc.totalDisplay,
-                    currency: bestSvc.currency,
-                    etaMin: bestSvc.etaMin,
-                    etaMax: bestSvc.etaMax,
-                    adminId: req.adminId, // From auth middleware
-                    customerId: req.customerId // From auth middleware
-                });
+                    await Quote.create({
+                        quoteId,
+                        pickupCountry: dsvPayload.pickupCountryCode,
+                        pickupCity: dsvPayload.pickupCity,
+                        pickupZipCode: dsvPayload.pickupZipCode,
+                        deliveryCountry: dsvPayload.deliveryCountryCode,
+                        deliveryCity: dsvPayload.deliveryCity,
+                        deliveryZipCode: dsvPayload.deliveryZipCode,
+                        weight: dsvPayload.packages[0].grossWeight,
+                        packageType: dsvPayload.serviceOptions.packageType,
+                        serviceName: bestSvc.serviceDescription,
+                        serviceCode: bestSvc.serviceCode,
+                        totalPrice: bestSvc.totalDisplay,
+                        currency: bestSvc.currency,
+                        etaMin: bestSvc.etaMin,
+                        etaMax: bestSvc.etaMax,
+                        adminId: req.adminId, // From auth middleware
+                        customerId: req.customerId // From auth middleware
+                    });
 
-                // Attach the generated ID to the response for the frontend
-                quoteResponse.data.generatedQuoteId = quoteId;
-            } catch (dbError) {
-                console.error('Error saving quote to database:', dbError);
-                // Don't fail the whole request if DB save fails
+                    // Attach the generated ID to the response for the frontend
+                    quoteResponse.data.generatedQuoteId = quoteId;
+                } catch (dbError) {
+                    console.error('Error saving quote to database:', dbError);
+                    // Don't fail the whole request if DB save fails
+                }
             }
         }
 

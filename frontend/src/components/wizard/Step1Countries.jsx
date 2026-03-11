@@ -17,14 +17,28 @@ const Step1Countries = ({ data, updateData, onNext }) => {
     const handlePricing = async () => {
         if (!data.originCountry || !data.deliveryCountry || !data.weight) return;
 
+        // Better defaults for common countries to ensure we get a quote
+        const defaults = {
+            'CH': { city: 'Baar', zip: '6340' },
+            'BD': { city: 'Dhaka', zip: '1212' },
+            'DE': { city: 'Berlin', zip: '10115' },
+            'GB': { city: 'London', zip: 'E1 6AN' },
+            'US': { city: 'New York', zip: '10001' }
+        };
+
+        const pickupDefault = defaults[data.originCountry] || { city: undefined, zip: undefined };
+        const destDefault = defaults[data.deliveryCountry] || { city: undefined, zip: undefined };
+
         setLoading(true);
         try {
             const response = await dsvApi.post('/quotes', {
                 dsvAccount: 8004990000,
                 pickupCountryCode: data.originCountry,
-                pickupCity: data.originCountry === 'CH' ? data.sender?.city || 'Baar' : undefined,
-                pickupZipCode: data.originCountry === 'CH' ? data.sender?.zip || '6340' : undefined,
+                pickupCity: data.sender?.city || pickupDefault.city,
+                pickupZipCode: data.sender?.zip || pickupDefault.zip,
                 deliveryCountryCode: data.deliveryCountry,
+                deliveryCity: data.receiver?.city || destDefault.city,
+                deliveryZipCode: data.receiver?.zip || destDefault.zip,
                 packageType: "PARCELS",
                 weight: data.weight,
                 length: data.dimensions?.length || 10,
