@@ -112,12 +112,12 @@ const CustomerLogin = () => {
                                     fontWeight: 600, fontSize: '0.85rem'
                                 }}
                             >
-                                Staff Login
+                                Admin Login
                             </button>
                         </div>
 
                         <h2 style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>
-                            {role === 'Admin' ? 'Staff Sign In' : 'Client Sign In'}
+                            {role === 'Admin' ? 'Admin Sign In' : 'Client Sign In'}
                         </h2>
 
                         {error && (

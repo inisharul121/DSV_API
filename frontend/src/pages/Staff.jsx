@@ -40,7 +40,7 @@ const Staff = () => {
         try {
             const res = await dsvApi.put(`/admins/${id}/status`, { status });
             if (res.data.success) {
-                toast.success(`Staff status updated to ${status}`);
+                toast.success(`Admin status updated to ${status}`);
                 fetchStaff();
             }
         } catch (error) {
@@ -51,15 +51,15 @@ const Staff = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this staff member?')) return;
+        if (!window.confirm('Are you sure you want to delete this admin member?')) return;
         try {
             const res = await dsvApi.delete(`/admins/${id}`);
             if (res.data.success) {
-                toast.success('Staff member deleted');
+                toast.success('Admin member deleted');
                 setStaff(prev => prev.filter(s => s.id !== id));
             }
         } catch (error) {
-            toast.error(error.response?.data?.error || 'Failed to delete staff');
+            toast.error(error.response?.data?.error || 'Failed to delete admin');
         }
     };
 
@@ -87,20 +87,20 @@ const Staff = () => {
             if (modalMode === 'add') {
                 const res = await dsvApi.post('/auth/admin/register', formData);
                 if (res.data.success) {
-                    toast.success('Staff member created successfully');
+                    toast.success('Admin member created successfully');
                     setIsModalOpen(false);
                     fetchStaff();
                 }
             } else {
                 const res = await dsvApi.put(`/admins/${selectedStaff.id}`, formData);
                 if (res.data.success) {
-                    toast.success('Staff details updated');
+                    toast.success('Admin details updated');
                     setIsModalOpen(false);
                     fetchStaff();
                 }
             }
         } catch (error) {
-            toast.error(error.response?.data?.error || 'Failed to save staff information');
+            toast.error(error.response?.data?.error || 'Failed to save admin information');
         } finally {
             setSaving(false);
         }
@@ -125,7 +125,7 @@ const Staff = () => {
                             <input
                                 type="text"
                                 className="input-field"
-                                placeholder="Search staff..."
+                                placeholder="Search admins..."
                                 style={{ paddingLeft: '2.5rem', width: '250px' }}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -136,7 +136,7 @@ const Staff = () => {
                             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem' }}
                             onClick={() => handleOpenModal('add')}
                         >
-                            <UserPlus size={18} /> Add Staff
+                            <UserPlus size={18} /> Add Admin
                         </button>
                     </div>
                 </div>
@@ -144,7 +144,7 @@ const Staff = () => {
                 {loading ? (
                     <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
                         <Loader2 size={24} className="loader" style={{ marginBottom: '1rem' }} />
-                        <p>Loading staff list...</p>
+                        <p>Loading admins list...</p>
                     </div>
                 ) : (
                     <div style={{ overflowX: 'auto' }}>
@@ -224,7 +224,7 @@ const Staff = () => {
 
                                                 <button
                                                     onClick={() => handleOpenModal('edit', s)}
-                                                    title="Edit Staff"
+                                                    title="Edit Admin"
                                                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
                                                 >
                                                     <Edit size={16} />
@@ -233,7 +233,7 @@ const Staff = () => {
                                                 {s.email !== 'admin@gmail.com' && (
                                                     <button
                                                         onClick={() => handleDelete(s.id)}
-                                                        title="Delete Staff"
+                                                        title="Delete Admin"
                                                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }}
                                                     >
                                                         <Trash2 size={16} />
@@ -246,7 +246,7 @@ const Staff = () => {
                                 {filteredStaff.length === 0 && (
                                     <tr>
                                         <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                                            No staff members found.
+                                            No admin members found.
                                         </td>
                                     </tr>
                                 )}
@@ -263,7 +263,7 @@ const Staff = () => {
                         <button onClick={() => setIsModalOpen(false)} style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
                             <X size={20} />
                         </button>
-                        <h3 style={{ marginBottom: '1.5rem' }}>{modalMode === 'add' ? 'Add New Staff' : 'Edit Staff Details'}</h3>
+                        <h3 style={{ marginBottom: '1.5rem' }}>{modalMode === 'add' ? 'Add New Admin' : 'Edit Admin Details'}</h3>
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div className="form-group">
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}>Full Name</label>
@@ -335,7 +335,7 @@ const Staff = () => {
                                 </select>
                             </div>
                             <button className="btn-primary" type="submit" disabled={saving} style={{ marginTop: '1rem' }}>
-                                {saving ? 'Saving...' : (modalMode === 'add' ? 'Create Staff Member' : 'Save Changes')}
+                                {saving ? 'Saving...' : (modalMode === 'add' ? 'Create Admin Member' : 'Save Changes')}
                             </button>
                         </form>
                     </div>

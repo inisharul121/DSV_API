@@ -97,7 +97,7 @@ const CustomerRegister = () => {
                                 <CheckCircle2 size={48} color="#10b981" style={{ margin: '0 auto 1.5rem' }} />
                                 <h2 style={{ color: '#1e293b', marginBottom: '1rem', fontWeight: 700 }}>Registration Successful!</h2>
                                 <p style={{ color: '#64748b', lineHeight: 1.6, marginBottom: '2rem' }}>
-                                    Your staff account has been created and is currently <strong>pending approval</strong>.
+                                    Your admin account has been created and is currently <strong>pending approval</strong>.
                                     You will be able to log in once an administrator activates your account.
                                 </p>
                                 <Link to="/login" style={{
@@ -135,7 +135,7 @@ const CustomerRegister = () => {
                                             fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s'
                                         }}
                                     >
-                                        Staff/Employee
+                                        Admin/Employee
                                     </button>
                                 </div>
 

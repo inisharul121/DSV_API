@@ -25,7 +25,7 @@ const Sidebar = () => {
         { name: 'Customers', path: '/customers', icon: <Users size={20} /> },
         { name: 'Payments', path: '/payments', icon: <CreditCard size={20} /> },
         { name: 'Reports', path: '/reports', icon: <BarChart3 size={20} /> },
-        { name: 'Staff Management', path: '/staff', icon: <Users size={20} /> },
+        { name: 'Admin Management', path: '/staff', icon: <Users size={20} /> },
         { name: 'Profile', path: '/profile', icon: <UserCircle size={20} /> },
     ];
 
