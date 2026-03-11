@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, Package, RefreshCw, FileText, ExternalLink, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
-import API_BASE_URL from '../utils/urlConfig';
+import { API_BASE_URL } from '../utils/urlConfig';
 
 const CustomerOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -33,16 +33,6 @@ const CustomerOrders = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleGenerateHTML = (orderId) => {
-        const previewUrl = `${API_BASE_URL}/customer/orders/${orderId}/invoice-html?token=${token}`;
-        window.open(previewUrl, '_blank');
-    };
-
-    const handleGeneratePDF = (orderId) => {
-        const downloadUrl = `${API_BASE_URL}/customer/orders/${orderId}/invoice?token=${token}`;
-        window.open(downloadUrl, '_blank');
     };
 
     useEffect(() => {
@@ -151,42 +141,49 @@ const CustomerOrders = () => {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1rem 0.75rem' }}>
-                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                                                 {order.labelUrl && (
                                                     <a
                                                         href={`${API_BASE_URL}${order.labelUrl}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="btn-secondary"
-                                                        style={{ padding: '0.35rem 0.7rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                                        style={{ padding: '0.35rem 0.6rem', borderRadius: '8px', textDecoration: 'none', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                                     >
-                                                        <FileText size={13} /> Label
+                                                        <FileText size={12} /> Label
                                                     </a>
                                                 )}
-                                                <button
-                                                    onClick={() => handleGenerateHTML(order.id)}
+                                                
+                                                <a
+                                                    href={order.invoiceUrl ? `${API_BASE_URL}${order.invoiceUrl}` : `${API_BASE_URL}/customer/orders/${order.id}/invoice-html?token=${token}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
                                                     className="btn-secondary"
                                                     style={{
-                                                        padding: '0.35rem 0.7rem', borderRadius: '8px', fontSize: '0.75rem',
+                                                        padding: '0.35rem 0.6rem', borderRadius: '8px', fontSize: '0.75rem',
                                                         display: 'flex', alignItems: 'center', gap: '0.3rem',
-                                                        background: 'rgba(230, 81, 0, 0.1)', color: '#e65100', border: 'none', cursor: 'pointer', fontWeight: 600
+                                                        background: 'rgba(230, 81, 0, 0.1)', color: '#e65100', border: 'none', textDecoration: 'none', fontWeight: 600
                                                     }}
                                                     title="Preview HTML Invoice"
                                                 >
                                                     <FileText size={12} /> HTML
-                                                </button>
-                                                <button
-                                                    onClick={() => handleGeneratePDF(order.id)}
+                                                </a>
+
+                                                <a
+                                                    href={`${API_BASE_URL}/customer/orders/${order.id}/invoice?token=${token}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
                                                     className="btn-secondary"
                                                     style={{
-                                                        padding: '0.35rem 0.7rem', borderRadius: '8px', fontSize: '0.75rem',
+                                                        padding: '0.35rem 0.6rem', borderRadius: '8px', fontSize: '0.75rem',
                                                         display: 'flex', alignItems: 'center', gap: '0.3rem',
-                                                        background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none', cursor: 'pointer', fontWeight: 600
+                                                        background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none', textDecoration: 'none', fontWeight: 600
                                                     }}
                                                     title="Download PDF Invoice"
                                                 >
                                                     <FileText size={12} /> PDF
-                                                </button>
+                                                </a>
+
                                                 <Link
                                                     to={`/portal/shipments?id=${order.bookingId}`}
                                                     style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: '#2563eb', textDecoration: 'none', fontWeight: 600, fontSize: '0.8rem' }}
