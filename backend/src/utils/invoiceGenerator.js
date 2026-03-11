@@ -101,7 +101,7 @@ exports.generateProformaInvoiceHTML = (data, bookingId) => {
         signerPhone,
 
         // Origin / Shipper
-        originCompany:      data.origin_company  || data.shipperName   || 'BCIC Swiss GmbH',
+        originCompany:      data.origin_company  || data.shipperName   || 'Limber Cargo',
         originAddress:      data.origin_address  || 'Lättichstrasse 6',
         originCity:         data.origin_city     || 'Baar',
         originZip:          data.origin_zip      || '6340',
@@ -115,15 +115,20 @@ exports.generateProformaInvoiceHTML = (data, bookingId) => {
         pickupInstructions: data.pickup_instructions || '',
 
         // Destination / Consignee
-        destCompany:        data.dest_company    || data.receiverName   || 'N/A',
-        destAddress:        data.dest_address    || '',
-        destCity:           data.dest_city       || '',
-        destZip:            data.dest_zip        || '',
-        destCountry:        (data.dest_country   || data.destinationCountry || '').toUpperCase(),
-        destCountryName:    countryName(data.dest_country || data.destinationCountry),
-        destContact:        data.dest_contact    || '',
-        destPhone:          data.dest_phone      || '',
+        destCompany:        data.dest_company    || data.receiverName   || data.delivery?.companyName || 'N/A',
+        destAddress:        data.dest_address    || data.delivery?.addressLine1 || '',
+        destCity:           data.dest_city       || data.delivery?.city || '',
+        destZip:            data.dest_zip        || data.delivery?.zipCode || '',
+        destCountry:        (data.dest_country   || data.destinationCountry || data.delivery?.countryCode || '').toUpperCase(),
+        destCountryName:    countryName(data.dest_country || data.destinationCountry || data.delivery?.countryCode),
+        destContact:        data.dest_contact    || data.delivery?.contactName || '',
+        destPhone:          data.dest_phone      || data.delivery?.contactPhoneNumber || '',
+        destEmail:          data.dest_email      || data.delivery?.email || '',
         destEori:           data.dest_eori       || '',
+
+        // Payment status
+        shippingCharges:    data.paymentType     || 'Sender',
+        dutiesTaxes:        data.dutiesType      || 'Receiver',
 
         // Goods / Shipment
         commodity:          data.commodity       || 'Shipping Goods',

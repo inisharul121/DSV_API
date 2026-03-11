@@ -23,7 +23,17 @@ const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
         collectDateTo: new Date(new Date().getTime() + 6 * 60 * 60 * 1000).toISOString().slice(0, 16),
         pickupInstructions: 'Ready at front desk',
         origin: { ...data.sender, eori: '' },
-        dest: { ...data.receiver, eori: '' },
+        dest: {
+            company: data.receiver?.company || '',
+            address: data.receiver?.address || '',
+            zip: data.receiver?.zip || '',
+            city: data.receiver?.city || '',
+            country: data.receiver?.country || '',
+            contact: data.receiver?.contact || '',
+            phone: data.receiver?.phone || '',
+            email: data.receiver?.email || '',
+            eori: ''
+        },
         payment: {
             shippingCharges: 'SENDER',
             dutiesTaxes: 'RECEIVER',

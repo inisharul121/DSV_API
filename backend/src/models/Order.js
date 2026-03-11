@@ -104,7 +104,19 @@ const Order = sequelize.define('Order', {
     baseShippingPrice: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: true
-    }
+    },
+    // New fields for complete invoice generation from database
+    originAddress: { type: DataTypes.STRING, allowNull: true },
+    originCity: { type: DataTypes.STRING, allowNull: true },
+    originZip: { type: DataTypes.STRING, allowNull: true },
+    originPhone: { type: DataTypes.STRING, allowNull: true },
+    originEmail: { type: DataTypes.STRING, allowNull: true },
+    destAddress: { type: DataTypes.STRING, allowNull: true },
+    destCity: { type: DataTypes.STRING, allowNull: true },
+    destZip: { type: DataTypes.STRING, allowNull: true },
+    destPhone: { type: DataTypes.STRING, allowNull: true },
+    destEmail: { type: DataTypes.STRING, allowNull: true },
+    destContact: { type: DataTypes.STRING, allowNull: true }
 }, {
     timestamps: true,
     tableName: 'orders'

@@ -210,8 +210,20 @@ exports.createSimpleBooking = async (req, res) => {
                 invoice_type: shipmentData.invoice_type || null,
                 invoice_signature: shipmentData.invoice_signature || null,
                 totalShippingPrice: parseFloat(shipmentData.totalShippingPrice || 0),
-                baseShippingPrice: parseFloat(shipmentData.baseShippingPrice || 0),
-                customerId: customerId
+                baseShippingPrice: parseFloat(shipmentData.totalShippingPrice || 0), // Base price fallback to total for now
+                customerId: customerId,
+                // Save complete address/contact details for future invoice generation
+                originAddress: shipmentData.origin_address || shipmentData.pickup?.address?.addressLine1 || "",
+                originCity: shipmentData.origin_city || shipmentData.pickup?.address?.city || "",
+                originZip: shipmentData.origin_zip || shipmentData.pickup?.address?.zipCode || "",
+                originPhone: shipmentData.origin_phone || shipmentData.pickup?.address?.contactPhoneNumber || "",
+                originEmail: shipmentData.origin_email || shipmentData.sender?.email || "",
+                destAddress: shipmentData.dest_address || shipmentData.delivery?.addressLine1 || "",
+                destCity: shipmentData.dest_city || shipmentData.delivery?.city || "",
+                destZip: shipmentData.dest_zip || shipmentData.delivery?.zipCode || "",
+                destPhone: shipmentData.dest_phone || shipmentData.delivery?.contactPhoneNumber || "",
+                destEmail: shipmentData.dest_email || shipmentData.receiver?.email || "",
+                destContact: shipmentData.dest_contact || shipmentData.delivery?.contactName || ""
             });
 
             // Create ProformaInvoice record

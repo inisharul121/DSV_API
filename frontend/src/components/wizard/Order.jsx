@@ -3,6 +3,7 @@ import Step1Delivery from './Step1Countries';
 import Step3Booking from './Step3Addresses';
 import Step4Finalize from './Step4Finalize';
 import { toast } from 'react-hot-toast';
+import { API_BASE_URL } from '../../utils/urlConfig';
 
 const Order = () => {
     const [currentStep, setCurrentStep] = useState(1);
@@ -14,7 +15,7 @@ const Order = () => {
         weight: '',
         dimensions: { length: 10, width: 10, height: 10 },
         sender: {
-            company: 'BCIC Swiss GmbH',
+            company: 'Limber Cargo',
             address: 'Lättichstrasse 6',
             zip: '6340',
             city: 'Baar',
@@ -76,7 +77,7 @@ const Order = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', width: '100%', maxWidth: '600px', margin: '0 auto 2rem' }}>
                         {bookingResult.invoiceUrl && (
                             <a 
-                                href={`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}${bookingResult.invoiceUrl}`} 
+                                href={`${API_BASE_URL}${bookingResult.invoiceUrl}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="btn-primary"
@@ -88,7 +89,7 @@ const Order = () => {
                         )}
                         {bookingResult.labelUrl && (
                             <a 
-                                href={`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}${bookingResult.labelUrl}`} 
+                                href={`${API_BASE_URL}${bookingResult.labelUrl}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
                                 className="btn-primary"

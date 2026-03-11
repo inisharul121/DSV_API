@@ -40,20 +40,9 @@ const CustomerOrders = () => {
         window.open(previewUrl, '_blank');
     };
 
-    const handleGeneratePDF = async (orderId) => {
-        try {
-            const response = await dsvApi.get(`/customer/orders/${orderId}/invoice`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.data.success) {
-                const invoiceUrl = `${API_BASE_URL}${response.data.invoiceUrl}`;
-                window.open(invoiceUrl, '_blank');
-                fetchOrders();
-            }
-        } catch (error) {
-            console.error('Error generating PDF:', error);
-            toast.error('Failed to generate PDF invoice.');
-        }
+    const handleGeneratePDF = (orderId) => {
+        const downloadUrl = `${API_BASE_URL}/customer/orders/${orderId}/invoice?token=${token}`;
+        window.open(downloadUrl, '_blank');
     };
 
     useEffect(() => {
