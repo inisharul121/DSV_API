@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
+const puppeteer = require('puppeteer');
 
 // Invoices directory — resolved lazily so env vars are read at call time
 const getInvoicesDir = () => {
@@ -167,35 +168,89 @@ exports.generateProformaInvoiceHTML = (data, bookingId) => {
 };
 
 /**
- * Generates and saves a Proforma Invoice HTML file to disk.
- * Returns the relative fileName.
+ * Generates and saves both Proforma Invoice HTML and PDF files to disk.
+ * Returns the relative fileName of the PDF.
  */
 exports.generateProformaInvoice = async (data, bookingId) => {
     try {
         const html = exports.generateProformaInvoiceHTML(data, bookingId);
-        const fileName = `proforma-${bookingId}.html`;
+        const baseFileName = `proforma-${bookingId}`;
         const dir = getInvoicesDir();
         
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
         
-        const filePath = path.join(dir, fileName);
-        fs.writeFileSync(filePath, html);
+        // Save HTML version
+        const htmlPath = path.join(dir, `${baseFileName}.html`);
+        fs.writeFileSync(htmlPath, html);
         
-        return fileName;
+        // Save PDF version using Puppeteer
+        const pdfBuffer = await exports.generateProformaInvoiceBuffer(data, bookingId);
+        const pdfPath = path.join(dir, `${baseFileName}.pdf`);
+        fs.writeFileSync(pdfPath, pdfBuffer);
+        
+        // Return the PDF as the primary document
+        return `${baseFileName}.pdf`;
     } catch (error) {
-        console.error('Error saving proforma invoice:', error);
+        console.error('Error saving proforma invoice documents:', error);
         throw error;
     }
 };
 
 /**
- * Generates a Proforma Invoice PDF as a Buffer.
-
- * Kept as a lightweight fallback (pdfkit).
+ * Generates a Proforma Invoice PDF as a Buffer using Puppeteer.
+ * This ensures the PDF looks exactly like the HTML template.
  */
-exports.generateProformaInvoiceBuffer = (data, bookingId) => {
+exports.generateProformaInvoiceBuffer = async (data, bookingId) => {
+    let browser;
+    try {
+        const html = exports.generateProformaInvoiceHTML(data, bookingId);
+        
+        browser = await puppeteer.launch({
+            headless: 'new',
+            executablePath: process.env.CHROME_PATH || null, // Optional: override chrome path
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        });
+        
+        const page = await browser.newPage();
+        
+        // Set content and wait for it to load completely
+        await page.setContent(html, { 
+            waitUntil: 'networkidle0',
+            timeout: 30000 
+        });
+        
+        // Generate PDF
+        const pdfBuffer = await page.pdf({
+            format: 'A4',
+            printBackground: true,
+            margin: {
+                top: '0px',
+                right: '0px',
+                bottom: '0px',
+                left: '0px'
+            },
+            displayHeaderFooter: false,
+            preferCSSPageSize: true
+        });
+        
+        await browser.close();
+        return pdfBuffer;
+    } catch (error) {
+        console.error('Puppeteer PDF generation failed:', error);
+        if (browser) await browser.close();
+        
+        // Lightweight fallback using PDFKit if Puppeteer fails
+        console.log('Falling back to PDFKit for invoice generation...');
+        return exports.generateProformaInvoiceBufferLegacy(data, bookingId);
+    }
+};
+
+/**
+ * OLD PDFKit version kept as a fallback.
+ */
+exports.generateProformaInvoiceBufferLegacy = (data, bookingId) => {
     return new Promise((resolve, reject) => {
         try {
             const doc = new PDFDocument({ margin: 40, size: 'A4' });
