@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Truck, Package, Search, MapPin, ShieldCheck, Globe, Phone, Clock, ChevronDown } from 'lucide-react';
 import PublicHeader from '../components/layout/PublicHeader';
 
 const Home = () => {
