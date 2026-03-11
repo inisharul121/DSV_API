@@ -120,6 +120,9 @@ exports.generateOrderInvoice = async (req, res) => {
 
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', `inline; filename=invoice.pdf`);
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
             res.send(buffer);
         } catch (genError) {
             console.error('PDF Generation Error:', genError);
@@ -173,6 +176,9 @@ exports.getOrderInvoiceHTML = async (req, res) => {
         }, order.bookingId);
 
         res.setHeader('Content-Type', 'text/html');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         res.send(html);
     } catch (error) {
         console.error('Admin HTML Invoice Error:', error.message);

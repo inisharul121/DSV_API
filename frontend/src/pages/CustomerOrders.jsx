@@ -155,7 +155,7 @@ const CustomerOrders = () => {
                                                 )}
                                                 
                                                 <a
-                                                    href={order.invoiceUrl ? `${API_BASE_URL}${order.invoiceUrl}` : `${API_BASE_URL}/customer/orders/${order.id}/invoice-html?token=${token}`}
+                                                    href={`${API_BASE_URL}/customer/orders/${order.id}/invoice-html?token=${token}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="btn-secondary"

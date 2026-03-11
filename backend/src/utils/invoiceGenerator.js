@@ -90,101 +90,118 @@ exports.generateProformaInvoiceHTML = (data, bookingId) => {
     // ── Build the replacements map ───────────────────────────────────────────
     const replacements = {
         // Invoice meta
-        invoiceNumber:      data.invoice_number  || data.invoiceNumber  || 'N/A',
+        invoiceNumber: data.invoice_number || data.invoiceNumber || 'N/A',
         invoiceDate,
-        invoiceType:        data.invoice_type    || data.invoiceType    || 'Proforma Invoice',
-        bookingId:          bookingId            || data.bookingId      || 'N/A',
-        awb:                data.awb             || bookingId           || 'N/A',
+        invoiceType: data.invoice_type || data.invoiceType || 'Proforma Invoice',
+        bookingId: bookingId || data.bookingId || 'N/A',
+        awb: data.awb || bookingId || 'N/A',
 
         // Signer
         signerName,
         signerPhone,
 
         // Origin / Shipper
-        originCompany:      data.origin_company  || data.shipperName   || 'Limber Cargo',
-        originAddress:      data.origin_address  || 'Lättichstrasse 6',
-        originCity:         data.origin_city     || 'Baar',
-        originZip:          data.origin_zip      || '6340',
-        originCountry:      (data.origin_country || data.originCountry || 'CH').toUpperCase(),
-        originCountryName:  countryName(data.origin_country || data.originCountry || 'CH'),
-        originContact:      data.origin_contact  || signerName,
-        originPhone:        data.origin_phone    || signerPhone,
-        originEmail:        data.origin_email    || '',
-        originEori:         data.origin_eori     || '',
-        pickupDate:         data.pickup_date     || invoiceDate,
+        originCompany: data.origin_company || data.shipperName || 'Limber Cargo',
+        originAddress: data.origin_address || 'Lättichstrasse 6',
+        originCity: data.origin_city || 'Baar',
+        originZip: data.origin_zip || '6340',
+        originCountry: (data.origin_country || data.originCountry || 'CH').toUpperCase(),
+        originCountryName: countryName(data.origin_country || data.originCountry || 'CH'),
+        originContact: data.origin_contact || signerName,
+        originPhone: data.origin_phone || signerPhone,
+        originEmail: data.origin_email || '',
+        originEori: data.origin_eori || '',
+        pickupDate: data.pickup_date || invoiceDate,
         pickupInstructions: data.pickup_instructions || '',
 
         // Destination / Consignee
-        destCompany:        data.dest_company    || data.receiverName   || data.delivery?.companyName || 'N/A',
-        destAddress:        data.dest_address    || data.delivery?.addressLine1 || '',
-        destCity:           data.dest_city       || data.delivery?.city || '',
-        destZip:            data.dest_zip        || data.delivery?.zipCode || '',
-        destCountry:        (data.dest_country   || data.destinationCountry || data.delivery?.countryCode || '').toUpperCase(),
-        destCountryName:    countryName(data.dest_country || data.destinationCountry || data.delivery?.countryCode),
-        destContact:        data.dest_contact    || data.delivery?.contactName || '',
-        destPhone:          data.dest_phone      || data.delivery?.contactPhoneNumber || '',
-        destEmail:          data.dest_email      || data.delivery?.email || '',
-        destEori:           data.dest_eori       || '',
+        destCompany: data.dest_company || data.receiverName || data.delivery?.companyName || 'N/A',
+        destAddress: data.dest_address || data.delivery?.addressLine1 || '',
+        destCity: data.dest_city || data.delivery?.city || '',
+        destZip: data.dest_zip || data.delivery?.zipCode || '',
+        destCountry: (data.dest_country || data.destinationCountry || data.delivery?.countryCode || '').toUpperCase(),
+        destCountryName: countryName(data.dest_country || data.destinationCountry || data.delivery?.countryCode),
+        destContact: data.dest_contact || data.delivery?.contactName || '',
+        destPhone: data.dest_phone || data.delivery?.contactPhoneNumber || '',
+        destEmail: data.dest_email || data.delivery?.email || '',
+        destEori: data.dest_eori || '',
 
         // Payment status
-        shippingCharges:    data.paymentType     || 'Sender',
-        dutiesTaxes:        data.dutiesType      || 'Receiver',
+        shippingCharges: data.paymentType || 'Sender',
+        dutiesTaxes: data.dutiesType || 'Receiver',
 
         // Goods / Shipment
-        commodity:          data.commodity       || 'Shipping Goods',
-        hsCode:             data.hsCode          || data.hs_code        || 'N/A',
-        originOfGoods:      data.originOfGoods   || data.commodity_origin || (data.origin_country || data.originCountry || 'CH').toUpperCase(),
-        quantity:           data.quantity        || 1,
-        uom:                data.uom             || 'PCS',
-        unitPrice,
-        goodsValue,
-        netWeight:          data.netWeight       || data.weight         || 0,
-        totalWeight:        data.totalWeight     || data.weight         || 0,
-        height:             data.height          || 0,
-        length:             data.length          || 0,
-        width:              data.width           || 0,
+        commodity: data.commodity || 'Shipping Goods',
+        hsCode: data.hsCode || data.hs_code || 'N/A',
+        originOfGoods: data.originOfGoods || data.commodity_origin || (data.origin_country || data.originCountry || 'CH').toUpperCase(),
+        quantity: data.quantity || 1,
+        uom: data.uom || 'PCS',
+        unitPrice: unitPrice, // Keep legacy for metadata if needed
+        goodsValue: goodsValue, // Keep legacy for metadata if needed
+        netWeight: data.netWeight || data.weight || 0,
+        totalWeight: data.totalWeight || data.weight || 0,
+        height: data.height || 0,
+        length: data.length || 0,
+        width: data.width || 0,
 
         // Export details
-        reasonForExport:    data.reasonForExport || 'Sale',
-        incoterms:          data.incoterms       || 'DAP - Delivered at Place',
-        serviceCode:        data.serviceCode     || 'N/A',
-        iossNumber:         data.iossNumber      || '',
+        reasonForExport: data.reasonForExport || 'Sale',
+        incoterms: data.incoterms || 'DAP - Delivered at Place',
+        serviceCode: data.serviceCode || 'N/A',
+        iossNumber: data.iossNumber || '',
 
         // Financial
-        currency:           curr,
-        baseShippingPrice:  baseShipping,
+        currency: curr,
+        baseShippingPrice: baseShipping,
         totalShippingPrice: totalShipping,
     };
 
     // ── Generate Dynamic Item Rows ──────────────────────────────────────────
     let itemRows = '';
-    const items = data.items || [
-        {
-            description: data.commodity || 'Shipping Goods',
-            hsCode:      data.hsCode    || data.hs_code || 'N/A',
-            origin:      data.originOfGoods || data.commodity_origin || (data.origin_country || data.originCountry || 'CH'),
-            quantity:    data.quantity   || 1,
-            uom:         data.uom        || 'PCS',
-            unitPrice:   data.unitPrice  || data.goodsValue || 0,
-            value:       data.goodsValue || data.unitPrice || 0,
-            netWeight:   data.netWeight  || data.weight    || 0
+    let items = data.items;
+
+    // Safety: Parse stringified JSON if needed (common when coming from some DB layers)
+    if (typeof items === 'string') {
+        try {
+            items = JSON.parse(items);
+        } catch (e) {
+            console.error('Failed to parse items string:', e);
+            items = null;
         }
-    ];
+    }
+
+    if (!items || !Array.isArray(items)) {
+        items = [
+            {
+                description: data.commodity || 'Shipping Goods',
+                hsCode: data.hsCode || data.hs_code || 'N/A',
+                origin: data.originOfGoods || data.commodity_origin || (data.origin_country || data.originCountry || 'CH'),
+                quantity: data.quantity || 1,
+                uom: data.uom || 'PCS',
+                unitPrice: data.unitPrice || data.goodsValue || 0,
+                value: data.goodsValue || data.unitPrice || 0,
+                netWeight: data.netWeight || data.weight || 0
+            }
+        ];
+    }
 
     items.forEach(item => {
-        const itemVal = parseFloat(item.value || (item.unitPrice * item.quantity) || 0).toFixed(2);
-        const itemUnitPrice = parseFloat(item.unitPrice || (item.value / item.quantity) || 0).toFixed(2);
-        
+        // Strictly calculate total from unitPrice * quantity to avoid stale 'value' from frontend
+        const price = parseFloat(item.unitPrice || 0);
+        const qty = parseInt(item.quantity) || 1;
+        const total = (price * qty).toFixed(2);
+        const displayUnitPrice = price.toFixed(2);
+
         itemRows += `
             <tr>
                 <td>${item.description || 'N/A'}</td>
                 <td>${item.hsCode || 'N/A'}</td>
                 <td>${item.origin || data.origin_country || 'CH'}</td>
-                <td>${item.quantity || 1}</td>
+                <td>${qty}</td>
                 <td>${item.uom || 'PCS'}</td>
-                <td>${curr} ${itemUnitPrice}</td>
+                <td>${curr} ${displayUnitPrice}</td>
                 <td>${item.netWeight || 0} kg</td>
-                <td>${curr} ${itemVal}</td>
+                <td>${curr} ${total}</td>
             </tr>
         `;
     });
@@ -215,20 +232,20 @@ exports.generateProformaInvoice = async (data, bookingId) => {
         const html = exports.generateProformaInvoiceHTML(data, bookingId);
         const baseFileName = `proforma-${bookingId}`;
         const dir = getInvoicesDir();
-        
+
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
-        
+
         // Save HTML version
         const htmlPath = path.join(dir, `${baseFileName}.html`);
         fs.writeFileSync(htmlPath, html);
-        
+
         // Save PDF version using Puppeteer
         const pdfBuffer = await exports.generateProformaInvoiceBuffer(data, bookingId);
         const pdfPath = path.join(dir, `${baseFileName}.pdf`);
         fs.writeFileSync(pdfPath, pdfBuffer);
-        
+
         // Return the PDF as the primary document
         return `${baseFileName}.pdf`;
     } catch (error) {
@@ -245,21 +262,21 @@ exports.generateProformaInvoiceBuffer = async (data, bookingId) => {
     let browser;
     try {
         const html = exports.generateProformaInvoiceHTML(data, bookingId);
-        
+
         browser = await puppeteer.launch({
             headless: 'new',
             executablePath: process.env.CHROME_PATH || null, // Optional: override chrome path
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
         });
-        
+
         const page = await browser.newPage();
-        
+
         // Set content and wait for it to load completely
-        await page.setContent(html, { 
+        await page.setContent(html, {
             waitUntil: 'networkidle0',
-            timeout: 30000 
+            timeout: 30000
         });
-        
+
         // Generate PDF
         const pdfBuffer = await page.pdf({
             format: 'A4',
@@ -273,13 +290,13 @@ exports.generateProformaInvoiceBuffer = async (data, bookingId) => {
             displayHeaderFooter: false,
             preferCSSPageSize: true
         });
-        
+
         await browser.close();
         return pdfBuffer;
     } catch (error) {
         console.error('Puppeteer PDF generation failed:', error);
         if (browser) await browser.close();
-        
+
         // Lightweight fallback using PDFKit if Puppeteer fails
         console.log('Falling back to PDFKit for invoice generation...');
         return exports.generateProformaInvoiceBufferLegacy(data, bookingId);
@@ -345,10 +362,59 @@ exports.generateProformaInvoiceBufferLegacy = (data, bookingId) => {
                 doc.font('Helvetica').fontSize(8).text(infoValues[i], 435, y + 5);
             });
 
+            // Items Table
+            const tableTop = gridTop + 160;
+            doc.rect(40, tableTop, 515, 20).fill('#f1f5f9').stroke('#e2e8f0');
+            doc.fillColor('#475569').font('Helvetica-Bold').fontSize(8);
+            doc.text('DESCRIPTION', 45, tableTop + 6);
+            doc.text('HS CODE', 230, tableTop + 6);
+            doc.text('ORIGIN', 300, tableTop + 6);
+            doc.text('QTY', 350, tableTop + 6);
+            doc.text('PRICE', 390, tableTop + 6);
+            doc.text('TOTAL', 480, tableTop + 6, { align: 'right', width: 70 });
+
+            let y = tableTop + 25;
+            let items = data.items;
+            if (typeof items === 'string') {
+                try { items = JSON.parse(items); } catch (e) { items = null; }
+            }
+
+            if (!items || !Array.isArray(items)) {
+                items = [{
+                    description: data.commodity || 'Shipping Goods',
+                    hsCode: data.hsCode || 'N/A',
+                    origin: (data.origin_country || 'CH'),
+                    quantity: data.quantity || 1,
+                    unitPrice: data.unitPrice || 0
+                }];
+            }
+
+            doc.fillColor('#1e293b').font('Helvetica').fontSize(8);
+            items.forEach((item, i) => {
+                const itemQty = parseInt(item.quantity) || 1;
+                const itemPrice = parseFloat(item.unitPrice || 0);
+                const itemTotal = (itemQty * itemPrice).toFixed(2);
+
+                doc.text(item.description || 'N/A', 45, y, { width: 175, height: 10, ellipsis: true });
+                doc.text(item.hsCode || 'N/A', 230, y);
+                doc.text(item.origin || 'CH', 300, y);
+                doc.text(itemQty.toString(), 350, y);
+                doc.text(`${curr} ${itemPrice.toFixed(2)}`, 390, y);
+                doc.text(`${curr} ${itemTotal}`, 480, y, { align: 'right', width: 70 });
+                y += 15;
+            });
+
             // Totals
-            doc.moveDown(20);
-            doc.font('Helvetica-Bold').fontSize(13)
-               .text(`TOTAL ${curr}: ${totalShippingPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 40, 580);
+            const totalsY = Math.max(y + 20, 500);
+            doc.rect(340, totalsY, 215, 40).stroke('#e2e8f0');
+            doc.fillColor('#64748b').font('Helvetica-Bold').fontSize(9).text('TOTAL ESTIMATE', 350, totalsY + 6);
+            doc.fillColor('#1e293b').fontSize(14).text(`${curr} ${totalShippingPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 350, totalsY + 18, { width: 195, align: 'right' });
+
+            // Signature
+            const sigY = 680;
+            doc.moveTo(40, sigY).lineTo(200, sigY).stroke('#cbd5e1');
+            doc.fillColor('#64748b').fontSize(8).text('Authorized Signature', 40, sigY + 5);
+            doc.text('BCIC Swiss GmbH', 40, sigY + 18);
 
             doc.end();
         } catch (error) {

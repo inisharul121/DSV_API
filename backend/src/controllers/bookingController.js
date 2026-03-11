@@ -191,7 +191,7 @@ exports.createSimpleBooking = async (req, res) => {
                 serviceCode: shipmentData.serviceCode || "DSVAirExpress",
                 totalWeight: parseFloat(shipmentData.weight || 1.0),
                 goodsValue: shipmentData.items?.length > 0 
-                    ? shipmentData.items.reduce((sum, item) => sum + parseFloat(item.value || (item.unitPrice * item.quantity) || 0), 0)
+                    ? shipmentData.items.reduce((sum, item) => sum + (parseFloat(item.unitPrice || 0) * (parseInt(item.quantity) || 1)), 0)
                     : parseFloat(shipmentData.goodsValue || 0),
                 currency: shipmentData.currencyCode || "CHF",
                 status: 'Created',
