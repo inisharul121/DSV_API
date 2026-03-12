@@ -267,11 +267,16 @@ exports.generateProformaInvoiceBuffer = async (data, bookingId) => {
             const puppeteerCore = require('puppeteer-core');
             
             console.log('[Puppeteer] Launching serverless chromium...');
+            
+            // Set graphics mode for better compatibility
+            chromium.setGraphicsMode = false;
+
             browser = await puppeteerCore.launch({
-                args: chromium.args,
+                args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
                 defaultViewport: chromium.defaultViewport,
                 executablePath: await chromium.executablePath(),
                 headless: chromium.headless,
+                ignoreHTTPSErrors: true,
             });
         } else {
             // LOCAL: Use standard puppeteer
