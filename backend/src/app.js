@@ -61,9 +61,17 @@ if (process.env.VERCEL) {
         .then(() => console.log('Database connected successfully'))
         .catch(err => console.error('Database connection failed:', err));
 } else if (require.main === module) {
-    sequelize.sync({ alter: true })
+    // Safer initialization: Authenticate without altering schema by default
+    // (Helps avoid "Too many keys" errors on Railway)
+    sequelize.authenticate()
         .then(() => {
-            console.log('Database synced successfully');
+            console.log('Database connected successfully');
+            
+            // If you need to sync schema, uncomment the line below temporarily:
+            // return sequelize.sync({ alter: true });
+            return Promise.resolve();
+        })
+        .then(() => {
             const server = app.listen(config.port, () => {
                 console.log(`Server running on port ${config.port} in ${config.env} mode`);
             });
@@ -72,9 +80,9 @@ if (process.env.VERCEL) {
             });
         })
         .catch((err) => {
-            console.error('Failed to sync database:', err);
+            console.error('Database connection or sync failed:', err);
             app.listen(config.port, () => {
-                console.log(`Server running on port ${config.port} in ${config.env} mode (DB Sync Failed)`);
+                console.log(`Server running on port ${config.port} in ${config.env} mode (DB Issue)`);
             });
         });
 }
