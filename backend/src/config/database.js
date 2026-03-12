@@ -1,6 +1,9 @@
 const { Sequelize } = require('sequelize');
 const config = require('./env');
 
+// Explicitly require mysql2 so Vercel's bundler includes it
+const mysql2 = require('mysql2');
+
 const sequelize = new Sequelize(
     config.database.database,
     config.database.username,
@@ -9,6 +12,7 @@ const sequelize = new Sequelize(
         host: config.database.host,
         port: config.database.port,
         dialect: config.database.dialect,
+        dialectModule: mysql2,
         logging: config.database.logging,
         pool: {
             max: 5,
@@ -18,6 +22,7 @@ const sequelize = new Sequelize(
         }
     }
 );
+
 
 // Verify connection
 sequelize.authenticate()
