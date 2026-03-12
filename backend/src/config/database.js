@@ -4,21 +4,26 @@ const config = require('./env');
 // Explicitly require mysql2 so Vercel's bundler includes it
 const mysql2 = require('mysql2');
 
-// Railway provides DATABASE_URL as a full mysql:// connection string.
-// We also check DB_HOST in case the user pasted the full URL there (as seen in screenshots).
-const DATABASE_URL = process.env.DATABASE_URL || (process.env.DB_HOST?.startsWith('mysql://') ? process.env.DB_HOST : null);
+// detect environment
+const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+const DATABASE_URL = (process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== "") 
+    ? process.env.DATABASE_URL 
+    : (process.env.DB_HOST?.startsWith('mysql://') ? process.env.DB_HOST : null);
 
 let sequelize;
 
+console.log(`[Database] Mode: ${isVercel ? 'Production/Vercel' : 'Development/Local'}`);
+
 if (DATABASE_URL) {
-    // Full URL mode (Railway / other managed DBs)
+    // 1. Connection via Full URL (Railway Public URL)
+    console.log('[Database] Connecting using DATABASE_URL...');
     sequelize = new Sequelize(DATABASE_URL, {
         dialect: 'mysql',
         dialectModule: mysql2,
         logging: config.database.logging,
         dialectOptions: {
             ssl: {
-                rejectUnauthorized: false  // Required for Railway's SSL certificate
+                rejectUnauthorized: false
             }
         },
         pool: {
@@ -28,8 +33,35 @@ if (DATABASE_URL) {
             idle: 10000
         }
     });
+} else if (isVercel) {
+    // 2. Connection via individual vars on Vercel (Railway Private/Individual vars)
+    console.log('[Database] Connecting using individual Vercel/Railway env vars...');
+    sequelize = new Sequelize(
+        process.env.DB_NAME || config.database.database,
+        process.env.DB_USER || config.database.username,
+        process.env.DB_PASSWORD || config.database.password,
+        {
+            host: process.env.DB_HOST || config.database.host,
+            port: process.env.DB_PORT || config.database.port,
+            dialect: 'mysql',
+            dialectModule: mysql2,
+            logging: false,
+            dialectOptions: {
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            },
+            pool: {
+                max: 5,
+                min: 0,
+                acquire: 30000,
+                idle: 10000
+            }
+        }
+    );
 } else {
-    // Individual vars mode (local XAMPP / custom config)
+    // 3. Connection via Local XAMPP
+    console.log('[Database] Connecting to Local XAMPP...');
     sequelize = new Sequelize(
         config.database.database,
         config.database.username,
