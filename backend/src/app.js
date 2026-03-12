@@ -28,10 +28,14 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files (labels, invoices)
-app.use('/api/labels', express.static(path.resolve('./public/labels')));
-app.use('/api/invoices', express.static(path.resolve('./public/invoices')));
-app.use('/api/templates', express.static(path.resolve('./public/templates'))); // For design previews
+const orderController = require('./controllers/orderController');
+
+// Serve static templates (only compile-time files)
+app.use('/api/templates', express.static(path.resolve('./public/templates'))); 
+
+// Dynamic serving of runtime-generated PDFs (Fix for Vercel 404s)
+app.get('/api/labels/:filename', orderController.serveDynamicLabel);
+app.get('/api/invoices/:filename', orderController.serveDynamicInvoice);
 
 // API Routes
 const apiRoutes = require('./routes/api');

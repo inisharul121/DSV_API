@@ -185,3 +185,73 @@ exports.getOrderInvoiceHTML = async (req, res) => {
         res.status(500).send(`<h1>Error generating invoice preview</h1><p>${error.message}</p>`);
     }
 };
+
+/**
+ * Dynamic serving of labels (stored in DB as base64)
+ * Matches: /api/labels/label-:bookingId.pdf
+ */
+exports.serveDynamicLabel = async (req, res) => {
+    try {
+        const { filename } = req.params;
+        const bookingId = filename.replace('label-', '').replace('.pdf', '');
+        
+        const order = await Order.findOne({ where: { bookingId } });
+        if (!order || !order.labelData) {
+            return res.status(404).send('<h1>Label Not Found</h1>');
+        }
+
+        const buffer = Buffer.from(order.labelData, 'base64');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename=${filename}`);
+        res.send(buffer);
+    } catch (error) {
+        console.error('Dynamic Label Serve Error:', error);
+        res.status(500).send('Error retrieving label');
+    }
+};
+
+/**
+ * Dynamic serving of invoices (re-generated on the fly)
+ * Matches: /api/invoices/proforma-:bookingId.pdf
+ */
+exports.serveDynamicInvoice = async (req, res) => {
+    try {
+        const { filename } = req.params;
+        const bookingId = filename.replace('proforma-', '').replace('.pdf', '');
+        
+        const order = await Order.findOne({ where: { bookingId } });
+        if (!order) {
+            return res.status(404).send('<h1>Invoice Not Found</h1>');
+        }
+
+        const buffer = await invoiceGenerator.generateProformaInvoiceBuffer({
+            ...order.toJSON(),
+            origin_company: order.shipperName,
+            origin_address: order.originAddress,
+            origin_city: order.originCity,
+            origin_zip: order.originZip,
+            origin_country: order.originCountry,
+            origin_phone: order.originPhone,
+            origin_email: order.originEmail,
+            dest_company: order.receiverName,
+            dest_address: order.destAddress,
+            dest_city: order.destCity,
+            dest_zip: order.destZip,
+            dest_country: order.destinationCountry,
+            dest_contact: order.destContact,
+            dest_phone: order.destPhone,
+            dest_email: order.destEmail,
+            weight: order.totalWeight,
+            currencyCode: order.currency,
+            invoice_date: order.createdAt
+        }, order.bookingId);
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename=${filename}`);
+        res.send(buffer);
+    } catch (error) {
+        console.error('Dynamic Invoice Serve Error:', error);
+        res.status(500).send('Error generating invoice');
+    }
+};
+

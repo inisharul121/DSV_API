@@ -216,6 +216,7 @@ exports.createSimpleBooking = async (req, res) => {
                 totalShippingPrice: parseFloat(shipmentData.totalShippingPrice || 0),
                 baseShippingPrice: parseFloat(shipmentData.totalShippingPrice || 0), // Base price fallback to total for now
                 customerId: customerId,
+                labelData: labelResponse ? labelExtractor.extractLabelContent(labelResponse) : null,
                 // Save complete address/contact details for future invoice generation
                 originAddress: shipmentData.origin_address || shipmentData.pickup?.address?.addressLine1 || "",
                 originCity: shipmentData.origin_city || shipmentData.pickup?.address?.city || "",

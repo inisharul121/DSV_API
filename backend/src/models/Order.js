@@ -121,6 +121,11 @@ const Order = sequelize.define('Order', {
         type: DataTypes.JSON,
         allowNull: true,
         comment: 'Stores array of multi-item commodities'
+    },
+    labelData: {
+        type: DataTypes.TEXT('long'),
+        allowNull: true,
+        comment: 'Stores the base64 content of the shipping label'
     }
 }, {
     timestamps: true,
