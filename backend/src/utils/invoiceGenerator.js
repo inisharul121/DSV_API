@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
-const puppeteer = require('puppeteer');
+
+// detect environment
+const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
 // Invoices directory — resolved lazily so env vars are read at call time
 const getInvoicesDir = () => {
@@ -254,20 +256,32 @@ exports.generateProformaInvoice = async (data, bookingId) => {
     }
 };
 
-/**
- * Generates a Proforma Invoice PDF as a Buffer using Puppeteer.
- * This ensures the PDF looks exactly like the HTML template.
- */
 exports.generateProformaInvoiceBuffer = async (data, bookingId) => {
     let browser;
     try {
         const html = exports.generateProformaInvoiceHTML(data, bookingId);
 
-        browser = await puppeteer.launch({
-            headless: 'new',
-            executablePath: process.env.CHROME_PATH || null, // Optional: override chrome path
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-        });
+        if (isVercel) {
+            // PRODUCTION: Use serverless-friendly chromium
+            const chromium = require('@sparticuz/chromium');
+            const puppeteerCore = require('puppeteer-core');
+            
+            console.log('[Puppeteer] Launching serverless chromium...');
+            browser = await puppeteerCore.launch({
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: chromium.headless,
+            });
+        } else {
+            // LOCAL: Use standard puppeteer
+            const puppeteer = require('puppeteer');
+            console.log('[Puppeteer] Launching local puppeteer...');
+            browser = await puppeteer.launch({
+                headless: 'new',
+                args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+            });
+        }
 
         const page = await browser.newPage();
 
