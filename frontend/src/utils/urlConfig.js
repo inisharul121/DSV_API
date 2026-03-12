@@ -10,8 +10,10 @@ const getApiBaseUrl = () => {
         return 'http://localhost:3001/api';
     }
 
-    // Default to relative path for any other hostname (production)
-    return '/api';
+    // In production, use the VITE_API_URL env variable pointing to the backend Vercel URL
+    return import.meta.env.VITE_API_URL
+        ? `${import.meta.env.VITE_API_URL}/api`
+        : 'https://dsv-api-backend.vercel.app/api';
 };
 
 export const API_BASE_URL = getApiBaseUrl();

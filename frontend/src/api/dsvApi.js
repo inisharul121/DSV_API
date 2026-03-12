@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+const getBaseURL = () => {
+    if (import.meta.env.DEV) return 'http://localhost:3001/api';
+    return import.meta.env.VITE_API_URL
+        ? `${import.meta.env.VITE_API_URL}/api`
+        : 'https://dsv-api-backend.vercel.app/api';
+};
+
 const dsvApi = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : '/api'),
+    baseURL: getBaseURL(),
     headers: {
         'Content-Type': 'application/json',
     },
