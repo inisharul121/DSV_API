@@ -11,9 +11,11 @@ const Quote = require('./models/Quote');
 const Admin = require('./models/Admin');
 const ProformaInvoice = require('./models/ProformaInvoice');
 
-// Establish associations
-Order.hasOne(ProformaInvoice, { foreignKey: 'orderId', as: 'invoice' });
-ProformaInvoice.belongsTo(Order, { foreignKey: 'orderId', as: 'order' });
+// Establish associations (guarded to prevent duplicate registration in serverless)
+if (!Order.associations.invoice) {
+    Order.hasOne(ProformaInvoice, { foreignKey: 'orderId', as: 'invoice' });
+    ProformaInvoice.belongsTo(Order, { foreignKey: 'orderId', as: 'order' });
+}
 
 const app = express();
 
