@@ -50,8 +50,15 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start Server with Database Sync
-if (require.main === module) {
+// Start Server or Sync Database
+if (process.env.VERCEL) {
+    // In Vercel environment, we just export the app
+    // Database sync should be handled separately or once during initialization
+    console.log('Running in Vercel environment');
+    sequelize.authenticate()
+        .then(() => console.log('Database connected successfully'))
+        .catch(err => console.error('Database connection failed:', err));
+} else if (require.main === module) {
     sequelize.sync({ alter: true })
         .then(() => {
             console.log('Database synced successfully');
@@ -64,7 +71,6 @@ if (require.main === module) {
         })
         .catch((err) => {
             console.error('Failed to sync database:', err);
-            // Still start the server if DB fails, or handle as needed
             app.listen(config.port, () => {
                 console.log(`Server running on port ${config.port} in ${config.env} mode (DB Sync Failed)`);
             });
