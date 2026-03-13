@@ -65,8 +65,13 @@ if (process.env.VERCEL) {
     // Database sync should be handled separately or once during initialization
     console.log('Running in Vercel environment');
     sequelize.authenticate()
-        .then(() => console.log('Database connected successfully'))
-        .catch(err => console.error('Database connection failed:', err));
+        .then(() => {
+            console.log('Database connected successfully (Vercel)');
+            // Sync database schema on Vercel to ensure labelData column exists
+            return sequelize.sync({ alter: true });
+        })
+        .then(() => console.log('Database synced successfully (Vercel)'))
+        .catch(err => console.error('Database connection/sync failed (Vercel):', err));
 } else if (require.main === module) {
     // Safer initialization: Authenticate without altering schema by default
     // (Helps avoid "Too many keys" errors on Railway)
