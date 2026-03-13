@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config/env');
+const dsvClient = require('../config/dsv-api');
+const labelExtractor = require('../utils/labelExtractor');
 const Order = require('../models/Order');
 const ProformaInvoice = require('../models/ProformaInvoice');
 const invoiceGenerator = require('../utils/invoiceGenerator');
@@ -211,7 +213,7 @@ exports.serveDynamicLabel = async (req, res) => {
             return res.send(buffer);
         }
 
-        // 2. Fallback: Try serving from Filesystem
+        // 2. Fallback: Try serving from Filesystem (Local development)
         const filePath = path.join(config.paths.labels, filename);
         if (fs.existsSync(filePath)) {
             console.log(`[ServeLabel] Found physical file for ${filename}, serving from disk.`);
@@ -220,8 +222,45 @@ exports.serveDynamicLabel = async (req, res) => {
             return res.sendFile(filePath);
         }
 
-        console.warn(`[ServeLabel] Label NOT found for ${bookingId} in DB or disk.`);
-        res.status(404).send('<h1>Label Not Found</h1><p>The requested label could not be found in our records or on disk.</p>');
+        // 3. Self-Healing: Fetch from DSV if missing everywhere (Critical for Vercel/Railway persistence)
+        console.log(`[ServeLabel] Label missing in DB and Disk for ${bookingId}. Attempting self-healing from DSV...`);
+        
+        // Try standard label paths
+        const pathsToTry = [
+            `${config.dsv.endpoints.booking}/v2/bookings/labels/${bookingId}?labelFormat=PDF`,
+            `${config.dsv.endpoints.booking}/booking/v2/bookings/labels/${bookingId}?labelFormat=PDF`,
+            `${config.dsv.endpoints.booking}/booking/v2/shipments/${bookingId}/labels?labelFormat=PDF`
+        ];
+
+        let labelContent = null;
+        for (const url of pathsToTry) {
+            try {
+                const response = await dsvClient.get(url);
+                labelContent = labelExtractor.extractLabelContent(response.data);
+                if (labelContent) {
+                    console.log(`[ServeLabel] Successfully re-fetched label from DSV: ${url}`);
+                    break;
+                }
+            } catch (err) {
+                // Silently continue to next path
+            }
+        }
+
+        if (labelContent) {
+            // Persist to DB for next time
+            if (order) {
+                await order.update({ labelData: labelContent });
+                console.log(`[ServeLabel] Persisted re-fetched label to DB for ${bookingId}`);
+            }
+            
+            const buffer = Buffer.from(labelContent, 'base64');
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `inline; filename=${filename}`);
+            return res.send(buffer);
+        }
+
+        console.warn(`[ServeLabel] Label NOT found for ${bookingId} in DB, Disk, or DSV API.`);
+        res.status(404).send('<h1>Label Not Found</h1><p>The requested label could not be found in our records, on disk, or retrieved from the carrier.</p>');
     } catch (error) {
         console.error('Dynamic Label Serve Error:', error);
         res.status(500).send('Error retrieving label');
