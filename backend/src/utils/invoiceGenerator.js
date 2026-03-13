@@ -356,14 +356,12 @@ exports.generateProformaInvoiceBufferLegacy = (data, bookingId) => {
             doc.rect(40, gridTop, 255, 60).stroke();
             doc.font('Helvetica-Bold').fontSize(8).text('CONSIGNOR', 45, gridTop + 4);
             doc.font('Helvetica').fontSize(9).text(data.origin_company || data.shipperName || 'BCIC Swiss GmbH', 45, gridTop + 16);
-            doc.fontSize(8).fillColor('#666').text(`${data.origin_address || ''}, ${data.origin_city || ''} ${data.origin_zip || ''}, ${countryName(data.origin_country || data.originCountry || 'CH')}`, 45, gridTop + 28);
-            doc.fillColor('#000');
+            doc.fontSize(8).text(`${data.origin_address || ''}, ${data.origin_city || ''} ${data.origin_zip || ''}, ${countryName(data.origin_country || data.originCountry || 'CH')}`, 45, gridTop + 28);
 
             doc.rect(295, gridTop, 260, 60).stroke();
             doc.font('Helvetica-Bold').fontSize(8).text('CONSIGNEE', 300, gridTop + 4);
             doc.font('Helvetica').fontSize(9).text(data.dest_company || data.receiverName || 'N/A', 300, gridTop + 16);
-            doc.fontSize(8).fillColor('#666').text(`${data.dest_address || ''}, ${data.dest_city || ''} ${data.dest_zip || ''}, ${countryName(data.dest_country || data.destinationCountry)}`, 300, gridTop + 28);
-            doc.fillColor('#000');
+            doc.fontSize(8).text(`${data.dest_address || ''}, ${data.dest_city || ''} ${data.dest_zip || ''}, ${countryName(data.dest_country || data.destinationCountry)}`, 300, gridTop + 28);
 
             // Invoice meta
             const infoLabels = ['DATE', 'BOOKING ID', 'AWB', 'INCOTERMS'];
@@ -383,8 +381,8 @@ exports.generateProformaInvoiceBufferLegacy = (data, bookingId) => {
 
             // Items Table
             const tableTop = gridTop + 160;
-            doc.rect(40, tableTop, 515, 20).fill('#f1f5f9').stroke('#e2e8f0');
-            doc.fillColor('#475569').font('Helvetica-Bold').fontSize(8);
+            doc.rect(40, tableTop, 515, 20).stroke();
+            doc.font('Helvetica-Bold').fontSize(8);
             doc.text('DESCRIPTION', 45, tableTop + 6);
             doc.text('HS CODE', 230, tableTop + 6);
             doc.text('ORIGIN', 300, tableTop + 6);
@@ -408,7 +406,7 @@ exports.generateProformaInvoiceBufferLegacy = (data, bookingId) => {
                 }];
             }
 
-            doc.fillColor('#1e293b').font('Helvetica').fontSize(8);
+            doc.font('Helvetica').fontSize(8);
             items.forEach((item, i) => {
                 const itemQty = parseInt(item.quantity) || 1;
                 const itemPrice = parseFloat(item.unitPrice || 0);
@@ -425,14 +423,14 @@ exports.generateProformaInvoiceBufferLegacy = (data, bookingId) => {
 
             // Totals
             const totalsY = Math.max(y + 20, 500);
-            doc.rect(340, totalsY, 215, 40).stroke('#e2e8f0');
-            doc.fillColor('#64748b').font('Helvetica-Bold').fontSize(9).text('TOTAL ESTIMATE', 350, totalsY + 6);
-            doc.fillColor('#1e293b').fontSize(14).text(`${curr} ${totalShippingPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 350, totalsY + 18, { width: 195, align: 'right' });
+            doc.rect(340, totalsY, 215, 40).stroke();
+            doc.font('Helvetica-Bold').fontSize(9).text('TOTAL ESTIMATE', 350, totalsY + 6);
+            doc.font('Helvetica-Bold').fontSize(14).text(`${curr} ${totalShippingPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 350, totalsY + 18, { width: 195, align: 'right' });
 
             // Signature
             const sigY = 680;
-            doc.moveTo(40, sigY).lineTo(200, sigY).stroke('#cbd5e1');
-            doc.fillColor('#64748b').fontSize(8).text('Authorized Signature', 40, sigY + 5);
+            doc.moveTo(40, sigY).lineTo(200, sigY).stroke();
+            doc.font('Helvetica').fontSize(8).text('Authorized Signature', 40, sigY + 5);
             doc.text('BCIC Swiss GmbH', 40, sigY + 18);
 
             doc.end();

@@ -12,19 +12,19 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f1f5f9;
-            padding: 30px;
-            line-height: 1.6;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #fff;
+            padding: 20px;
+            line-height: 1.4;
+            color: #000;
         }
 
         .invoice-container {
-            max-width: 900px;
+            max-width: 850px;
             margin: 0 auto;
-            background: white;
-            padding: 40px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.12), 0 8px 10px -6px rgba(0,0,0,0.08);
-            border-radius: 8px;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #000;
         }
 
         /* ── HEADER ── */
@@ -32,23 +32,20 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 36px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #e67e22;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
         }
 
         .company-info h1 {
-            color: #002e6e;
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.025em;
-            margin-bottom: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
         .company-info p {
-            color: #64748b;
-            font-size: 13px;
-            margin: 3px 0;
+            font-size: 12px;
+            margin: 2px 0;
         }
 
         .invoice-title {
@@ -56,133 +53,104 @@
         }
 
         .badge {
-            display: inline-block;
-            background-color: #e67e22;
-            color: white;
-            padding: 5px 16px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
+            display: block;
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
         }
 
         .invoice-title h2 {
-            color: #002e6e;
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
         .invoice-meta {
-            color: #64748b;
-            font-size: 13px;
-            margin: 4px 0;
-        }
-
-        .invoice-meta strong {
-            color: #1e293b;
+            font-size: 12px;
+            margin: 2px 0;
         }
 
         /* ── SECTION TITLES ── */
         .section {
-            margin-bottom: 28px;
+            margin-bottom: 20px;
         }
 
         .section-title {
-            background-color: #f8fafc;
-            padding: 9px 14px;
-            color: #002e6e;
-            font-weight: 700;
-            border-left: 4px solid #e67e22;
-            margin-bottom: 14px;
-            font-size: 13px;
+            padding: 5px 0;
+            color: #000;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            margin-bottom: 10px;
+            font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
         }
 
         /* ── 2-COLUMN INFO GRID ── */
         .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            display: flex;
+            gap: 20px;
         }
 
         .info-box {
-            padding: 14px;
-            background-color: #f8fafc;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #000;
         }
 
         .info-box h3 {
-            color: #64748b;
             font-size: 11px;
-            font-weight: 800;
-            margin-bottom: 10px;
+            font-weight: bold;
+            margin-bottom: 5px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            text-decoration: underline;
         }
 
         .info-box p {
-            color: #475569;
-            font-size: 13px;
-            margin: 4px 0;
-        }
-
-        .info-box strong {
-            color: #1e293b;
+            font-size: 12px;
+            margin: 2px 0;
         }
 
         /* ── SHIPMENT ITEMS TABLE ── */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 14px 0;
+            margin: 10px 0;
         }
 
         th {
-            background-color: #002e6e;
-            color: white;
-            padding: 11px 12px;
+            border: 1px solid #000;
+            padding: 8px;
             text-align: left;
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 11px;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
         }
 
         td {
-            padding: 11px 12px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
-            color: #334155;
-        }
-
-        tr:nth-child(even) td {
-            background-color: #f8fafc;
+            padding: 8px;
+            border: 1px solid #000;
+            font-size: 11px;
         }
 
         /* ── TOTALS ── */
         .totals-wrapper {
-            margin-top: 20px;
+            margin-top: 15px;
             display: flex;
             justify-content: flex-end;
         }
 
         .totals-table {
-            width: 300px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            overflow: hidden;
+            width: 250px;
+            border: 1px solid #000;
         }
 
         .total-row {
             display: flex;
             justify-content: space-between;
-            padding: 9px 14px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
+            padding: 5px 10px;
+            border-bottom: 1px solid #000;
+            font-size: 12px;
         }
 
         .total-row:last-child {
@@ -190,77 +158,62 @@
         }
 
         .total-row .lbl {
-            font-weight: 700;
-            color: #64748b;
-        }
-
-        .total-row .val {
-            font-weight: 600;
-            color: #1e293b;
+            font-weight: bold;
         }
 
         .total-row.grand {
-            background-color: #002e6e;
+            border-top: 2px solid #000;
         }
 
         .total-row.grand .lbl,
         .total-row.grand .val {
-            color: white;
-            font-size: 15px;
-            font-weight: 800;
+            font-size: 14px;
+            font-weight: bold;
         }
 
         /* ── SIGNATURE ── */
         .signature {
-            margin-top: 44px;
+            margin-top: 40px;
             display: flex;
             justify-content: space-between;
         }
 
         .signature-box {
-            width: 240px;
-            text-align: center;
+            width: 45%;
         }
 
         .signature-line {
-            border-top: 1px solid #334155;
-            margin-top: 52px;
-            padding-top: 6px;
-            font-weight: 700;
-            color: #1e293b;
-            font-size: 13px;
+            border-top: 1px solid #000;
+            margin-top: 45px;
+            padding-top: 5px;
+            font-weight: bold;
+            font-size: 12px;
         }
 
         .signature-box p {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 4px;
+            font-size: 11px;
+            margin-top: 2px;
         }
 
         /* ── FOOTER ── */
         .footer {
-            margin-top: 36px;
-            padding-top: 18px;
-            border-top: 2px solid #e2e8f0;
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #000;
             text-align: center;
-            color: #94a3b8;
-            font-size: 11px;
-            line-height: 1.7;
-        }
-
-        .footer strong {
-            color: #64748b;
+            font-size: 10px;
+            line-height: 1.4;
         }
 
         @media print {
             body {
-                background: white;
+                background: #fff;
                 padding: 0;
             }
             .invoice-container {
-                box-shadow: none;
-                border-radius: 0;
-                padding: 20px;
+                border: none;
+                width: 100%;
+                max-width: none;
             }
         }
     </style>
