@@ -276,11 +276,25 @@ exports.serveDynamicInvoice = async (req, res) => {
         const { filename } = req.params;
         const bookingId = filename.replace('proforma-', '').replace('.pdf', '');
         
+        console.log(`[ServeInvoice] Requested: ${filename}, BookingID: ${bookingId}`);
+
         const order = await Order.findOne({ where: { bookingId } });
         if (!order) {
             return res.status(404).send('<h1>Invoice Not Found</h1>');
         }
 
+        // 1. Try serving from Database (Base64)
+        if (order.invoiceData) {
+            console.log(`[ServeInvoice] Found persistent invoice in DB for ${bookingId}`);
+            const buffer = Buffer.from(order.invoiceData, 'base64');
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `inline; filename=${filename}`);
+            return res.send(buffer);
+        }
+
+        // 2. Generate if missing (Self-Healing / First Time)
+        console.log(`[ServeInvoice] Invoice missing in DB for ${bookingId}. Generating and persisting...`);
+        
         const buffer = await invoiceGenerator.generateProformaInvoiceBuffer({
             ...order.toJSON(),
             origin_company: order.shipperName,
@@ -302,6 +316,10 @@ exports.serveDynamicInvoice = async (req, res) => {
             currencyCode: order.currency,
             invoice_date: order.createdAt
         }, order.bookingId);
+
+        // Save to DB for future use
+        await order.update({ invoiceData: buffer.toString('base64') });
+        console.log(`[ServeInvoice] Persistent invoice saved to DB for ${bookingId}`);
 
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename=${filename}`);

@@ -126,6 +126,11 @@ const Order = sequelize.define('Order', {
         type: DataTypes.TEXT('long'),
         allowNull: true,
         comment: 'Stores the base64 content of the shipping label'
+    },
+    invoiceData: {
+        type: DataTypes.TEXT('long'),
+        allowNull: true,
+        comment: 'Stores the base64 content of the generated proforma invoice PDF'
     }
 }, {
     timestamps: true,

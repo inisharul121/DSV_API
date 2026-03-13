@@ -63,12 +63,13 @@
         .invoice-title h2 {
             font-size: 24px;
             font-weight: bold;
+            line-height: 1.1;
             margin-bottom: 5px;
         }
 
         .invoice-meta {
-            font-size: 12px;
-            margin: 2px 0;
+            font-size: 11px;
+            margin: 1px 0;
         }
 
         /* ── SECTION TITLES ── */
@@ -222,20 +223,21 @@
     <div class="invoice-container">
 
         <!-- ════════════════════  HEADER  ════════════════════ -->
-        <div class="header" style="overflow: auto;">
-            <div class="company-info" style="float: left; width: 60%;">
-                <h1>Limber Cargo</h1>
-                <p>Lättichstrasse 6, 6340 Baar, Switzerland</p>
-                <p>Country Code: CH</p>
-                <p>Contact: {{signerName}}</p>
-                <p>Phone: {{signerPhone}}</p>
+        <div class="header" style="border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 25px; overflow: hidden;">
+            <div class="company-info" style="float: left; width: 55%;">
+                <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">Limber Cargo</h1>
+                <p style="font-size: 12px; margin: 2px 0;">Lättichstrasse 6, 6340 Baar, Switzerland</p>
+                <p style="font-size: 12px; margin: 2px 0;">Country Code: CH</p>
+                <p style="font-size: 12px; margin: 2px 0;">Contact: {{signerName}}</p>
+                <p style="font-size: 12px; margin: 2px 0;">Phone: {{signerPhone}}</p>
             </div>
-            <div class="invoice-title" style="float: right; width: 38%; text-align: right;">
-                <h2 style="font-size: 22px; line-height: 1.2; margin-bottom: 8px;">PROFORMA<br>INVOICE</h2>
+            <div class="invoice-title" style="float: right; width: 44%; text-align: right;">
+                <h2 style="font-size: 22px; font-weight: bold; line-height: 1.1; margin-bottom: 10px; text-transform: uppercase;">Proforma<br>Invoice</h2>
                 <p class="invoice-meta"><strong>Invoice No:</strong> {{invoiceNumber}}</p>
                 <p class="invoice-meta"><strong>Date:</strong> {{invoiceDate}}</p>
                 <p class="invoice-meta"><strong>Booking ID:</strong> {{bookingId}}</p>
             </div>
+            <div style="clear: both;"></div>
         </div>
 
         <!-- ════════════════════  SHIPPER & CONSIGNEE  ════════════════════ -->

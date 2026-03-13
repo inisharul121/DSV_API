@@ -79,9 +79,8 @@ if (process.env.VERCEL) {
         .then(() => {
             console.log('Database connected successfully');
             
-            // If you need to sync schema, uncomment the line below temporarily:
-            // return sequelize.sync({ alter: true });
-            return Promise.resolve();
+            // Sync schema locally to add the new invoiceData column
+            return sequelize.sync({ alter: true });
         })
         .then(() => {
             const server = app.listen(config.port, () => {
