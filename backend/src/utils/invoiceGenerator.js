@@ -234,19 +234,33 @@ exports.generateProformaInvoice = async (data, bookingId) => {
         const html = exports.generateProformaInvoiceHTML(data, bookingId);
         const baseFileName = `proforma-${bookingId}`;
         const dir = getInvoicesDir();
+        console.log(`[InvoiceGen] Target directory: ${dir}`);
 
         if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
+            try {
+                fs.mkdirSync(dir, { recursive: true });
+            } catch (mkdirErr) {
+                console.warn(`[InvoiceGen] Failed to create directory ${dir}:`, mkdirErr.message);
+                // On Vercel, /tmp should exist, but let's be safe
+            }
         }
 
         // Save HTML version
         const htmlPath = path.join(dir, `${baseFileName}.html`);
-        fs.writeFileSync(htmlPath, html);
+        try {
+            fs.writeFileSync(htmlPath, html);
+        } catch (fErr) {
+            console.warn(`[InvoiceGen] Could not save HTML to disk: ${fErr.message}`);
+        }
 
         // Save PDF version using Puppeteer
         const pdfBuffer = await exports.generateProformaInvoiceBuffer(data, bookingId);
         const pdfPath = path.join(dir, `${baseFileName}.pdf`);
-        fs.writeFileSync(pdfPath, pdfBuffer);
+        try {
+            fs.writeFileSync(pdfPath, pdfBuffer);
+        } catch (fErr) {
+            console.warn(`[InvoiceGen] Could not save PDF to disk: ${fErr.message}`);
+        }
 
         // Return the PDF as the primary document
         return `${baseFileName}.pdf`;

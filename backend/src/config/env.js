@@ -4,6 +4,8 @@ const path = require('path');
 // Load env vars
 dotenv.config();
 
+const isVercel = process.env.VERCEL === '1';
+
 module.exports = {
     env: process.env.NODE_ENV || 'development',
     port: process.env.PORT || 3001,
@@ -31,8 +33,8 @@ module.exports = {
         testId: process.env.CERTIFICATION_TEST_ID || '',
     },
     paths: {
-        labels: path.resolve(process.env.LABEL_STORAGE_PATH || './public/labels'),
-        invoices: path.resolve(process.env.INVOICE_STORAGE_PATH || './public/invoices'),
+        labels: isVercel ? '/tmp' : path.resolve(process.env.LABEL_STORAGE_PATH || './public/labels'),
+        invoices: isVercel ? '/tmp' : path.resolve(process.env.INVOICE_STORAGE_PATH || './public/invoices'),
     },
     upload: {
         maxSize: process.env.MAX_UPLOAD_SIZE || '10mb',
