@@ -338,101 +338,123 @@ exports.generateProformaInvoiceBufferLegacy = (data, bookingId) => {
             const curr = data.currency || data.currencyCode || 'CHF';
             const totalShippingPrice = parseFloat(data.totalShippingPrice || 0);
             const formattedDate = formatDate(data.invoice_date || data.createdAt);
+            const signerName = data.invoice_signature || data.origin_contact || 'Mazharul Sheikh';
 
-            // Header
-            doc.font('Helvetica-Bold').fontSize(16).text('BCIC Swiss GmbH', 40, 40);
-            doc.font('Helvetica').fontSize(9).text('Lättichstrasse 6, 6340 Baar, Switzerland', 40, 60);
+            // 1. TOP HEADER SECTION
+            doc.rect(40, 40, 260, 95).stroke(); // Left box
+            doc.font('Helvetica-Bold').fontSize(16).text('Limber Cargo', 45, 48);
+            doc.font('Helvetica').fontSize(8).text('Lättichstrasse 6, 6340 Baar, Switzerland', 45, 65);
+            doc.text(`Country Code: CH`, 45, 75);
+            doc.text(`Contact: ${signerName}`, 45, 85);
+            doc.text(`Phone: ${data.origin_phone || '+41786195928'}`, 45, 95);
 
-            doc.fontSize(22).font('Helvetica-Bold').text('PROFORMA', 350, 40, { align: 'right', width: 200 });
-            doc.fontSize(22).font('Helvetica-Bold').text('INVOICE', 350, 62, { align: 'right', width: 200 });
-            doc.fontSize(9).font('Helvetica').text(`Invoice No: ${data.invoice_number || data.invoiceNumber || 'N/A'}`, 350, 88, { align: 'right', width: 200 });
-            doc.fontSize(9).font('Helvetica').text(`Date: ${formattedDate}`, 350, 100, { align: 'right', width: 200 });
+            doc.rect(300, 40, 255, 95).stroke(); // Right box
+            doc.fontSize(18).font('Helvetica-Bold').text('PROFORMA', 305, 48, { align: 'right', width: 240 });
+            doc.fontSize(18).text('INVOICE', 305, 68, { align: 'right', width: 240 });
+            doc.fontSize(8).font('Helvetica').text(`Invoice No: ${data.invoice_number || data.invoiceNumber || 'N/A'}`, 305, 95, { align: 'right', width: 240 });
+            doc.text(`Date: ${formattedDate}`, 305, 105, { align: 'right', width: 240 });
+            doc.text(`Booking ID: ${bookingId || data.bookingId || 'N/A'}`, 305, 115, { align: 'right', width: 240 });
 
-            // Title block
-            doc.rect(40, 120, 515, 28).stroke();
-            doc.font('Helvetica-Bold').fontSize(14).text('PRO FORMA TAX INVOICE', 45, 129);
-
-            // Consignor / Consignee
-            const gridTop = 168;
-            doc.rect(40, gridTop, 255, 60).stroke();
-            doc.font('Helvetica-Bold').fontSize(8).text('CONSIGNOR', 45, gridTop + 4);
-            doc.font('Helvetica').fontSize(9).text(data.origin_company || data.shipperName || 'BCIC Swiss GmbH', 45, gridTop + 16);
-            doc.fontSize(8).text(`${data.origin_address || ''}, ${data.origin_city || ''} ${data.origin_zip || ''}, ${countryName(data.origin_country || data.originCountry || 'CH')}`, 45, gridTop + 28);
-
-            doc.rect(295, gridTop, 260, 60).stroke();
-            doc.font('Helvetica-Bold').fontSize(8).text('CONSIGNEE', 300, gridTop + 4);
-            doc.font('Helvetica').fontSize(9).text(data.dest_company || data.receiverName || 'N/A', 300, gridTop + 16);
-            doc.fontSize(8).text(`${data.dest_address || ''}, ${data.dest_city || ''} ${data.dest_zip || ''}, ${countryName(data.dest_country || data.destinationCountry)}`, 300, gridTop + 28);
-
-            // Invoice meta
-            const infoLabels = ['DATE', 'BOOKING ID', 'AWB', 'INCOTERMS'];
-            const infoValues = [
-                formattedDate,
-                bookingId || data.bookingId || 'N/A',
-                data.awb || 'N/A',
-                data.incoterms || 'DAP',
-            ];
-            infoLabels.forEach((label, i) => {
-                const y = gridTop + 80 + (i * 18);
-                doc.rect(340, y, 90, 18).stroke();
-                doc.rect(430, y, 125, 18).stroke();
-                doc.font('Helvetica-Bold').fontSize(7).text(label, 345, y + 5, { width: 80, align: 'right' });
-                doc.font('Helvetica').fontSize(8).text(infoValues[i], 435, y + 5);
-            });
-
-            // Items Table
-            const tableTop = gridTop + 160;
-            doc.rect(40, tableTop, 515, 20).stroke();
-            doc.font('Helvetica-Bold').fontSize(8);
-            doc.text('DESCRIPTION', 45, tableTop + 6);
-            doc.text('HS CODE', 230, tableTop + 6);
-            doc.text('ORIGIN', 300, tableTop + 6);
-            doc.text('QTY', 350, tableTop + 6);
-            doc.text('PRICE', 390, tableTop + 6);
-            doc.text('TOTAL', 480, tableTop + 6, { align: 'right', width: 70 });
-
-            let y = tableTop + 25;
-            let items = data.items;
-            if (typeof items === 'string') {
-                try { items = JSON.parse(items); } catch (e) { items = null; }
-            }
-
-            if (!items || !Array.isArray(items)) {
-                items = [{
-                    description: data.commodity || 'Shipping Goods',
-                    hsCode: data.hsCode || 'N/A',
-                    origin: (data.origin_country || 'CH'),
-                    quantity: data.quantity || 1,
-                    unitPrice: data.unitPrice || 0
-                }];
-            }
-
+            // 2. SHIPPER & CONSIGNEE
+            doc.font('Helvetica-Bold').fontSize(10).text('SHIPPER & CONSIGNEE INFORMATION', 40, 150);
+            
+            const gridTop = 165;
+            // Shipper Box
+            doc.rect(40, gridTop, 252, 110).stroke();
+            doc.font('Helvetica-Bold').fontSize(8).text('SHIPPER (SENDER)', 45, gridTop + 5, { underline: true });
             doc.font('Helvetica').fontSize(8);
-            items.forEach((item, i) => {
-                const itemQty = parseInt(item.quantity) || 1;
-                const itemPrice = parseFloat(item.unitPrice || 0);
-                const itemTotal = (itemQty * itemPrice).toFixed(2);
+            doc.text(`Company: ${data.origin_company || data.shipperName || 'Limber Cargo'}`, 45, gridTop + 18);
+            doc.text(`Address: ${data.origin_address || 'N/A'}`, 45, gridTop + 28);
+            doc.text(`City/ZIP: ${data.origin_city || ''} ${data.origin_zip || ''}`, 45, gridTop + 38);
+            doc.text(`Country: ${countryName(data.origin_country || 'CH')} (${data.origin_country || 'CH'})`, 45, gridTop + 48);
+            doc.text(`Contact: ${data.origin_contact || signerName}`, 45, gridTop + 58);
+            doc.text(`Phone: ${data.origin_phone || 'N/A'}`, 45, gridTop + 68);
+            doc.text(`E-Mail: ${data.origin_email || ''}`, 45, gridTop + 78);
+            doc.text(`Pickup: ${formatDate(data.pickup_date || data.createdAt)}`, 45, gridTop + 88);
 
-                doc.text(item.description || 'N/A', 45, y, { width: 175, height: 10, ellipsis: true });
-                doc.text(item.hsCode || 'N/A', 230, y);
-                doc.text(item.origin || 'CH', 300, y);
-                doc.text(itemQty.toString(), 350, y);
-                doc.text(`${curr} ${itemPrice.toFixed(2)}`, 390, y);
-                doc.text(`${curr} ${itemTotal}`, 480, y, { align: 'right', width: 70 });
-                y += 15;
+            // Consignee Box
+            doc.rect(302, gridTop, 253, 110).stroke();
+            doc.font('Helvetica-Bold').fontSize(8).text('CONSIGNEE (RECEIVER)', 307, gridTop + 5, { underline: true });
+            doc.font('Helvetica').fontSize(8);
+            doc.text(`Company: ${data.dest_company || data.receiverName || 'N/A'}`, 307, gridTop + 18);
+            doc.text(`Address: ${data.dest_address || 'N/A'}`, 307, gridTop + 28);
+            doc.text(`City/ZIP: ${data.dest_city || ''} ${data.dest_zip || ''}`, 307, gridTop + 38);
+            doc.text(`Country: ${countryName(data.dest_country)} (${data.dest_country || ''})`, 307, gridTop + 48);
+            doc.text(`Contact: ${data.dest_contact || 'N/A'}`, 307, gridTop + 58);
+            doc.text(`Phone: ${data.dest_phone || 'N/A'}`, 307, gridTop + 68);
+            doc.text(`Shipping Charges: Sender`, 307, gridTop + 78);
+            doc.text(`Duties & Taxes: Receiver`, 307, gridTop + 88);
+
+            // 3. SHIPMENT DETAILS
+            doc.font('Helvetica-Bold').fontSize(10).text('SHIPMENT DETAILS', 40, 290);
+            const tableTop = 305;
+            
+            // Table Header
+            doc.rect(40, tableTop, 515, 20).stroke();
+            doc.fontSize(7);
+            doc.text('DESCRIPTION OF GOODS', 45, tableTop + 7);
+            doc.text('HS CODE', 225, tableTop + 7);
+            doc.text('COUNTRY OF ORIGIN', 280, tableTop + 7);
+            doc.text('QTY', 375, tableTop + 7);
+            doc.text('UOM', 395, tableTop + 7);
+            doc.text('UNIT PRICE', 435, tableTop + 7);
+            doc.text('NET WEIGHT', 495, tableTop + 7);
+            doc.text('TOTAL VALUE', 545, tableTop + 7, { align: 'right', width: 10 }); // Dummy width to align text right
+
+            // Table Rows
+            let y = tableTop + 20;
+            let items = data.items;
+            if (typeof items === 'string') { try { items = JSON.parse(items); } catch (e) { items = null; } }
+            if (!items || !Array.isArray(items)) {
+                items = [{ description: data.commodity || 'Shipping Goods', hsCode: data.hsCode || 'N/A', origin: (data.origin_country || 'CH'), quantity: data.quantity || 1, uom: data.uom || 'Pieces', unitPrice: data.unitPrice, netWeight: data.netWeight || data.weight || 0 }];
+            }
+
+            items.forEach((item) => {
+                doc.rect(40, y, 515, 18).stroke();
+                doc.font('Helvetica').fontSize(7);
+                doc.text(item.description || 'N/A', 45, y + 5, { width: 170, ellipsis: true });
+                doc.text(item.hsCode || 'N/A', 225, y + 5);
+                doc.text(item.origin || data.origin_country || 'CH', 280, y + 5);
+                doc.text(item.quantity?.toString() || '1', 375, y + 5);
+                doc.text(item.uom || 'Pieces', 395, y + 5);
+                doc.text(`${curr} ${parseFloat(item.unitPrice || 0).toFixed(2)}`, 435, y + 5);
+                doc.text(`${item.netWeight || 0} kg`, 495, y + 5);
+                const val = (parseFloat(item.unitPrice || 0) * (parseInt(item.quantity) || 1)).toFixed(2);
+                doc.text(`${curr} ${val}`, 510, y + 5, { align: 'right', width: 40 });
+                y += 18;
             });
 
-            // Totals
-            const totalsY = Math.max(y + 20, 500);
-            doc.rect(340, totalsY, 215, 40).stroke();
-            doc.font('Helvetica-Bold').fontSize(9).text('TOTAL ESTIMATE', 350, totalsY + 6);
-            doc.font('Helvetica-Bold').fontSize(14).text(`${curr} ${totalShippingPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 350, totalsY + 18, { width: 195, align: 'right' });
+            // 4. BOTTOM INFO BOXES
+            const bottomBoxTop = y + 15;
+            doc.rect(40, bottomBoxTop, 252, 65).stroke();
+            doc.font('Helvetica').fontSize(8);
+            doc.text(`Gross Weight: ${data.totalWeight || data.weight || 0} kg`, 45, bottomBoxTop + 8);
+            doc.text(`Net Weight: ${data.netWeight || data.weight || 0} kg`, 45, bottomBoxTop + 18);
+            doc.text(`Dimensions (HxLxW): ${data.height || 0}x${data.length || 0}x${data.width || 0} cm`, 45, bottomBoxTop + 28);
+            doc.text(`No. of Packages: ${data.quantity || 1} pcs`, 45, bottomBoxTop + 38);
+            doc.text(`Incoterms: ${data.incoterms || 'DAP'}`, 45, bottomBoxTop + 48);
 
-            // Signature
-            const sigY = 680;
+            doc.rect(302, bottomBoxTop, 253, 65).stroke();
+            doc.text(`Service Code: ${data.serviceCode || 'DSVAirExpress'}`, 307, bottomBoxTop + 8);
+            doc.text(`AWB / Shipment Ref: ${data.awb || bookingId || 'N/A'}`, 307, bottomBoxTop + 18);
+            doc.text(`Invoice Type: PROFORMA`, 307, bottomBoxTop + 28);
+            doc.text(`IOSS Number: ${data.iossNumber || ''}`, 307, bottomBoxTop + 38);
+
+            // 5. TOTALS
+            const totalY = bottomBoxTop + 80;
+            doc.rect(302, totalY, 253, 35).stroke();
+            doc.font('Helvetica-Bold').fontSize(10).text('TOTAL ESTIMATE:', 307, totalY + 12);
+            doc.fontSize(14).text(`${curr} ${totalShippingPrice.toFixed(2)}`, 307, totalY + 10, { align: 'right', width: 240 });
+
+            // 6. SIGNATURE
+            const sigY = totalY + 80;
             doc.moveTo(40, sigY).lineTo(200, sigY).stroke();
             doc.font('Helvetica').fontSize(8).text('Authorized Signature', 40, sigY + 5);
-            doc.text('BCIC Swiss GmbH', 40, sigY + 18);
+            doc.text('Limber Cargo', 40, sigY + 15);
+            
+            doc.moveTo(350, sigY).lineTo(510, sigY).stroke();
+            doc.text(signerName, 350, sigY + 5);
+            doc.text('Signer / Responsible Person', 350, sigY + 15);
 
             doc.end();
         } catch (error) {
