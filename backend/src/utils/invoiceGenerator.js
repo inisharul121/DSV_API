@@ -340,12 +340,13 @@ exports.generateProformaInvoiceBufferLegacy = (data, bookingId) => {
             const formattedDate = formatDate(data.invoice_date || data.createdAt);
 
             // Header
-            doc.font('Helvetica-Bold').fontSize(18).text('BCIC Swiss GmbH', 40, 40);
-            doc.font('Helvetica').fontSize(9).text('Lättichstrasse 6, 6340 Baar, Switzerland', 40, 62);
+            doc.font('Helvetica-Bold').fontSize(16).text('BCIC Swiss GmbH', 40, 40);
+            doc.font('Helvetica').fontSize(9).text('Lättichstrasse 6, 6340 Baar, Switzerland', 40, 60);
 
-            doc.fontSize(22).font('Helvetica-Bold').text('PROFORMA INVOICE', 350, 40, { align: 'right', width: 200 });
-            doc.fontSize(9).font('Helvetica').text(`Invoice No: ${data.invoice_number || data.invoiceNumber || 'N/A'}`, 350, 68, { align: 'right', width: 200 });
-            doc.fontSize(9).font('Helvetica').text(`Date: ${formattedDate}`, 350, 80, { align: 'right', width: 200 });
+            doc.fontSize(22).font('Helvetica-Bold').text('PROFORMA', 350, 40, { align: 'right', width: 200 });
+            doc.fontSize(22).font('Helvetica-Bold').text('INVOICE', 350, 62, { align: 'right', width: 200 });
+            doc.fontSize(9).font('Helvetica').text(`Invoice No: ${data.invoice_number || data.invoiceNumber || 'N/A'}`, 350, 88, { align: 'right', width: 200 });
+            doc.fontSize(9).font('Helvetica').text(`Date: ${formattedDate}`, 350, 100, { align: 'right', width: 200 });
 
             // Title block
             doc.rect(40, 120, 515, 28).stroke();
