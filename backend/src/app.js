@@ -30,10 +30,13 @@ app.use(express.urlencoded({ extended: true }));
 
 const orderController = require('./controllers/orderController');
 
-// Serve static templates (only compile-time files)
+// Serve static templates
 app.use('/api/templates', express.static(path.resolve('./public/templates'))); 
 
-// Dynamic serving of runtime-generated PDFs (Fix for Vercel 404s)
+// Dynamic serving & Static Fallback for runtime-generated files
+app.use('/api/labels', express.static(path.resolve('./public/labels')));
+app.use('/api/invoices', express.static(path.resolve('./public/invoices')));
+
 app.get('/api/labels/:filename', orderController.serveDynamicLabel);
 app.get('/api/invoices/:filename', orderController.serveDynamicInvoice);
 

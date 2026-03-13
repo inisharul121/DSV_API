@@ -195,8 +195,8 @@ exports.createSimpleBooking = async (req, res) => {
                     : parseFloat(shipmentData.goodsValue || 0),
                 currency: shipmentData.currencyCode || "CHF",
                 status: 'Created',
-                labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
-                invoiceUrl: savedInvoicePath,
+                labelUrl: savedLabelPath ? `/api/labels/${savedLabelPath}` : null,
+                invoiceUrl: savedInvoicePath ? `/api${savedInvoicePath}` : null,
                 hsCode: shipmentData.items?.[0]?.hsCode || shipmentData.hsCode || null,
                 quantity: shipmentData.items?.length > 0
                     ? shipmentData.items.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0)
@@ -255,8 +255,8 @@ exports.createSimpleBooking = async (req, res) => {
             success: true,
             bookingId,
             shipmentId: bookingId,
-            labelUrl: savedLabelPath ? `/labels/${savedLabelPath}` : null,
-            invoiceUrl: savedInvoicePath,
+            labelUrl: savedLabelPath ? `/api/labels/${savedLabelPath}` : null,
+            invoiceUrl: savedInvoicePath ? `/api${savedInvoicePath}` : null,
             labelWarning: !savedLabelPath ? "Booking created but no labels could be retrieved (this is normal if you don't have a label subscription)." : null,
             trackingUrl: `https://track.dsv.com?bookingId=${bookingId}`
         });

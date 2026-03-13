@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+const config = require('../config/env');
 const Order = require('../models/Order');
 const ProformaInvoice = require('../models/ProformaInvoice');
 const invoiceGenerator = require('../utils/invoiceGenerator');
@@ -195,15 +198,30 @@ exports.serveDynamicLabel = async (req, res) => {
         const { filename } = req.params;
         const bookingId = filename.replace('label-', '').replace('.pdf', '');
         
+        console.log(`[ServeLabel] Requested: ${filename}, BookingID: ${bookingId}`);
+
         const order = await Order.findOne({ where: { bookingId } });
-        if (!order || !order.labelData) {
-            return res.status(404).send('<h1>Label Not Found</h1>');
+        
+        // 1. Try serving from Database (Base64)
+        if (order && order.labelData) {
+            console.log(`[ServeLabel] Found label in DB for ${bookingId}`);
+            const buffer = Buffer.from(order.labelData, 'base64');
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `inline; filename=${filename}`);
+            return res.send(buffer);
         }
 
-        const buffer = Buffer.from(order.labelData, 'base64');
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename=${filename}`);
-        res.send(buffer);
+        // 2. Fallback: Try serving from Filesystem
+        const filePath = path.join(config.paths.labels, filename);
+        if (fs.existsSync(filePath)) {
+            console.log(`[ServeLabel] Found physical file for ${filename}, serving from disk.`);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `inline; filename=${filename}`);
+            return res.sendFile(filePath);
+        }
+
+        console.warn(`[ServeLabel] Label NOT found for ${bookingId} in DB or disk.`);
+        res.status(404).send('<h1>Label Not Found</h1><p>The requested label could not be found in our records or on disk.</p>');
     } catch (error) {
         console.error('Dynamic Label Serve Error:', error);
         res.status(500).send('Error retrieving label');
