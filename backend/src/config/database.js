@@ -16,7 +16,8 @@ console.log(`[Database] Mode: ${isVercel ? 'Production/Vercel' : 'Development/Lo
 
 if (DATABASE_URL) {
     // 1. Connection via Full URL (Railway Public URL)
-    console.log('[Database] Connecting using DATABASE_URL...');
+    const maskedUrl = DATABASE_URL.replace(/:([^@]+)@/, ':****@');
+    console.log(`[Database] Connecting using DATABASE_URL: ${maskedUrl}`);
     sequelize = new Sequelize(DATABASE_URL, {
         dialect: 'mysql',
         dialectModule: mysql2,
@@ -35,7 +36,9 @@ if (DATABASE_URL) {
     });
 } else if (isVercel) {
     // 2. Connection via individual vars on Vercel (Railway Private/Individual vars)
-    console.log('[Database] Connecting using individual Vercel/Railway env vars...');
+    const host = process.env.DB_HOST || config.database.host;
+    const dbName = process.env.DB_NAME || config.database.database;
+    console.log(`[Database] Connecting to: ${host} / ${dbName} (Vercel/Railway)`);
     sequelize = new Sequelize(
         process.env.DB_NAME || config.database.database,
         process.env.DB_USER || config.database.username,
@@ -61,7 +64,7 @@ if (DATABASE_URL) {
     );
 } else {
     // 3. Connection via Local XAMPP
-    console.log('[Database] Connecting to Local XAMPP...');
+    console.log(`[Database] Connecting to: ${config.database.host} / ${config.database.database} (Local XAMPP)`);
     sequelize = new Sequelize(
         config.database.database,
         config.database.username,
