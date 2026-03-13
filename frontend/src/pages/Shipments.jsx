@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Truck, Search, Filter, Download, ExternalLink, Package, Clock, CheckCircle, AlertCircle, RefreshCw, Printer, ShieldCheck, Loader2, ChevronRight, FileText } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
-import API_BASE_URL from '../utils/urlConfig';
+import API_BASE_URL, { resolveUrl } from '../utils/urlConfig';
 
 const Shipments = () => {
     const [trackingId, setTrackingId] = useState('');
@@ -174,7 +174,7 @@ const Shipments = () => {
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     {s.labelUrl ? (
                                         <a
-                                            href={`${API_BASE_URL}${s.labelUrl}`}
+                                            href={resolveUrl(s.labelUrl)}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="btn-primary"
@@ -247,7 +247,7 @@ const Shipments = () => {
                                     <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
                                         {s.labelUrl ? (
                                             <a
-                                                href={`${API_BASE_URL}${s.labelUrl}`}
+                                                href={resolveUrl(s.labelUrl)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', marginRight: '1rem', textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem' }}

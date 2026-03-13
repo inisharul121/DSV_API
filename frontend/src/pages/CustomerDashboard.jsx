@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Package, Truck, FileText, CheckCircle, Clock, ArrowRight, ExternalLink } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
-import API_BASE_URL from '../utils/urlConfig';
+import API_BASE_URL, { resolveUrl } from '../utils/urlConfig';
 
 const StatCard = ({ icon: Icon, value, label, color, bgColor }) => (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem' }}>
@@ -156,7 +156,7 @@ const CustomerDashboard = () => {
                                                 </Link>
                                                 {order.labelUrl && (
                                                     <a
-                                                        href={`${API_BASE_URL}${order.labelUrl}`}
+                                                        href={resolveUrl(order.labelUrl)}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="btn-secondary"

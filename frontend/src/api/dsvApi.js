@@ -1,10 +1,14 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
-    if (import.meta.env.DEV) return 'http://localhost:3001/api';
-    return import.meta.env.VITE_API_URL
-        ? `${import.meta.env.VITE_API_URL}/api`
-        : 'https://dsv-api-backend.vercel.app/api';
+    let baseUrl = import.meta.env.DEV ? 'http://localhost:3001' : (import.meta.env.VITE_API_URL || 'https://dsv-api-backend.vercel.app');
+    
+    // Standardize: Remove trailing slash, then add /api if missing
+    if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+    if (!baseUrl.endsWith('/api')) {
+        baseUrl = `${baseUrl}/api`;
+    }
+    return baseUrl;
 };
 
 const dsvApi = axios.create({

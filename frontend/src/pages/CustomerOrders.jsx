@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, Package, RefreshCw, FileText, ExternalLink, Truck } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
-import { API_BASE_URL } from '../utils/urlConfig';
+import API_BASE_URL, { resolveUrl } from '../utils/urlConfig';
 
 const CustomerOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -160,7 +160,7 @@ const CustomerOrders = () => {
                                             <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                                 {order.labelUrl && (
                                                     <a
-                                                        href={`${API_BASE_URL}${order.labelUrl}`}
+                                                        href={resolveUrl(order.labelUrl)}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="btn-secondary"
