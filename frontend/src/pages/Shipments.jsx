@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Truck, Search, Filter, Download, ExternalLink, Package, Clock, CheckCircle, AlertCircle, RefreshCw, Printer, ShieldCheck, Loader2, ChevronRight, FileText } from 'lucide-react';
 import dsvApi from '../api/dsvApi';
 import { toast } from 'react-hot-toast';
+import API_BASE_URL from '../utils/urlConfig';
 
 const Shipments = () => {
     const [trackingId, setTrackingId] = useState('');
@@ -171,14 +172,27 @@ const Shipments = () => {
                                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.destinationCountry} • {new Date(s.createdAt).toLocaleDateString()}</div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <button
-                                        className="btn-primary"
-                                        style={{ padding: '0.4rem', borderRadius: '8px', background: '#e2e8f0', color: '#475569' }}
-                                        onClick={() => handleDownloadLabel(s.bookingId)}
-                                        title="Download Label"
-                                    >
-                                        {downloading === s.bookingId ? <Loader2 size={16} className="spin" /> : <Download size={16} />}
-                                    </button>
+                                    {s.labelUrl ? (
+                                        <a
+                                            href={`${API_BASE_URL}${s.labelUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="btn-primary"
+                                            style={{ padding: '0.4rem', borderRadius: '8px', background: '#e2e8f0', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                            title="Download Label"
+                                        >
+                                            <Download size={16} />
+                                        </a>
+                                    ) : (
+                                        <button
+                                            className="btn-primary"
+                                            style={{ padding: '0.4rem', borderRadius: '8px', background: '#e2e8f0', color: '#475569' }}
+                                            onClick={() => handleDownloadLabel(s.bookingId)}
+                                            title="Download Label"
+                                        >
+                                            {downloading === s.bookingId ? <Loader2 size={16} className="spin" /> : <Download size={16} />}
+                                        </button>
+                                    )}
                                     <button
                                         className="btn-primary"
                                         style={{ padding: '0.4rem', borderRadius: '8px' }}
@@ -231,13 +245,24 @@ const Shipments = () => {
                                     </td>
                                     <td style={{ padding: '1rem 0.5rem', fontFamily: 'monospace' }}>{s.awb || s.bookingId}</td>
                                     <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
-                                        <button
-                                            onClick={() => handleDownloadLabel(s.bookingId)}
-                                            disabled={downloading === s.bookingId}
-                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', marginRight: '1rem' }}
-                                        >
-                                            {downloading === s.bookingId ? '...' : 'Label'}
-                                        </button>
+                                        {s.labelUrl ? (
+                                            <a
+                                                href={`${API_BASE_URL}${s.labelUrl}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', marginRight: '1rem', textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem' }}
+                                            >
+                                                Label
+                                            </a>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleDownloadLabel(s.bookingId)}
+                                                disabled={downloading === s.bookingId}
+                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', marginRight: '1rem' }}
+                                            >
+                                                {downloading === s.bookingId ? '...' : 'Label'}
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => handleTrack(null, s.bookingId)}
                                             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)' }}

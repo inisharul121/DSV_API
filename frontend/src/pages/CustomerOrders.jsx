@@ -111,7 +111,7 @@ const CustomerOrders = () => {
                         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead>
                                 <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem' }}>
-                                    {['Date', 'Booking ID', 'Destination', 'Weight', 'Value', 'Status', 'Actions'].map(h => (
+                                    {['Date', 'Booking ID', 'Destination', 'Weight', 'Value', 'Status', 'Invoice', 'Actions'].map(h => (
                                         <th key={h} style={{ padding: '1rem 0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
                                     ))}
                                 </tr>
@@ -141,7 +141,23 @@ const CustomerOrders = () => {
                                             </span>
                                         </td>
                                         <td style={{ padding: '1rem 0.75rem' }}>
-                                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                            <a
+                                                href={`${API_BASE_URL}/customer/orders/${order.id}/invoice?token=${token}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn-secondary"
+                                                style={{
+                                                    padding: '0.35rem 0.6rem', borderRadius: '8px', fontSize: '0.75rem',
+                                                    display: 'flex', alignItems: 'center', gap: '0.3rem',
+                                                    background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none', textDecoration: 'none', fontWeight: 600, width: 'fit-content'
+                                                }}
+                                                title="Download PDF Invoice"
+                                            >
+                                                <FileText size={12} /> PDF
+                                            </a>
+                                        </td>
+                                        <td style={{ padding: '1rem 0.75rem' }}>
+                                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
                                                 {order.labelUrl && (
                                                     <a
                                                         href={`${API_BASE_URL}${order.labelUrl}`}
@@ -154,6 +170,7 @@ const CustomerOrders = () => {
                                                     </a>
                                                 )}
                                                 
+                                                {/* Hidden as requested: HTML Preview Link
                                                 <a
                                                     href={`${API_BASE_URL}/customer/orders/${order.id}/invoice-html?token=${token}`}
                                                     target="_blank"
@@ -168,21 +185,7 @@ const CustomerOrders = () => {
                                                 >
                                                     <FileText size={12} /> HTML
                                                 </a>
-
-                                                <a
-                                                    href={`${API_BASE_URL}/customer/orders/${order.id}/invoice?token=${token}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="btn-secondary"
-                                                    style={{
-                                                        padding: '0.35rem 0.6rem', borderRadius: '8px', fontSize: '0.75rem',
-                                                        display: 'flex', alignItems: 'center', gap: '0.3rem',
-                                                        background: 'rgba(37,99,235,0.1)', color: '#2563eb', border: 'none', textDecoration: 'none', fontWeight: 600
-                                                    }}
-                                                    title="Download PDF Invoice"
-                                                >
-                                                    <FileText size={12} /> PDF
-                                                </a>
+                                                */}
 
                                                 <Link
                                                     to={`/portal/shipments?id=${order.bookingId}`}
