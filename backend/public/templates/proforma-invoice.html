@@ -222,23 +222,24 @@
 <body>
     <div class="invoice-container">
 
-        <!-- ════════════════════  HEADER  ════════════════════ -->
-        <div class="header" style="border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 25px; overflow: hidden;">
-            <div class="company-info" style="float: left; width: 55%;">
-                <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">Limber Cargo</h1>
-                <p style="font-size: 12px; margin: 2px 0;">Lättichstrasse 6, 6340 Baar, Switzerland</p>
-                <p style="font-size: 12px; margin: 2px 0;">Country Code: CH</p>
-                <p style="font-size: 12px; margin: 2px 0;">Contact: {{signerName}}</p>
-                <p style="font-size: 12px; margin: 2px 0;">Phone: {{signerPhone}}</p>
-            </div>
-            <div class="invoice-title" style="float: right; width: 44%; text-align: right;">
-                <h2 style="font-size: 22px; font-weight: bold; line-height: 1.1; margin-bottom: 10px; text-transform: uppercase;">Proforma<br>Invoice</h2>
-                <p class="invoice-meta"><strong>Invoice No:</strong> {{invoiceNumber}}</p>
-                <p class="invoice-meta"><strong>Date:</strong> {{invoiceDate}}</p>
-                <p class="invoice-meta"><strong>Booking ID:</strong> {{bookingId}}</p>
-            </div>
-            <div style="clear: both;"></div>
-        </div>
+        <!-- ════════════════════  HEADER (TABLE BASED FOR PDF STABILITY)  ════════════════════ -->
+        <table style="width: 100%; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 55%; vertical-align: top; text-align: left;">
+                    <h1 style="font-size: 26px; font-weight: bold; margin-bottom: 8px;">Limber Cargo</h1>
+                    <p style="font-size: 13px; margin: 3px 0;">Lättichstrasse 6, 6340 Baar, Switzerland</p>
+                    <p style="font-size: 13px; margin: 3px 0;">Country Code: CH</p>
+                    <p style="font-size: 13px; margin: 3px 0;">Contact: {{signerName}}</p>
+                    <p style="font-size: 13px; margin: 3px 0;">Phone: {{signerPhone}}</p>
+                </td>
+                <td style="width: 45%; vertical-align: top; text-align: right;">
+                    <h2 style="font-size: 24px; font-weight: bold; line-height: 1.2; margin-bottom: 12px; text-transform: uppercase;">Proforma<br>Invoice</h2>
+                    <p class="invoice-meta" style="font-size: 12px; margin: 2px 0;"><strong>Invoice No:</strong> {{invoiceNumber}}</p>
+                    <p class="invoice-meta" style="font-size: 12px; margin: 2px 0;"><strong>Date:</strong> {{invoiceDate}}</p>
+                    <p class="invoice-meta" style="font-size: 12px; margin: 2px 0;"><strong>Booking ID:</strong> {{bookingId}}</p>
+                </td>
+            </tr>
+        </table>
 
         <!-- ════════════════════  SHIPPER & CONSIGNEE  ════════════════════ -->
         <div class="section">

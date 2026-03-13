@@ -274,17 +274,18 @@ exports.serveDynamicLabel = async (req, res) => {
 exports.serveDynamicInvoice = async (req, res) => {
     try {
         const { filename } = req.params;
+        const { refresh } = req.query;
         const bookingId = filename.replace('proforma-', '').replace('.pdf', '');
         
-        console.log(`[ServeInvoice] Requested: ${filename}, BookingID: ${bookingId}`);
+        console.log(`[ServeInvoice] Requested: ${filename}, BookingID: ${bookingId}, Refresh: ${refresh === 'true'}`);
 
         const order = await Order.findOne({ where: { bookingId } });
         if (!order) {
             return res.status(404).send('<h1>Invoice Not Found</h1>');
         }
 
-        // 1. Try serving from Database (Base64)
-        if (order.invoiceData) {
+        // 1. Try serving from Database (unless refresh is requested)
+        if (order.invoiceData && refresh !== 'true') {
             console.log(`[ServeInvoice] Found persistent invoice in DB for ${bookingId}`);
             const buffer = Buffer.from(order.invoiceData, 'base64');
             res.setHeader('Content-Type', 'application/pdf');
@@ -292,8 +293,8 @@ exports.serveDynamicInvoice = async (req, res) => {
             return res.send(buffer);
         }
 
-        // 2. Generate if missing (Self-Healing / First Time)
-        console.log(`[ServeInvoice] Invoice missing in DB for ${bookingId}. Generating and persisting...`);
+        // 2. Generate/Refresh if missing or requested
+        console.log(`[ServeInvoice] ${refresh === 'true' ? 'Refreshing' : 'Generating'} invoice for ${bookingId}...`);
         
         const buffer = await invoiceGenerator.generateProformaInvoiceBuffer({
             ...order.toJSON(),
