@@ -1,0 +1,580 @@
+import React, { useState } from 'react';
+import { ArrowLeft, Send, Building2, MapPin, Phone, Mail, User, ShieldCheck, FileUp, Plus, X } from 'lucide-react';
+import { countries } from '../../utils/countries';
+import dsvApi from '../../api/dsvApi';
+import { toast } from 'react-hot-toast';
+
+const Step3Booking = ({ data, updateData, onBack, onComplete }) => {
+    const [submitting, setSubmitting] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        setSelectedFiles(prev => [...prev, ...files]);
+    };
+
+    const removeFile = (index) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // Internal state for the complex form
+    const [form, setForm] = useState({
+        collectDateFrom: new Date(new Date().getTime() + 2 * 60 * 60 * 1000).toISOString().slice(0, 16),
+        collectDateTo: new Date(new Date().getTime() + 6 * 60 * 60 * 1000).toISOString().slice(0, 16),
+        pickupInstructions: 'Ready at front desk',
+        origin: { ...data.sender, eori: '' },
+        dest: {
+            company: data.receiver?.company || '',
+            address: data.receiver?.address || '',
+            zip: data.receiver?.zip || '',
+            city: data.receiver?.city || '',
+            country: data.receiver?.country || '',
+            contact: data.receiver?.contact || '',
+            phone: data.receiver?.phone || '',
+            email: data.receiver?.email || '',
+            eori: ''
+        },
+        payment: {
+            shippingCharges: 'SENDER',
+            dutiesTaxes: 'RECEIVER',
+            iossNumber: ''
+        },
+        invoice: {
+            number: 'INV-' + Date.now().toString().slice(-6),
+            type: 'PROFORMA',
+            signature: data.sender?.contact || ''
+        },
+        service: {
+            packageType: 'PARCELS',
+            serviceCode: data.serviceCode || 'DSVAirExpress',
+            currency: data.pricing?.currency || 'CHF',
+            insuranceValue: 0
+        },
+        measurements: {
+            length: data.dimensions.length,
+            width: data.dimensions.width,
+            height: data.dimensions.height,
+            weight: data.weight,
+            length2: '',
+            width2: '',
+            height2: '',
+            weight2: ''
+        },
+        items: [{
+            origin: 'CH',
+            description: 'Shipping Goods',
+            currency: 'CHF',
+            value: 60,
+            hsCode: '',
+            quantity: 1,
+            unitPrice: 60,
+            netWeight: 1,
+            uom: 'Pieces',
+            reasonForExport: 'SALE',
+            incoterms: 'DAP'
+        }],
+        notifications: {
+            dep: 'recipient1@receiver.com',
+            exc: 'recipient1@receiver.com',
+            lang: 'EN'
+        },
+        reference: {
+            qualifier: 'SHPR_REF',
+            value: ''
+        }
+    });
+
+    const handleFormChange = (section, field, value) => {
+        setForm(prev => ({
+            ...prev,
+            [section]: {
+                ...prev[section],
+                [field]: value
+            }
+        }));
+    };
+
+    const handleItemChange = (index, field, value) => {
+        const newItems = [...form.items];
+        newItems[index] = { ...newItems[index], [field]: value };
+        setForm(prev => ({ ...prev, items: newItems }));
+    };
+
+    const addItem = () => {
+        setForm(prev => ({
+            ...prev,
+            items: [...prev.items, { 
+                ...prev.items[0], 
+                description: '', 
+                hsCode: '', 
+                quantity: 1, 
+                value: 60,
+                unitPrice: 60,
+                netWeight: 1
+            }]
+        }));
+    };
+
+    const removeItem = (index) => {
+        if (form.items.length > 1) {
+            setForm(prev => ({
+                ...prev,
+                items: prev.items.filter((_, i) => i !== index)
+            }));
+        }
+    };
+
+    // Synchronize price when service code changes in this form
+    React.useEffect(() => {
+        if (data.availableServices) {
+            const newSvc = data.availableServices.find(s => s.serviceCode === form.service.serviceCode);
+            if (newSvc) {
+                updateData({
+                    serviceCode: newSvc.serviceCode,
+                    pricing: {
+                        totalPrice: newSvc.totalDisplay,
+                        currency: newSvc.currency,
+                        breakdown: newSvc.detailedBreakdown
+                    }
+                });
+            }
+        }
+    }, [form.service.serviceCode]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+            // Aggregated values for the API
+            const totalGoodsValue = form.items.reduce((sum, item) => sum + parseFloat(item.value || (item.unitPrice * item.quantity) || 0), 0);
+            const totalQuantity = form.items.reduce((sum, item) => sum + (parseInt(item.quantity) || 1), 0);
+
+            // Mapping for the API
+            const payload = {
+                collectDateFrom: form.collectDateFrom,
+                collectDateTo: form.collectDateTo,
+                pickupInstructions: form.pickupInstructions,
+                origin_company: form.origin.company,
+                origin_address: form.origin.address,
+                origin_zip: form.origin.zip,
+                origin_city: form.origin.city,
+                origin_country: form.origin.country,
+                origin_contact: form.origin.contact,
+                origin_phone: form.origin.phone,
+                origin_email: form.origin.email,
+                origin_eori: form.origin.eori,
+
+                dest_company: form.dest.company,
+                dest_address: form.dest.address,
+                dest_zip: form.dest.zip,
+                dest_city: form.dest.city,
+                dest_country: form.dest.country,
+                dest_contact: form.dest.contact,
+                dest_phone: form.dest.phone,
+                dest_email: form.dest.email,
+                dest_eori: form.dest.eori,
+
+                paymentType: form.payment.shippingCharges,
+                dutiesType: form.payment.dutiesTaxes,
+                iossNumber: form.payment.iossNumber,
+
+                invoice_number: form.invoice.number,
+                invoice_type: form.invoice.type,
+                invoice_signature: form.invoice.signature,
+
+                packageType: form.service.packageType,
+                serviceCode: form.service.serviceCode,
+                currencyCode: form.service.currency,
+                insuranceValue: form.service.insuranceValue,
+
+                length: form.measurements.length,
+                width: form.measurements.width,
+                height: form.measurements.height,
+                weight: form.measurements.weight,
+
+                items: form.items,
+                commodity_origin: form.items[0].origin,
+                commodity: form.items[0].description,
+                commodity_currency: form.items[0].currency,
+                goodsValue: totalGoodsValue,
+                hsCode: form.items[0].hsCode,
+                quantity: totalQuantity,
+                unitPrice: form.items[0].unitPrice,
+                netWeight: form.items[0].netWeight,
+                uom: form.items[0].uom,
+                reasonForExport: form.items[0].reasonForExport,
+                incoterms: form.items[0].incoterms,
+
+                notif_email_1: form.notifications.dep,
+                notif_email_2: form.notifications.exc,
+                notif_lang: form.notifications.lang,
+
+                ref_value: form.reference.value,
+
+                // Static/Dynamic Pricing Data
+                totalShippingPrice: data.pricing?.totalPrice || 0,
+                baseShippingPrice: (parseFloat(data.pricing?.totalPrice || 0) - 15).toFixed(2)
+            };
+
+            const formData = new FormData();
+            formData.append('shipmentData', JSON.stringify(payload));
+            selectedFiles.forEach(file => {
+                formData.append('documents', file);
+            });
+
+            const response = await dsvApi.post('/bookings/simple', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            if (response.data.success) {
+                toast.success('Booking created successfully!');
+                onComplete(response.data);
+            } else {
+                toast.error('Booking failed: ' + (response.data.error || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error('Booking error:', err);
+            toast.error('Booking failed. Please check the console for details.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const SectionHeader = ({ title, icon: Icon }) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0' }}>
+            {Icon && <Icon size={20} color="var(--accent)" />}
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, textTransform: 'uppercase' }}>{title}</h3>
+        </div>
+    );
+
+    return (
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <div className="card" style={{ padding: '2.5rem', background: 'white' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                    <h2 style={{ fontWeight: 800 }}>BOOKING INFORMATION</h2>
+                    <div style={{ background: 'var(--accent)', color: 'white', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>
+                        WIZARD DATA ATTACHED
+                    </div>
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
+                        {/* LEFT COLUMN */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                            <section>
+                                <SectionHeader title="Pickup Information" icon={Building2} />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Date From *</label>
+                                        <input type="datetime-local" className="input-field" required value={form.collectDateFrom} onChange={(e) => setForm({ ...form, collectDateFrom: e.target.value })} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">Date To *</label>
+                                        <input type="datetime-local" className="input-field" required value={form.collectDateTo} onChange={(e) => setForm({ ...form, collectDateTo: e.target.value })} />
+                                    </div>
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '1rem' }}>
+                                    <label className="input-label">Pickup Instructions</label>
+                                    <input type="text" className="input-field" value={form.pickupInstructions} onChange={(e) => setForm({ ...form, pickupInstructions: e.target.value })} />
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '1rem' }}>
+                                    <label className="input-label">Company Name</label>
+                                    <input type="text" className="input-field" value={form.origin.company} onChange={(e) => handleFormChange('origin', 'company', e.target.value)} />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Country Code</label>
+                                        <input type="text" className="input-field" disabled value={form.origin.country} style={{ backgroundColor: '#f1f5f9' }} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">EORI / Tax ID</label>
+                                        <input type="text" className="input-field" placeholder="e.g. GB123456789" value={form.origin.eori} onChange={(e) => handleFormChange('origin', 'eori', e.target.value)} />
+                                    </div>
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '1rem' }}>
+                                    <label className="input-label">Address *</label>
+                                    <input type="text" className="input-field" required value={form.origin.address} onChange={(e) => handleFormChange('origin', 'address', e.target.value)} />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Zip Code</label>
+                                        <input type="text" className="input-field" value={form.origin.zip} onChange={(e) => handleFormChange('origin', 'zip', e.target.value)} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">City *</label>
+                                        <input type="text" className="input-field" required value={form.origin.city} onChange={(e) => handleFormChange('origin', 'city', e.target.value)} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Contact Name *</label>
+                                        <input type="text" className="input-field" required value={form.origin.contact} onChange={(e) => handleFormChange('origin', 'contact', e.target.value)} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">Contact Phone *</label>
+                                        <input type="text" className="input-field" required placeholder="+41 78 123 45 67" value={form.origin.phone} onChange={(e) => handleFormChange('origin', 'phone', e.target.value)} />
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section>
+                                <SectionHeader title="Payment & Compliance" icon={ShieldCheck} />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Shipping Charges</label>
+                                        <select className="input-field" value={form.payment.shippingCharges} onChange={(e) => handleFormChange('payment', 'shippingCharges', e.target.value)}>
+                                            <option value="SENDER">Sender</option>
+                                            <option value="RECEIVER">Receiver</option>
+                                        </select>
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">Duties and Taxes</label>
+                                        <select className="input-field" value={form.payment.dutiesTaxes} onChange={(e) => handleFormChange('payment', 'dutiesTaxes', e.target.value)}>
+                                            <option value="SENDER">Sender</option>
+                                            <option value="RECEIVER">Receiver</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="input-group">
+                                    <label className="input-label">IOSS Number (EU Exports)</label>
+                                    <input type="text" className="input-field" placeholder="IM1234567890" value={form.payment.iossNumber} onChange={(e) => handleFormChange('payment', 'iossNumber', e.target.value)} />
+                                </div>
+                            </section>
+                        </div>
+
+                        {/* RIGHT COLUMN */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                            <section>
+                                <SectionHeader title="Delivery Information" icon={MapPin} />
+                                <div className="input-group" style={{ marginBottom: '1rem' }}>
+                                    <label className="input-label">Company Name</label>
+                                    <input type="text" className="input-field" placeholder="Recipient Company" value={form.dest.company} onChange={(e) => handleFormChange('dest', 'company', e.target.value)} />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Country Code</label>
+                                        <input type="text" className="input-field" disabled value={form.dest.country} style={{ backgroundColor: '#f1f5f9' }} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">EORI / Tax ID</label>
+                                        <input type="text" className="input-field" placeholder="Recipient Tax ID" value={form.dest.eori} onChange={(e) => handleFormChange('dest', 'eori', e.target.value)} />
+                                    </div>
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '1rem' }}>
+                                    <label className="input-label">Address *</label>
+                                    <input type="text" className="input-field" required value={form.dest.address} onChange={(e) => handleFormChange('dest', 'address', e.target.value)} />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Zip Code</label>
+                                        <input type="text" className="input-field" value={form.dest.zip} onChange={(e) => handleFormChange('dest', 'zip', e.target.value)} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">City *</label>
+                                        <input type="text" className="input-field" required value={form.dest.city} onChange={(e) => handleFormChange('dest', 'city', e.target.value)} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Contact Name *</label>
+                                        <input type="text" className="input-field" required value={form.dest.contact} onChange={(e) => handleFormChange('dest', 'contact', e.target.value)} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">Contact Phone *</label>
+                                        <input type="text" className="input-field" required placeholder="+XX XXXXXXXX" value={form.dest.phone} onChange={(e) => handleFormChange('dest', 'phone', e.target.value)} />
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section>
+                                <SectionHeader title="Invoice & Commodities" icon={ShieldCheck} />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Invoice Number</label>
+                                        <input type="text" className="input-field" value={form.invoice.number} onChange={(e) => handleFormChange('invoice', 'number', e.target.value)} />
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">Invoice Type</label>
+                                        <select className="input-field" value={form.invoice.type} onChange={(e) => handleFormChange('invoice', 'type', e.target.value)}>
+                                            <option value="PROFORMA">Proforma Invoice</option>
+                                            <option value="COMMERCIAL">Commercial Invoice</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="input-group" style={{ marginBottom: '1rem' }}>
+                                    <label className="input-label">Signer / Responsible Person</label>
+                                    <input type="text" className="input-field" placeholder="Full Name" value={form.invoice.signature} onChange={(e) => handleFormChange('invoice', 'signature', e.target.value)} />
+                                </div>
+                                {form.items.map((item, index) => (
+                                    <div key={index} style={{ marginBottom: '1.5rem', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '8px', position: 'relative', background: 'white' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                            <h5 style={{ margin: 0, color: '#0f172a', fontSize: '0.9rem', fontWeight: 700 }}>Product Item #{index + 1}</h5>
+                                            {form.items.length > 1 && (
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => removeItem(index)} 
+                                                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', fontWeight: 600 }}
+                                                >
+                                                    <X size={14} /> Remove
+                                                </button>
+                                            )}
+                                        </div>
+                                        
+                                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div className="input-group">
+                                                <label className="input-label">Good Description *</label>
+                                                <input type="text" className="input-field" required value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">HS Code</label>
+                                                <input type="text" className="input-field" placeholder="6-10 digits" value={item.hsCode} onChange={(e) => handleItemChange(index, 'hsCode', e.target.value)} />
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div className="input-group">
+                                                <label className="input-label">Quantity</label>
+                                                <input type="number" className="input-field" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} />
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">Unit Price ({item.currency})</label>
+                                                <input type="number" className="input-field" min="0" value={item.unitPrice} onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)} />
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">UOM</label>
+                                                <select className="input-field" value={item.uom} onChange={(e) => handleItemChange(index, 'uom', e.target.value)}>
+                                                    <option value="Pieces">Pieces</option>
+                                                    <option value="Sets">Sets</option>
+                                                    <option value="Meters">Meters</option>
+                                                    <option value="Kilograms">Kilograms</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem' }}>
+                                            <div className="input-group">
+                                                <label className="input-label">Net Weight (kg)</label>
+                                                <input type="number" className="input-field" step="0.1" value={item.netWeight} onChange={(e) => handleItemChange(index, 'netWeight', e.target.value)} />
+                                            </div>
+                                            <div className="input-group">
+                                                <label className="input-label">Country of Origin</label>
+                                                <input type="text" className="input-field" maxLength="2" value={item.origin} onChange={(e) => handleItemChange(index, 'origin', e.target.value.toUpperCase())} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                <button 
+                                    type="button" 
+                                    onClick={addItem} 
+                                    style={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        gap: '0.5rem', 
+                                        padding: '0.75rem 1rem', 
+                                        background: '#f1f5f9', 
+                                        border: '1px solid #cbd5e1', 
+                                        borderRadius: '8px', 
+                                        cursor: 'pointer', 
+                                        fontSize: '0.9rem', 
+                                        fontWeight: 600, 
+                                        color: '#334155', 
+                                        marginBottom: '2rem',
+                                        width: '100%',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.background = '#e2e8f0'}
+                                    onMouseOut={(e) => e.target.style.background = '#f1f5f9'}
+                                >
+                                    <Plus size={18} /> Add Another Product
+                                </button>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div className="input-group">
+                                        <label className="input-label">Reason for Export</label>
+                                        <select className="input-field" value={form.items[0].reasonForExport} onChange={(e) => handleItemChange(0, 'reasonForExport', e.target.value)}>
+                                            <option value="SALE">Sale</option>
+                                            <option value="GIFT">Gift</option>
+                                            <option value="SAMPLE">Sample</option>
+                                            <option value="RETURN">Return</option>
+                                        </select>
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="input-label">Incoterms</label>
+                                        <select className="input-field" value={form.items[0].incoterms} onChange={(e) => handleItemChange(0, 'incoterms', e.target.value)}>
+                                            <option value="DAP">DAP - Delivered at Place</option>
+                                            <option value="DDP">DDP - Delivered Duty Paid</option>
+                                            <option value="FCA">FCA - Free Carrier</option>
+                                            <option value="EXW">EXW - Ex Works</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section style={{ marginTop: '2rem', padding: '1.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1e293b', marginBottom: '1rem', fontSize: '1rem' }}>
+                                    <FileUp size={20} color="var(--primary)" /> International Documents (Optional)
+                                </h4>
+                                <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem' }}>
+                                    We will automatically generate your Pro Forma Invoice. You can upload additional documents (Packing List, customs forms) below.
+                                </p>
+
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
+                                    {selectedFiles.map((f, i) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'white', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.85rem' }}>
+                                            <span style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeFile(i)}
+                                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex' }}
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <label style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem', background: 'white', border: '1px solid var(--primary)', borderRadius: '8px', color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
+                                    <Plus size={18} /> Add Document
+                                    <input type="file" multiple onChange={handleFileChange} style={{ display: 'none' }} />
+                                </label>
+                            </section>
+                        </div>
+                    </div>
+
+                    <div style={{ marginTop: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', borderTop: '2px solid #f1f5f9', paddingTop: '2rem' }}>
+                        <div style={{ width: '100%', maxWidth: '500px', display: 'flex', flexDirection: 'column', gap: '1rem', background: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', color: '#64748b' }}>
+                                <span>Shipping Base Rate</span>
+                                <span>{data.pricing?.currency || 'CHF'} {(parseFloat(data.pricing?.totalPrice || 0) - 15).toFixed(2)}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', color: 'var(--accent)', fontWeight: 700 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <ShieldCheck size={18} /> Limber Cargo Handling Fee
+                                </span>
+                                <span>{data.pricing?.currency || 'CHF'} 15.00</span>
+                            </div>
+                            <div style={{ height: '1px', background: '#e2e8f0', margin: '0.5rem 0' }} />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
+                                <span>Final Estimate</span>
+                                <span>{data.pricing?.currency || 'CHF'} {data.pricing?.totalPrice || '---'}</span>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '500px' }}>
+                            <button type="button" className="btn-primary" style={{ background: 'var(--text-muted)', flex: 1 }} onClick={onBack}>
+                                <ArrowLeft size={18} style={{ marginRight: '0.5rem' }} /> Back
+                            </button>
+                            <button type="submit" className="btn-primary" style={{ flex: 2, background: '#e65100' }} disabled={submitting}>
+                                {submitting ? 'Processing...' : 'Submit Booking'}
+                                {!submitting && <Send size={18} style={{ marginLeft: '0.5rem' }} />}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default Step3Booking;

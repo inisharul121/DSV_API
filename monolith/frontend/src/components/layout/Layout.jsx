@@ -1,0 +1,70 @@
+import React from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import Header from './Header';
+import { useNavigate } from 'react-router-dom';
+
+const Layout = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const [adminInfo, setAdminInfo] = React.useState({ name: 'Admin', role: 'Administrator' });
+
+    // Access Control: Only Staff/Admin can access this area
+    React.useEffect(() => {
+        const adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            navigate('/login');
+            return;
+        }
+
+        const storedInfo = localStorage.getItem('adminInfo');
+        if (storedInfo) {
+            try {
+                setAdminInfo(JSON.parse(storedInfo));
+            } catch (e) {
+                console.error('Error parsing adminInfo:', e);
+            }
+        }
+    }, [navigate]);
+
+    // Map routes to titles
+    const getPageTitle = (pathname) => {
+        switch (pathname) {
+            case '/dashboard': return 'Dashboard Overview';
+            case '/order': return 'Order';
+            case '/shipments': return 'Shipment Management';
+            case '/orders': return 'Order History';
+            case '/customers': return 'Customer Directory';
+            case '/payments': return 'Payment History';
+            case '/reports': return 'Detailed Reports';
+            case '/profile': return 'User Profile';
+            default: return 'DSV XPress';
+        }
+    };
+
+    const getPageSubtitle = (pathname) => {
+        switch (pathname) {
+            case '/dashboard': return `Welcome back, ${adminInfo.name}! Here is what is happening today.`;
+            case '/order': return 'Follow the steps below to book a new order.';
+            default: return 'Manage your DSV XPress operations.';
+        }
+    };
+
+    return (
+        <div className="layout" style={{ display: 'flex', minHeight: '100vh' }}>
+            <Sidebar />
+            <main className="main-content" style={{ marginLeft: 'var(--sidebar-width)', flex: 1, padding: '2rem 3rem' }}>
+                <Header
+                    title={getPageTitle(location.pathname)}
+                    subtitle={getPageSubtitle(location.pathname)}
+                />
+                <div className="view-container" style={{ marginTop: '2rem' }}>
+                    <Outlet />
+                </div>
+            </main>
+        </div>
+    );
+};
+
+export default Layout;

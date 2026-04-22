@@ -1,0 +1,18 @@
+{
+  "name": "dsv-api-monolith",
+  "version": "1.0.0",
+  "description": "DSV API Monolith - Backend and Frontend combined for cPanel hosting",
+  "main": "backend/src/app.js",
+  "scripts": {
+    "build": "node build.js",
+    "start": "cd backend && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "prepare-deploy": "npm run build"
+  },
+  "keywords": ["dsv", "api", "monolith", "cpanel"],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -30,12 +30,15 @@ app.use(express.urlencoded({ extended: true }));
 
 const orderController = require('./controllers/orderController');
 
-// Serve static templates
-app.use('/api/templates', express.static(path.resolve('./public/templates'))); 
+// Serve static templates and generated files
+app.use('/api/templates', express.static(path.join(__dirname, '../public/templates'))); 
+app.use('/api/labels', express.static(path.join(__dirname, '../public/labels')));
+app.use('/api/invoices', express.static(path.join(__dirname, '../public/invoices')));
 
-// Dynamic serving & Static Fallback for runtime-generated files
-app.use('/api/labels', express.static(path.resolve('./public/labels')));
-app.use('/api/invoices', express.static(path.resolve('./public/invoices')));
+// Serve ALL static files from the public folder (Vite frontend build)
+const publicPath = path.join(__dirname, '../public');
+console.log(`[Static] Serving files from: ${publicPath}`);
+app.use(express.static(publicPath));
 
 app.get('/api/labels/:filename', orderController.serveDynamicLabel);
 app.get('/api/invoices/:filename', orderController.serveDynamicInvoice);
@@ -45,17 +48,39 @@ const apiRoutes = require('./routes/api');
 app.use('/api', authMiddleware, apiRoutes);
 
 // Root route for health check
-app.get('/', (req, res) => {
+app.get('/api/health', (req, res) => {
     res.json({ message: 'DSV XPress API is operational', version: '2.0.0' });
+});
+
+// Fallback to index.html for React SPA (MUST be after API routes)
+app.get(/.*/, (req, res) => {
+    const indexPath = path.join(__dirname, '../public/index.html');
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error(`[Static] Error sending index.html from: ${indexPath}`);
+            res.status(404).json({ error: 'Frontend entry point missing', path: indexPath });
+        }
+    });
 });
 
 // Error Handling
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    const { logAuth } = require('./utils/logger');
+    const errorMessage = err.message || 'Unknown Error';
+    const errorStack = err.stack || '';
+
+    console.error(`[GlobalError] ${errorMessage}`);
+    logAuth(`[ERROR] 500 at ${req.url} - Message: ${errorMessage}`);
+    if (errorStack) {
+        // Log a snippet of the stack to the file too
+        logAuth(`[STACK] ${errorStack.split('\n').slice(0, 3).join(' | ')}`);
+    }
+
     res.status(500).json({
         success: false,
         error: 'Internal Server Error',
-        message: config.env === 'development' ? err.message : undefined
+        message: errorMessage, // Temporarily expose for debugging
+        debug_hint: 'Check /logs/auth-debug.log for full stack trace'
     });
 });
 
@@ -74,26 +99,22 @@ if (process.env.VERCEL) {
         .catch(err => console.error('Database connection/sync failed (Vercel):', err));
 } else if (require.main === module) {
     // Safer initialization: Authenticate without altering schema by default
-    // (Helps avoid "Too many keys" errors on Railway)
     sequelize.authenticate()
         .then(() => {
             console.log('Database connected successfully');
-            
-            // Sync schema locally to add the new invoiceData column
-            return sequelize.sync({ alter: true });
+            return sequelize.sync({ alter: false });
         })
         .then(() => {
-            const server = app.listen(config.port, () => {
-                console.log(`Server running on port ${config.port} in ${config.env} mode`);
-            });
-            server.on('error', (err) => {
-                console.error('Server error:', err);
+            app.listen(config.port, () => {
+                console.log(`[Server] Port: ${config.port}`);
+                console.log(`[Server] Environment: ${config.env}`);
             });
         })
         .catch((err) => {
-            console.error('Database connection or sync failed:', err);
+            console.error('Database connection failed:', err);
+            // Even if DB fails, we still listen so the server at least starts
             app.listen(config.port, () => {
-                console.log(`Server running on port ${config.port} in ${config.env} mode (DB Issue)`);
+                console.log(`[Server] Listening on ${config.port} (DB Connection Pending)`);
             });
         });
 }

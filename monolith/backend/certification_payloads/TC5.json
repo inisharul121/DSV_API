@@ -1,0 +1,60 @@
+{
+    "dsvAccount": 8004990000,
+    "pickup": {
+        "requestPickup": true,
+        "collectDateFrom": "2026-02-26T09:00:00Z",
+        "collectDateTo": "2026-02-26T13:00:00Z",
+        "pickupInstructions": "Ready at front desk",
+        "address": {
+            "companyName": "BCIC Swiss GmbH",
+            "addressLine1": "Lättichstrasse 6",
+            "city": "Baar",
+            "countryCode": "CH",
+            "zipCode": "6340",
+            "contactName": "Mazharul Sheikh",
+            "contactPhoneNumber": "+41 786195928"
+        }
+    },
+    "delivery": {
+        "companyName": "European Partner IT",
+        "addressLine1": "Via Milano 10",
+        "city": "Milan",
+        "countryCode": "IT",
+        "zipCode": "20121",
+        "contactName": "Marco Rossi",
+        "contactPhoneNumber": "+39 02 1234567",
+        "residential": false
+    },
+    "paymentInformation": {
+        "shippingChargesPayment": {
+            "paymentType": "SENDER"
+        },
+        "dutiesAndTaxesPayment": {
+            "paymentType": "RECEIVER"
+        }
+    },
+    "serviceOptions": {
+        "packageType": "PARCELS",
+        "serviceCode": "DSVEconomy"
+    },
+    "dimensionUnit": "CM",
+    "weightUnit": "KG",
+    "packages": [
+        {
+            "length": 20,
+            "width": 20,
+            "height": 20,
+            "grossWeight": 5.0
+        }
+    ],
+    "commodities": [
+        {
+            "originCountryCode": "CH",
+            "goodsDescription": "General Cargo",
+            "goodsValue": {
+                "currencyCode": "CHF",
+                "monetaryValue": 100
+            }
+        }
+    ]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "dsv_api",
+  "version": "1.0.0",
+  "description": "**Comprehensive Implementation Guide for Web Development Team**",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@sparticuz/chromium": "123.0.1",
+    "axios": "^1.13.4",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "form-data": "^4.0.5",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "mysql2": "^3.18.2",
+    "pdfkit": "^0.17.2",
+    "puppeteer": "^24.39.0",
+    "puppeteer-core": "22.6.0",
+    "sequelize": "^6.37.7",
+    "tslib": "2.8.1"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.2.2"
+  }
+}

@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 
-const JWT_SECRET = process.env.JWT_ADMIN_SECRET || 'limber-cargo-admin-secret-2026';
+const JWT_SECRET = process.env.JWT_ADMIN_SECRET || process.env.JWT_SECRET || 'limber-cargo-admin-secret-2026';
 const JWT_EXPIRES = '24h';
 
 // POST /api/auth/admin/register

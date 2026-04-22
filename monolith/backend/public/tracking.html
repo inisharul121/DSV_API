@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Shipment - DSV XPress</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <a href="/" class="logo">DSV XPress Portal</a>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/booking.html">New Booking</a>
+            <a href="/tracking.html" class="active">Track Shipment</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Track Your Shipment</h1>
+
+        <div class="card" style="max-width: 600px; margin: 2rem auto;">
+            <div class="form-group">
+                <label class="form-label">Shipment ID / Tracking Number</label>
+                <div style="display: flex; gap: 1rem;">
+                    <input type="text" id="trackingInput" class="form-control" placeholder="e.g. SHP-123456789">
+                    <button onclick="trackShipment()" class="btn btn-primary">Track</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="trackingResult" class="card" style="max-width: 800px; margin: 2rem auto; display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h3>Shipment Status</h3>
+                <span id="statusBadge" class="badge">In Transit</span>
+            </div>
+
+            <div class="timeline" id="trackingTimeline">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

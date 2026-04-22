@@ -1,0 +1,60 @@
+{
+    "dsvAccount": 8004990000,
+    "pickup": {
+        "requestPickup": true,
+        "collectDateFrom": "2026-02-26T09:00:00Z",
+        "collectDateTo": "2026-02-26T13:00:00Z",
+        "pickupInstructions": "Ready at front desk",
+        "address": {
+            "companyName": "BCIC Swiss GmbH",
+            "addressLine1": "Lättichstrasse 6",
+            "city": "Baar",
+            "countryCode": "CH",
+            "zipCode": "6340",
+            "contactName": "Mazharul Sheikh",
+            "contactPhoneNumber": "+41 786195928"
+        }
+    },
+    "delivery": {
+        "companyName": "Swiss Logistics Partner",
+        "addressLine1": "Bahnhofstrasse 12",
+        "city": "Zurich",
+        "countryCode": "CH",
+        "zipCode": "8001",
+        "contactName": "Hans Schmidt",
+        "contactPhoneNumber": "+41 44 123 45 67",
+        "residential": false
+    },
+    "paymentInformation": {
+        "shippingChargesPayment": {
+            "paymentType": "SENDER"
+        },
+        "dutiesAndTaxesPayment": {
+            "paymentType": "RECEIVER"
+        }
+    },
+    "serviceOptions": {
+        "packageType": "DOCUMENT",
+        "serviceCode": "DSVAirExpress"
+    },
+    "dimensionUnit": "CM",
+    "weightUnit": "KG",
+    "packages": [
+        {
+            "length": 30,
+            "width": 25,
+            "height": 2,
+            "grossWeight": 0.5
+        }
+    ],
+    "commodities": [
+        {
+            "originCountryCode": "CH",
+            "goodsDescription": "Confidential Documents",
+            "goodsValue": {
+                "currencyCode": "CHF",
+                "monetaryValue": 5
+            }
+        }
+    ]
+}

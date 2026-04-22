@@ -4,7 +4,7 @@ const Customer = require('../models/Customer');
 const Order = require('../models/Order');
 const { Sequelize } = require('sequelize');
 
-const JWT_SECRET = process.env.JWT_CUSTOMER_SECRET || 'limber-cargo-customer-secret-2026';
+const JWT_SECRET = process.env.JWT_CUSTOMER_SECRET || process.env.JWT_SECRET || 'limber-cargo-customer-secret-2026';
 const JWT_EXPIRES = '7d';
 
 // POST /api/auth/customer/register

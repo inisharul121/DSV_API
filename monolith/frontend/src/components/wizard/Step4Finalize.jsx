@@ -1,0 +1,222 @@
+import React, { useState } from 'react';
+import { CheckCircle2, Download, Printer, Truck, ArrowLeft, Loader2, ExternalLink, FileUp, X } from 'lucide-react';
+import dsvApi from '../../api/dsvApi';
+import { toast } from 'react-hot-toast';
+
+const Step4Finalize = ({ data, onBack }) => {
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [bookingResult, setBookingResult] = useState(null);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        setSelectedFiles(prev => [...prev, ...files]);
+    };
+
+    const removeFile = (index) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleBook = async () => {
+        setLoading(true);
+        try {
+            const shipmentData = {
+                origin_country: data.sender.countryCode,
+                origin_zip: data.sender.zipCode,
+                origin_city: data.sender.city,
+                origin_address: data.sender.address,
+                origin_company: data.sender.companyName,
+                origin_contact: data.sender.contactName,
+                origin_phone: data.sender.contactPhone,
+                origin_email: data.sender.contactEmail,
+
+                dest_country: data.receiver.countryCode,
+                dest_zip: data.receiver.zipCode,
+                dest_city: data.receiver.city,
+                dest_address: data.receiver.address,
+                dest_company: data.receiver.companyName,
+                dest_contact: data.receiver.contactName,
+                dest_phone: data.receiver.contactPhone,
+                dest_email: data.receiver.contactEmail,
+
+                weight: data.weight,
+                length: data.dimensions.length,
+                width: data.dimensions.width,
+                height: data.dimensions.height,
+
+                dsvAccount: "8004990000",
+                serviceCode: data.direction === 'import' ? 'DSVAirExpressImport' : 'DSVAirExpress',
+                packageType: 'PARCELS',
+                currencyCode: 'CHF'
+            };
+
+            const formData = new FormData();
+            formData.append('shipmentData', JSON.stringify(shipmentData));
+
+            selectedFiles.forEach(file => {
+                formData.append('documents', file);
+            });
+
+            const response = await dsvApi.post('/bookings/simple', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            if (response.data.success) {
+                setSuccess(true);
+                setBookingResult(response.data);
+                toast.success('Booking created successfully!');
+            } else {
+                toast.error('Booking failed: ' + (response.data.error?.message || response.data.error));
+            }
+        } catch (err) {
+            console.error('Booking error:', err);
+            toast.error('Network error during booking');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (success) {
+        return (
+            <div className="form-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+                <CheckCircle2 size={80} color="var(--success)" style={{ margin: '0 auto 2rem' }} />
+                <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '1.5rem' }}>Shipment Booked Successfully!</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2.5rem' }}>
+                    Your shipment has been confirmed with DSV. Tracking ID: <strong>{bookingResult.bookingId}</strong>
+                </p>
+
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                    {bookingResult.labelUrl && (
+                        <a
+                            href={bookingResult.labelUrl}
+                            target="_blank"
+                            className="btn-primary"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                        >
+                            <Download size={20} /> Download Label PDF
+                        </a>
+                    )}
+                    <button
+                        className="btn-primary"
+                        style={{ background: 'var(--primary-light)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                    >
+                        <Truck size={20} /> Track Shipment
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <div className="form-card" style={{ padding: '3rem' }}>
+                <h2 style={{ marginBottom: '2rem', borderBottom: '2px solid var(--accent)', paddingBottom: '0.5rem' }}>
+                    Final Summary
+                </h2>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
+                    <div>
+                        <h4 style={{ color: 'var(--text-muted)', marginBottom: '1rem', textTransform: 'uppercase', fontSize: '0.8rem' }}>Route & Size</h4>
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ fontWeight: 700 }}>{data.sender.countryCode} → {data.receiver.countryCode}</div>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{data.direction === 'export' ? 'Export' : 'Import'}</div>
+                        </div>
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ fontWeight: 700 }}>{data.weight} kg</div>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{data.dimensions.length}x{data.dimensions.width}x{data.dimensions.height} cm</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style={{ color: 'var(--text-muted)', marginBottom: '1rem', textTransform: 'uppercase', fontSize: '0.8rem' }}>Price Estimate</h4>
+                        {data.pricing ? (
+                            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--accent)' }}>
+                                CHF {data.pricing.totalPrice}
+                            </div>
+                        ) : (
+                            <div style={{ color: 'var(--error)' }}>Rate unavailable</div>
+                        )}
+                    </div>
+                </div>
+
+                <hr style={{ margin: '2rem 0', border: '0', borderTop: '1px solid #e2e8f0' }} />
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                    <div>
+                        <h4 style={{ color: 'var(--text-muted)', marginBottom: '1rem', textTransform: 'uppercase', fontSize: '0.8rem' }}>Pickup (Sender)</h4>
+                        <div style={{ fontSize: '0.9rem' }}>
+                            <div style={{ fontWeight: 700 }}>{data.sender.companyName}</div>
+                            <div>{data.sender.address}</div>
+                            <div>{data.sender.zipCode} {data.sender.city}</div>
+                            <div style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>{data.sender.contactName}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style={{ color: 'var(--text-muted)', marginBottom: '1rem', textTransform: 'uppercase', fontSize: '0.8rem' }}>Delivery (Receiver)</h4>
+                        <div style={{ fontSize: '0.9rem' }}>
+                            <div style={{ fontWeight: 700 }}>{data.receiver.companyName}</div>
+                            <div>{data.receiver.address}</div>
+                            <div>{data.receiver.zipCode} {data.receiver.city}</div>
+                            <div style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>{data.receiver.contactName}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ marginTop: '2.5rem', padding: '1.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#1e293b', marginBottom: '1rem', fontSize: '1rem' }}>
+                        <FileUp size={20} color="var(--primary)" /> International Documents (Optional)
+                    </h4>
+                    <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.5rem' }}>
+                        We will automatically generate your Pro Forma Invoice. You can upload additional documents (Packing List, customs forms) below.
+                    </p>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
+                        {selectedFiles.map((f, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'white', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.85rem' }}>
+                                <span style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+                                <button
+                                    onClick={() => removeFile(i)}
+                                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex' }}
+                                >
+                                    <X size={14} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    <label style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem', background: 'white', border: '1px solid var(--primary)', borderRadius: '8px', color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
+                        <Plus size={18} /> Add Document
+                        <input type="file" multiple onChange={handleFileChange} style={{ display: 'none' }} />
+                    </label>
+                </div>
+
+                <div style={{ marginTop: '3rem', display: 'flex', gap: '1rem' }}>
+                    <button
+                        type="button"
+                        className="btn-primary"
+                        style={{ background: 'var(--text-muted)', flex: 1 }}
+                        onClick={onBack}
+                        disabled={loading}
+                    >
+                        <ArrowLeft size={18} /> Edit Details
+                    </button>
+                    <button
+                        type="button"
+                        className="btn-primary"
+                        style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}
+                        onClick={handleBook}
+                        disabled={loading || !data.pricing}
+                    >
+                        {loading ? <Loader2 className="spin" size={24} /> : <Printer size={24} />}
+                        {loading ? 'Processing Booking...' : 'Confirm & Book Now'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Step4Finalize;
